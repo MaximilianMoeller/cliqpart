@@ -20,7 +20,7 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 # Enable C++ compilation unless explicitly deselected.
 # NOTE: This is no longer needed, as CXX is selected as the default language for this project.
 # NOTE: However, all occurrences of “if(CXX) …” will remain such as to keep the original code from the gurobi forum.
-# option(CXX "enable C++ compilation" ON)
+option(CXX "enable C++ compilation" ON)
 if(CXX)
     enable_language(CXX)
     set(CMAKE_CXX_STANDARD 17)
