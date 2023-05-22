@@ -1,4 +1,6 @@
 /build/
+cliqpart
+log
 
 # Prerequisites
 *.d

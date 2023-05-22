@@ -16,3 +16,12 @@ And to build the project to `build/bin/cliqpart`:
 ```
 cmake --build build
 ```
+
+## License and Copyright
+
+cliqpart is licenced under the [MIT License](LICENSE),
+and uses the following external libraries,
+which might be licensed under different license agreements:
+    
+- [TCLAP](https://tclap.sourceforge.net) for command line argument parsing
+- [gurobi](https://www.gurobi.com) as the ILP solver

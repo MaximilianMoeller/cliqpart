@@ -52,6 +52,7 @@ endif()
 
 find_package(GUROBI REQUIRED)
 include_directories(${GUROBI_INCLUDE_DIRS})
+include_directories(include)
 
 # All source code is under src/
 add_subdirectory(src)

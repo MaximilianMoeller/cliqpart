@@ -9,4 +9,3 @@ if(CXX)
             debug ${GUROBI_CXX_DEBUG_LIBRARY})
 endif()
 target_link_libraries(${CMAKE_PROJECT_NAME} ${GUROBI_LIBRARY})
-

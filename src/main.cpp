@@ -15,6 +15,8 @@
 #include <algorithm>
 #include <iterator>
 #include <iostream>
+#include <tclap/CmdLine.h>
+
 
 
 using namespace std;
@@ -37,6 +39,9 @@ protected:
                 // iterate through whole graph to find a violated triangle
                 for (int i = 0; i < n; ++i) {
                     for (int j = 0; j < i; ++j) {
+                        // if kante = 1, gleichung eh nihct verletzt => continue
+
+                        // ggf. für ein paar (i,j) nur einen verletzten knoten suchen
                         for (int k = 0; k < j; ++k) {
 
                             // get the values of all the edge decisions
@@ -50,10 +55,10 @@ protected:
                             // gurobi might return values slightly fractional
                             if (1.5 < sum && sum < 2.5) {
                                 clog << "Found violated triangle: " << i << "-" << j << "-" << k << endl;
+                                // TODO: nur die verletzte ungleichung hinzufügen
                                 addLazy(x_ij + x_ik - x_jk <= 1);
                                 addLazy(x_ij - x_ik + x_jk <= 1);
                                 addLazy(-x_ij + x_ik + x_jk <= 1);
-                                return;
                             }
                         }
                     }
@@ -76,8 +81,12 @@ main(int argc,
         cout << "Usage: cliqpart size" << endl;
         return 1;
     }
+    // random number sampling ersetzen durch „sinnvolle“ daten, z.b. erst cluster erzeugen und dann von 2 gebiasden verteilungen samplen
+
+
     // random numbers generator (copied from https://stackoverflow.com/a/19728404)
-    const int min = -10, max = 10;
+    // seeden für Vergleichbarkeit
+    const int min = -5, max = 15;
     std::random_device rd;     // Only used once to initialise (seed) engine
     std::mt19937 rng(rd());    // Random-number engine used (Mersenne-Twister in this case)
     std::uniform_int_distribution<int> uni(min, max); // Guaranteed unbiased
@@ -106,6 +115,8 @@ main(int argc,
         // x_ij indicates whether the edge from node i to node j is in the clique partitioning or not
         for (i = 0; i < n; i++) {
             for (j = 0; j <= i; j++) {
+                //int weight = uni(rng) ? 1 : -1;
+                //if (i == j) continue;
                 int weight = uni(rng);
                 clog << "weight of x_" << i << j << ": " << weight << endl;
                 vars[i][j] = model.addVar(0.0, 1.0, weight,
@@ -144,14 +155,14 @@ main(int argc,
             for (i = 0; i < n; i++)
                 sol[i] = model.get(GRB_DoubleAttr_X, vars[i], n);
 
-            cout << "Solution:" << endl;
+            cout << "Solution:" << endl << "\t";
             for (int i = 0; i < n; ++i) {
-                cout << " \t" << i;
+                cout << i << "\t";
             }
-            cout << endl << std::string((n + 1) * 8, '-') << endl;
+            cout << endl << std::string((n+1) * 8, '-') << endl;
             for (i = 0; i < n; i++) {
-                cout << i << " |\t";
-                std::copy(sol[i], sol[i] + n, std::ostream_iterator<int>(std::cout, "\t"));
+                cout << i << "|\t";
+                std::copy(sol[i], sol[i] + n, std::ostream_iterator<int>(std::cout, "       "));
                 cout << endl;
             }
 
