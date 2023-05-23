@@ -8,8 +8,10 @@ project(cliqpart
         DESCRIPTION "Implementation of a branch and cut algorithm for the clique partitioning problem."
         LANGUAGES CXX)
 
-# Includes all CMake-Files in the cmake directory.
-list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+option(CXX "enable C++ compilation" ON)
+enable_language(CXX)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Default build type is “Release”
 if(NOT CMAKE_BUILD_TYPE)
@@ -17,15 +19,14 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
+
+# Includes all CMake-Files in the cmake directory.
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+
+
 # Enable C++ compilation unless explicitly deselected.
 # NOTE: This is no longer needed, as CXX is selected as the default language for this project.
 # NOTE: However, all occurrences of “if(CXX) …” will remain such as to keep the original code from the gurobi forum.
-option(CXX "enable C++ compilation" ON)
-if(CXX)
-    enable_language(CXX)
-    set(CMAKE_CXX_STANDARD 17)
-    set(CMAKE_CXX_STANDARD_REQUIRED ON)
-endif()
 
 # Set output directories for all artefacts that are built under UNIX.
 if(UNIX)
@@ -50,12 +51,29 @@ if(MSVC AND MT)
     set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /MTd")
 endif()
 
+# Define the target name, i.e. “cliqpart”
+add_executable(${CMAKE_PROJECT_NAME})
+
+# Add source code
+add_subdirectory(src)
+
+# Adding Libraries
 find_package(GUROBI REQUIRED)
 include_directories(${GUROBI_INCLUDE_DIRS})
-include_directories(include)
 
-# All source code is under src/
-add_subdirectory(src)
+set(CLI11_TESTING OFF)
+set(CLI11_PRECOMPILED ON)
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE "extern/CLI11/include")
+#set(CLI11_BINARY_DIR "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/CLI11")
+#mark_as_advanced(CLI_CXX_STD CLI_EXAMPLES CLI_SINGLE_FILE CLI_SINGLE_FILE_TESTS CLI_TESTING)
+#target_link_libraries(${CMAKE_PROJECT_NAME} INTERFACE CLI11::CLI11)
+
+# Link Libraries
+if(CXX)
+    target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE optimized ${GUROBI_CXX_LIBRARY}
+            debug ${GUROBI_CXX_DEBUG_LIBRARY})
+endif()
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE ${GUROBI_LIBRARY})
 
 # Only execute if this file is the toplevel being build (i.e. not a sub-goal in another CMake-File)
 if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR})

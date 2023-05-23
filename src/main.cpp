@@ -15,9 +15,8 @@
 #include <algorithm>
 #include <iterator>
 #include <iostream>
-#include <tclap/CmdLine.h>
-
-
+#include <CLI/CLI.hpp>
+#include <CLI/App.hpp>
 
 using namespace std;
 
@@ -32,7 +31,7 @@ public:
     }
 
 protected:
-    void callback() {
+    void callback() override {
         try {
             if (where == GRB_CB_MIPSOL) {
 
@@ -77,10 +76,17 @@ protected:
 int
 main(int argc,
      char *argv[]) {
-    if (argc < 2) {
-        cout << "Usage: cliqpart size" << endl;
-        return 1;
-    }
+
+    // A complete graph of size n has n*(n-1)/2 edges.
+    int n{5};
+
+    CLI::App app("Comparison Implementation of different branch-and-cut algorithms for CLIQUE PARTITIONING.");
+    app.add_option("DEGREE", n, "The degree of the complete graph")
+            ->required(true);
+    CLI11_PARSE(app, argc, argv);
+
+
+
     // random number sampling ersetzen durch „sinnvolle“ daten, z.b. erst cluster erzeugen und dann von 2 gebiasden verteilungen samplen
 
 
@@ -91,8 +97,6 @@ main(int argc,
     std::mt19937 rng(rd());    // Random-number engine used (Mersenne-Twister in this case)
     std::uniform_int_distribution<int> uni(min, max); // Guaranteed unbiased
 
-    // A complete graph of size n has n*(n-1)/2 edges.
-    int n = atoi(argv[1]);
 
     GRBVar **vars = NULL;
     int i;
@@ -159,7 +163,7 @@ main(int argc,
             for (int i = 0; i < n; ++i) {
                 cout << i << "\t";
             }
-            cout << endl << std::string((n+1) * 8, '-') << endl;
+            cout << endl << std::string((n + 1) * 8, '-') << endl;
             for (i = 0; i < n; i++) {
                 cout << i << "|\t";
                 std::copy(sol[i], sol[i] + n, std::ostream_iterator<int>(std::cout, "       "));
