@@ -17,7 +17,7 @@
 #include <CLI/CLI.hpp>
 #include <CLI/App.hpp>
 
-#include "separators/Cubic_Triangle_Separator.cpp"
+#include "separators/Cubic_Triangle_Separator.h"
 #include "types.h"
 
 using namespace std;
