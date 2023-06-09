@@ -5,6 +5,9 @@
 #ifndef CLIQPART_SRC_RUN_CONFIG_H_
 #define CLIQPART_SRC_RUN_CONFIG_H_
 
-class RunConfig {};
+struct RunConfig {
+  const int degree;
+
+};
 
 #endif // CLIQPART_SRC_RUN_CONFIG_H_
