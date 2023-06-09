@@ -5,8 +5,6 @@
 #ifndef CLIQPART_CUBIC_TRIANGLE_SEPARATOR_H
 #define CLIQPART_CUBIC_TRIANGLE_SEPARATOR_H
 
-#endif //CLIQPART_CUBIC_TRIANGLE_SEPARATOR_H
-
 #include <gurobi_c++.h>
 
 using namespace std;
@@ -21,3 +19,5 @@ public:
 protected:
     void callback() override;
 };
+
+#endif //CLIQPART_CUBIC_TRIANGLE_SEPARATOR_H

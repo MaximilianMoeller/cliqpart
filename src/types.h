@@ -1,10 +1,12 @@
-#pragma once
-
-#include <string>
-
 //
 // Created by max on 26.05.23.
 //
+
+#ifndef CLIQPART_TYPES_H
+#define CLIQPART_TYPES_H
+
+#include <string>
+
 enum class Verbosity {
     Error, Warn, Info, Debug, Trace
 };
@@ -31,3 +33,5 @@ inline std::ostream &operator<<(std::ostream &os, const Verbosity &v) {
     os << t;
     return os;
 }
+
+#endif //CLIQPART_TYPES_H
