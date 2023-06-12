@@ -14,7 +14,7 @@ CompleteGraph::CompleteGraph(RunConfig &config, GRBModel &model) {
 
   // TODO add error handling (file not found, wrong value types, too few lines/columns, empty lines/columns, ignore cells (i,i), …)
   // TODO add configuration support (row/column headers (i.e. labels), global objective offset)
-  rapidcsv::Document doc(config.graph_data, rapidcsv::LabelParams(0, 0));
+  rapidcsv::Document doc(config.graph_data, rapidcsv::LabelParams(-1, -1));
 
   for (int i = 0; i < degree_; i++) {
 	vector<pair<double, GRBVar>> row;

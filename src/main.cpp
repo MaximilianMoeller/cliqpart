@@ -9,6 +9,7 @@
 
 #include "gurobi_c++.h"
 #include <CLI/App.hpp>
+#include <CLI/CLI.hpp>
 #include <algorithm>
 #include <iostream>
 #include <memory>
@@ -21,9 +22,9 @@
 
 using namespace std;
 
-Verbosity verbosity;
-
 int main(int argc, char *argv[]) {
+
+  Verbosity verbosity;
 
   CLI::App app("Comparison Implementation of different branch-and-cut "
 			   "algorithms for CLIQUE PARTITIONING.");
@@ -61,7 +62,7 @@ int main(int argc, char *argv[]) {
 	// Must set LazyConstraints parameter when using lazy constraints
 	model.set(GRB_IntParam_LazyConstraints, 1);
 
-	RunConfig config{.degree= 160, .graph_data = "data/data_jannik.csv", .obj_offset = 0.4};
+	RunConfig config{.degree=5, .graph_data = "data/example.csv", .obj_offset = 0.5};
 	CompleteGraph graph(config, model);
 
 	// Generate separator based on runconfig
