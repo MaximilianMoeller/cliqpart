@@ -6,18 +6,16 @@
 #define CLIQPART_SRC_SEPARATORS_ABSTRACT_SEPARATOR_H_
 
 #include "../verbosity.h"
+#include "../complete_graph.h"
 #include <gurobi_c++.h>
 
 using namespace std;
 
 class AbstractSeparator : public GRBCallback {
- public:
-  // Should only comment on errors by default.
-  AbstractSeparator() : verbosity_(Verbosity::ERROR) {}
-  ~AbstractSeparator() override = 0;
-
  protected:
+  AbstractSeparator(Verbosity verbosity, CompleteGraph &graph) : verbosity_(verbosity), graph_(graph) {}
   Verbosity verbosity_;
+  CompleteGraph& graph_;
   void callback() override = 0;
 };
 

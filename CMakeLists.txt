@@ -57,16 +57,18 @@ add_executable(${CMAKE_PROJECT_NAME})
 # Add source code
 add_subdirectory(src)
 
-# Adding Libraries
+### Adding Libraries ###
+# gurobi for ILP-solving
 find_package(GUROBI REQUIRED)
 include_directories(${GUROBI_INCLUDE_DIRS})
 
+# CLI11 for command line parsing
 set(CLI11_TESTING OFF)
 set(CLI11_PRECOMPILED ON)
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE "extern/CLI11/include")
-#set(CLI11_BINARY_DIR "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/CLI11")
-#mark_as_advanced(CLI_CXX_STD CLI_EXAMPLES CLI_SINGLE_FILE CLI_SINGLE_FILE_TESTS CLI_TESTING)
-#target_link_libraries(${CMAKE_PROJECT_NAME} INTERFACE CLI11::CLI11)
+
+# rapidcsv for CSV file parsing
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE "extern/rapidcsv/src")
 
 # Link Libraries
 if(CXX)
