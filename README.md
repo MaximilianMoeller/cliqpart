@@ -23,5 +23,6 @@ cliqpart is licenced under the [MIT License](LICENSE),
 and uses the following external libraries,
 which might be licensed under different license agreements:
     
-- [TCLAP](https://tclap.sourceforge.net) for command line argument parsing
+- [CLI11](https://github.com/CLIUtils/CLI11) for command line argument parsing
+- [rapidcsv](https://github.com/d99kris/rapidcsv) for CSV file parsing
 - [gurobi](https://www.gurobi.com) as the ILP solver

@@ -1,3 +1,6 @@
 [submodule "cli11"]
 	path = extern/CLI11
 	url = https://github.com/CLIUtils/CLI11.git
+[submodule "rapidcsv"]
+	path = extern/rapidcsv
+	url = https://github.com/d99kris/rapidcsv.git
