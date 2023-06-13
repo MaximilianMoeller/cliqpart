@@ -15,7 +15,6 @@
 #include <memory>
 #include <string>
 
-
 #include "separators/cubic_triangle_separator.h"
 #include "separators/abstract_separator.h"
 #include "separator_factory.h"
@@ -28,17 +27,48 @@
 
 using namespace std;
 
-bool colored_output;
+// validates (non-)existence of the needed files in the run_dir
+struct RunDirValidator : public CLI::Validator {
+  RunDirValidator() {
+	name_ = "RUNDIR";
+	func_ = [](const std::string &str) {
+	  string result;
+	  string helper;
+
+	  // the string should point to an existing directory.
+	  helper = CLI::ExistingDirectory(str);
+	  if (!helper.empty()) return "\n" + helper;
+	  // make sure the run directory ends in '/' otherwise the following checks would contain '//'.
+	  if (str.back() != '/') {
+		return string("\nRun directory must be specified with trailing '/': " + str);
+	  };
+
+	  // RunDir should contain a "run_config.yaml" …
+	  helper = CLI::ExistingFile(str + "run_config.yaml");
+	  if (!helper.empty()) result += "\n" + helper;
+	  // … and a "data.csv".
+	  helper = CLI::ExistingFile(str + "data.csv");
+	  if (!helper.empty()) result += "\n" + helper;
+
+	  return result;
+	};
+  }
+};
 
 int main(int argc, char *argv[]) {
 
+  // can run different settings after each other
+  // every such run is dependent on a few configuration parameters (e.g. selection of heuristics used) and data,
+  // thus every run should be the path to a directory containing a "run_config.yaml" and a "data.csv" file.
   vector<string> runs;
 
   CLI::App app("Comparison Implementation of different branch-and-cut "
 			   "algorithms for CLIQUE PARTITIONING.");
 
+  const static RunDirValidator kRunDirVal;
   app.add_option("RUNS", runs, "Whitespace separated list of run directories (see README -> Usage).")
-	  ->required(true);
+	  ->required(true)
+	  ->check(kRunDirVal);
 
   CLI::Option *v = app.add_flag("-v", "Level of verbosity increases with every use.");
 
@@ -47,46 +77,58 @@ int main(int argc, char *argv[]) {
   plog::Severity log_level;
 
   switch (v->count()) {
-	case 0:log_level = plog::Severity::none;
-	  break;
-	case 1:log_level = plog::Severity::fatal;
-	  break;
-	case 2:log_level = plog::Severity::error;
-	  break;
-	case 3:log_level = plog::Severity::warning;
-	  break;
-	case 4:log_level = plog::Severity::info;
+	case 6:log_level = plog::Severity::verbose;
 	  break;
 	case 5:log_level = plog::Severity::debug;
 	  break;
-	default: log_level = plog::Severity::verbose;
+	case 4:log_level = plog::Severity::info;
+	  break;
+	case 3:log_level = plog::Severity::warning;
+	  break;
+	case 2:log_level = plog::Severity::error;
+	  break;
+	case 1:log_level = plog::Severity::fatal;
+	  break;
+	default: log_level = plog::Severity::none;
 	  break;
   }
 
-  for (string run : runs) {
-	static plog::RollingFileAppender<plog::TxtFormatter> file_appender("log", 16000000, 1000); // Create the 1st appender.
-	static plog::ColorConsoleAppender<plog::TxtFormatter> console_appender; // Create the 2nd appender.
+  // log into a file called "log" before the first run and into "{run_dir}/log" afterwards
+  static plog::RollingFileAppender<plog::TxtFormatter> file_appender("log", 16000000, 1000);
+  // also display colored console logging
+  static plog::ColorConsoleAppender<plog::TxtFormatter> console_appender;
 
-	plog::init(log_level,
-			   &file_appender).addAppender(&console_appender); // Initialize the logger with the both appenders.
+  // Initialize the logger
+  plog::init(log_level,
+			 &file_appender).addAppender(&console_appender);
 
-	try {
+  try {
+	// everything else needs to be rebuilt for every run
+	for (const string &kRunDir : runs) {
+	  // set log file for this run
+	  const string kLogFile = kRunDir + "log";
+	  file_appender.setFileName(kLogFile.c_str());
 
-	  // only one GRBEnv is ever required
+	  // TODO load run_config.yaml here
+	  // TODO run_config should allow rerunning the same config multiple times (for robustness in measurement)
+	  // TODO therefore another loop over the this re-run-count is required
+	  // TODO this should create directories named with timestamps and adjust the logfile again
+	  RunConfig config{.degree=5, .graph_data = "data/example.csv", .obj_offset = 0.5};
+
+	  // always create a new environment instead of reusing the old one to ensure fairness between runs
 	  unique_ptr<GRBEnv> env{new GRBEnv};
 	  GRBModel model = GRBModel(*env);
-
-	  // Must set LazyConstraints parameter when using lazy constraints
+	  // must set LazyConstraints parameter when using lazy constraints
 	  model.set(GRB_IntParam_LazyConstraints, 1);
 
-	  RunConfig config{.degree=5, .graph_data = "data/example.csv", .obj_offset = 0.5};
+	  // load data and create model variables
 	  CompleteGraph graph(config, model);
 
-	  // Generate separator based on runconfig
+	  // generate separator based on run_config
 	  unique_ptr<AbstractSeparator> sep = SeparatorFactory::BuildSeparator(config, graph);
 	  model.setCallback(sep.get());
 
-	  // Optimize model
+	  // optimize model
 	  model.optimize();
 
 	  // Extract solution
@@ -109,12 +151,13 @@ int main(int argc, char *argv[]) {
 //	  }
 //	}
 
-	} catch (GRBException e) {
-	  PLOGE << "Error number: " << e.getErrorCode() << endl;
-	  PLOGE << e.getMessage() << endl;
-	} catch (...) {
-	  PLOGF << "Error during optimization" << endl;
 	}
+  } catch (GRBException
+		   e) {
+	PLOGE << "Error number: " << e.getErrorCode() << endl;
+	PLOGE << e.getMessage() << endl;
+  } catch (...) {
+	PLOGF << "Error during optimization" << endl;
   }
 
   return 0;
