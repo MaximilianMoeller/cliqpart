@@ -13,7 +13,7 @@ using namespace std;
 
 class CubicTriangleSeparator : public AbstractSeparator {
  public:
-  CubicTriangleSeparator(Verbosity verb, CompleteGraph& graph) : AbstractSeparator(verb, graph) {};
+  explicit CubicTriangleSeparator(CompleteGraph& graph) : AbstractSeparator(graph) {};
   ~CubicTriangleSeparator() override= default;
 
  protected:

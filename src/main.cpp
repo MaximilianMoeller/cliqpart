@@ -15,64 +15,81 @@
 #include <memory>
 #include <string>
 
+
 #include "separators/cubic_triangle_separator.h"
-#include "verbosity.h"
 #include "separators/abstract_separator.h"
 #include "separator_factory.h"
 
+#include <plog/Log.h>
+#include <plog/Appenders/RollingFileAppender.h>
+#include <plog/Formatters/TxtFormatter.h>
+#include <plog/Init.h>
+#include <plog/Appenders/ColorConsoleAppender.h>
+
 using namespace std;
+
+bool colored_output;
 
 int main(int argc, char *argv[]) {
 
-  Verbosity verbosity;
+  vector<string> runs;
 
   CLI::App app("Comparison Implementation of different branch-and-cut "
 			   "algorithms for CLIQUE PARTITIONING.");
-  CLI::Option *v = app.add_flag("-v", "Level of verbosity_ increases with every use.");
+
+  app.add_option("RUNS", runs, "Whitespace separated list of run directories (see README -> Usage).")
+	  ->required(true);
+
+  CLI::Option *v = app.add_flag("-v", "Level of verbosity increases with every use.");
 
   CLI11_PARSE(app, argc, argv)
 
+  plog::Severity log_level;
+
   switch (v->count()) {
-	case 0:verbosity = Verbosity::ERROR;
+	case 0:log_level = plog::Severity::none;
 	  break;
-	case 1:verbosity = Verbosity::WARN;
+	case 1:log_level = plog::Severity::fatal;
 	  break;
-	case 2:verbosity = Verbosity::INFO;
+	case 2:log_level = plog::Severity::error;
 	  break;
-	case 3:verbosity = Verbosity::DEBUG;
+	case 3:log_level = plog::Severity::warning;
 	  break;
-	default:
-	  // for 4 or higher
-	  verbosity = Verbosity::TRACE;
+	case 4:log_level = plog::Severity::info;
+	  break;
+	case 5:log_level = plog::Severity::debug;
+	  break;
+	default: log_level = plog::Severity::verbose;
 	  break;
   }
-  cout << "Set verbosity_ level to {" << verbosity << "}." << endl;
 
-  // random number sampling ersetzen durch „sinnvolle“ daten, z.b. erst cluster
-  // erzeugen und dann von 2 gebiasden verteilungen samplen
+  for (string run : runs) {
+	static plog::RollingFileAppender<plog::TxtFormatter> file_appender("log", 16000000, 1000); // Create the 1st appender.
+	static plog::ColorConsoleAppender<plog::TxtFormatter> console_appender; // Create the 2nd appender.
 
-  // seeden für Vergleichbarkeit
+	plog::init(log_level,
+			   &file_appender).addAppender(&console_appender); // Initialize the logger with the both appenders.
 
-  try {
+	try {
 
-	// only one GRBEnv is ever required
-	unique_ptr<GRBEnv> env{new GRBEnv};
-	GRBModel model = GRBModel(*env);
+	  // only one GRBEnv is ever required
+	  unique_ptr<GRBEnv> env{new GRBEnv};
+	  GRBModel model = GRBModel(*env);
 
-	// Must set LazyConstraints parameter when using lazy constraints
-	model.set(GRB_IntParam_LazyConstraints, 1);
+	  // Must set LazyConstraints parameter when using lazy constraints
+	  model.set(GRB_IntParam_LazyConstraints, 1);
 
-	RunConfig config{.degree=5, .graph_data = "data/example.csv", .obj_offset = 0.5};
-	CompleteGraph graph(config, model);
+	  RunConfig config{.degree=5, .graph_data = "data/example.csv", .obj_offset = 0.5};
+	  CompleteGraph graph(config, model);
 
-	// Generate separator based on runconfig
-	unique_ptr<AbstractSeparator> sep = SeparatorFactory::BuildSeparator(config, graph);
-	model.setCallback(sep.get());
+	  // Generate separator based on runconfig
+	  unique_ptr<AbstractSeparator> sep = SeparatorFactory::BuildSeparator(config, graph);
+	  model.setCallback(sep.get());
 
-	// Optimize model
-	model.optimize();
+	  // Optimize model
+	  model.optimize();
 
-	// Extract solution
+	  // Extract solution
 
 //	if (model.get(GRB_IntAttr_SolCount) > 0) {
 //	  double **sol = new double *[degree];
@@ -92,11 +109,12 @@ int main(int argc, char *argv[]) {
 //	  }
 //	}
 
-  } catch (GRBException e) {
-	cout << "Error number: " << e.getErrorCode() << endl;
-	cout << e.getMessage() << endl;
-  } catch (...) {
-	cout << "Error during optimization" << endl;
+	} catch (GRBException e) {
+	  PLOGE << "Error number: " << e.getErrorCode() << endl;
+	  PLOGE << e.getMessage() << endl;
+	} catch (...) {
+	  PLOGF << "Error during optimization" << endl;
+	}
   }
 
   return 0;

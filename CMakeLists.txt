@@ -67,6 +67,9 @@ set(CLI11_TESTING OFF)
 set(CLI11_PRECOMPILED ON)
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE "extern/CLI11/include")
 
+# plog for logging
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE "extern/plog/include")
+
 # rapidcsv for CSV file parsing
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE "extern/rapidcsv/src")
 

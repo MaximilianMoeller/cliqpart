@@ -35,11 +35,6 @@ void CubicTriangleSeparator::callback() {
 			double sum = v_ik + v_jk;
 			// gurobi might return values slightly fractional
 			if (1.75 < sum && sum < 2.25) {
-			  if (verbosity_ == Verbosity::DEBUG)
-				clog << "Δ(" << i << "," << j << "," << k << ")" << endl;
-			  if (verbosity_ == Verbosity::TRACE)
-				clog << "Δ(" << endl << "\t" << i << "-" << j << ":" << v_ij << endl << "\t" << i << "-" << k << ":"
-					 << v_ik << endl << "\t" << j << "-" << k << ":" << v_jk << endl << ")" << endl;
 			  addLazy(-x_ij + x_ik + x_jk <= 1);
 			}
 		  }
