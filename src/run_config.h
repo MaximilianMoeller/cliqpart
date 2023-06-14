@@ -6,15 +6,18 @@
 #define CLIQPART_SRC_RUN_CONFIG_H_
 
 #include <string>
+#include <toml++/toml.h>
+#include <plog/Log.h>
+
 using namespace std;
 
 // TODO read runconfig from config file
 
 struct RunConfig {
   const int degree;
-  const string graph_data;
-
   double obj_offset;
+
+  static RunConfig FromFile(const string& path);
 };
 
 #endif // CLIQPART_SRC_RUN_CONFIG_H_

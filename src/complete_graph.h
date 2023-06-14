@@ -13,7 +13,7 @@ using namespace std;
 
 class CompleteGraph {
  private:
-  // the degree of the complete graph, i.e. the number of nodes
+// the degree of the complete graph, i.e. the number of nodes
   int degree_;
   // 2D-vector (degree x degree) of edge weights (double) and the corresponding gurobi-variables
   vector<vector<pair<double, GRBVar>>> edges_;
@@ -21,9 +21,10 @@ class CompleteGraph {
   pair<double, GRBVar> Get(int v1, int v2);
 
  public:
-  // needs information from the run config to generate edge weights
+  // needs information from the run config to generate edge weights,
+  // a path to the CSV data_path,
   // and the gurobi-model to create the variables
-  explicit CompleteGraph(RunConfig &config, GRBModel &model);
+  explicit CompleteGraph(RunConfig &config, string data_path, GRBModel &model);
 
   [[nodiscard]] int GetDegree() const { return degree_; };
   // often convenient, as the model will have a variable for every edge, not node.

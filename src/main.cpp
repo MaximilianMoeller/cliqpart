@@ -34,8 +34,8 @@ struct RunDirValidator : public CLI::Validator {
 		return string("\nRun directory must be specified with trailing '/': " + str);
 	  };
 
-	  // RunDir should contain a "run_config.yaml" …
-	  helper = CLI::ExistingFile(str + "run_config.yaml");
+	  // RunDir should contain a "run_config.toml" …
+	  helper = CLI::ExistingFile(str + "run_config.toml");
 	  if (!helper.empty()) result += "\n" + helper;
 	  // … and a "data.csv".
 	  helper = CLI::ExistingFile(str + "data.csv");
@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
 
   // can run different settings after each other
   // every such run is dependent on a few configuration parameters (e.g. selection of heuristics used) and data,
-  // thus every run should be the path to a directory containing a "run_config.yaml" and a "data.csv" file.
+  // thus every run should be the path to a directory containing a "run_config.toml" and a "data.csv" file.
   vector<string> runs;
 
   CLI::App app("Comparison Implementation of different branch-and-cut "
@@ -68,19 +68,17 @@ int main(int argc, char *argv[]) {
   plog::Severity log_level;
 
   switch (v->count()) {
-	case 6:log_level = plog::Severity::verbose;
-	  break;
-	case 5:log_level = plog::Severity::debug;
-	  break;
-	case 4:log_level = plog::Severity::info;
-	  break;
-	case 3:log_level = plog::Severity::warning;
+	case 0 ... 1:log_level = plog::Severity::fatal;
 	  break;
 	case 2:log_level = plog::Severity::error;
 	  break;
-	case 1:log_level = plog::Severity::fatal;
+	case 3:log_level = plog::Severity::warning;
 	  break;
-	default: log_level = plog::Severity::none;
+	case 4:log_level = plog::Severity::info;
+	  break;
+	case 5:log_level = plog::Severity::debug;
+	  break;
+	default:log_level = plog::Severity::verbose;
 	  break;
   }
 
@@ -100,11 +98,11 @@ int main(int argc, char *argv[]) {
 	  const string kLogFile = kRunDir + "log";
 	  file_appender.setFileName(kLogFile.c_str());
 
-	  // TODO load run_config.yaml here
+	  // TODO load run_config.toml here
 	  // TODO run_config should allow rerunning the same config multiple times (for robustness in measurement)
 	  // TODO therefore another loop over the this re-run-count is required
 	  // TODO this should create directories named with timestamps and adjust the logfile again
-	  RunConfig config{.degree=5, .graph_data = "data/example.csv", .obj_offset = 0.5};
+	  RunConfig config = RunConfig::FromFile(kRunDir + "run_config.toml");
 
 	  // always create a new environment instead of reusing the old one to ensure fairness between runs
 	  unique_ptr<GRBEnv> env{new GRBEnv};
@@ -113,7 +111,7 @@ int main(int argc, char *argv[]) {
 	  model.set(GRB_IntParam_LazyConstraints, 1);
 
 	  // load data and create model variables
-	  CompleteGraph graph(config, model);
+	  CompleteGraph graph(config, kRunDir + "data.csv", model);
 
 	  // generate separator based on run_config
 	  unique_ptr<AbstractSeparator> sep = SeparatorFactory::BuildSeparator(config, graph);
@@ -148,7 +146,7 @@ int main(int argc, char *argv[]) {
 	PLOGE << "Error number: " << e.getErrorCode() << endl;
 	PLOGE << e.getMessage() << endl;
   } catch (...) {
-	PLOGF << "Error during optimization" << endl;
+	PLOGF << "Unexpected error occurred." << endl;
   }
 
   return 0;

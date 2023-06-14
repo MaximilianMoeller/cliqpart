@@ -73,6 +73,9 @@ target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE "extern/plog/include")
 # rapidcsv for CSV file parsing
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE "extern/rapidcsv/src")
 
+# tomplplusplus for config file parsing
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE "extern/tomlplusplus/include")
+
 # Link Libraries
 if(CXX)
     target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE optimized ${GUROBI_CXX_LIBRARY}

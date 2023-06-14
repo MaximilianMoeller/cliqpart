@@ -9,14 +9,15 @@
 #include "complete_graph.h"
 
 using namespace std;
-CompleteGraph::CompleteGraph(RunConfig &config, GRBModel &model) {
+CompleteGraph::CompleteGraph(RunConfig &config, string data_path, GRBModel &model) {
   degree_ = config.degree;
 
   // TODO add error handling (file not found, wrong value types, too few lines/columns, empty lines/columns, ignore cells (i,i), …)
   // TODO add configuration support (row/column headers (i.e. labels), global objective offset)
-  rapidcsv::Document doc(config.graph_data, rapidcsv::LabelParams(-1, -1));
+  // TODO move opening the file to the main function -> constructor adjustment
+  rapidcsv::Document doc(data_path, rapidcsv::LabelParams(-1, -1));
 
-  for (int i = 0; i < degree_; i++) {
+  for (int i = 1; i < degree_; i++) {
 	vector<pair<double, GRBVar>> row;
 	for (int j = 0; j < i; j++) {
 	  auto obj_coefficient = doc.GetCell<double>(i, j) - config.obj_offset;
