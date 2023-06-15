@@ -13,11 +13,11 @@ using namespace std;
 
 class CubicTriangleSeparator : public AbstractSeparator {
  public:
-  explicit CubicTriangleSeparator(CompleteGraph& graph) : AbstractSeparator(graph) {};
-  ~CubicTriangleSeparator() override= default;
+  explicit CubicTriangleSeparator(CompleteGraph &graph) : AbstractSeparator(graph) {};
+  ~CubicTriangleSeparator() override = default;
 
  protected:
-  void callback() override;
+  void my_callback() override;
 };
 
 #endif // CLIQPART_SRC_SEPARATORS_CUBIC_TRIANGLE_SEPARATOR_H_

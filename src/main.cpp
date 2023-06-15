@@ -58,8 +58,8 @@ int main(int argc, char *argv[]) {
 
   const static RunDirValidator kRunDirVal;
   app.add_option("RUNS", runs, "Whitespace separated list of run directories (see README -> Usage).")
-	  ->required(true)
-	  ->check(kRunDirVal);
+	->required(true)
+	->check(kRunDirVal);
 
   CLI::Option *v = app.add_flag("-v", "Level of verbosity increases with every use.");
 

@@ -8,26 +8,23 @@
 
 using namespace std;
 
-void CubicTriangleSeparator::callback() {
+void CubicTriangleSeparator::my_callback() {
   try {
 	if (where == GRB_CB_MIPSOL) {
 
 	  // iterate through whole graph to find a violated triangle
-	  for (int i = 0; i < graph_.GetDegree(); ++i) {
-		for (int j = 0; j < i; ++j) {
+	  for (int i = 2; i < GetDegree(); ++i) {
+		for (int j = 1; j < i; ++j) {
 		  // if the edge is in the CP, i.e. x_ij=1, no triangle inequality can
 		  // be violated -> continue
-		  auto x_ij = graph_.GetVar(i, j);
-		  auto v_ij = getSolution(x_ij);
+		  auto v_ij = getSolution(i, j);
 		  if (v_ij > 0.9)
 			continue;
 
 		  for (int k = 0; k < j; ++k) {
-			// Get the values of the other two the edge decisions
-			auto x_ik = graph_.GetVar(i, k);
-			auto v_ik = getSolution(x_ik);
-			auto x_jk = graph_.GetVar(j, k);
-			auto v_jk = getSolution(x_jk);
+			// GetIndex the values of the other two the edge decisions
+			auto v_ik = getSolution(i, k);
+			auto v_jk = getSolution(j, k);
 
 			// a triangle inequality is violated iff the sum of the other edges
 			// in the triangle is 2; i.e. edge ij is not in the clique
@@ -35,7 +32,7 @@ void CubicTriangleSeparator::callback() {
 			double sum = v_ik + v_jk;
 			// gurobi might return values slightly fractional
 			if (1.75 < sum && sum < 2.25) {
-			  addLazy(-x_ij + x_ik + x_jk <= 1);
+			  addLazy(-GetVar(i, j) + GetVar(i, k) + GetVar(j, k) <= 1);
 			}
 		  }
 		}
@@ -44,15 +41,15 @@ void CubicTriangleSeparator::callback() {
   } catch (GRBException &e) {
 	cout << "Error number: " << e.
 
-		getErrorCode()
+	  getErrorCode()
 
 		 << endl;
 	cout << e.
 
-		getMessage()
+	  getMessage()
 
 		 << endl;
   } catch (...) {
-	cout << "Error during callback" << endl;
+	cout << "Error during my_callback" << endl;
   }
 }
