@@ -10,18 +10,18 @@
 
 using namespace std;
 CompleteGraph::CompleteGraph(RunConfig &config, const string &data_path, GRBModel &model) {
-  degree_ = config.degree;
+  degree_ = config.graph_degree;
   weights_ = new double[EdgeCount()];
   vars_ = new GRBVar[EdgeCount()];
 
   // TODO add error handling (file not found, wrong value types, too few lines/columns, empty lines/columns, ignore cells (i,i), …)
   // TODO add configuration support (row/column headers (i.e. labels), global objective offset)
   // TODO move opening the file to the main function -> constructor adjustment
-  rapidcsv::Document doc(data_path, rapidcsv::LabelParams(0, 0));
+  rapidcsv::Document doc(data_path, rapidcsv::LabelParams(config.column_labels - 1, config.row_labels - 1));
 
   for (int i = 1; i < degree_; i++) {
 	for (int j = 0; j < i; j++) {
-	  auto obj_coefficient = doc.GetCell<double>(i, j) - config.obj_offset;
+	  auto obj_coefficient = doc.GetCell<double>(i, j) - config.value_offset;
 	  auto var = model.addVar(0.0,
 							  1.0,
 							  obj_coefficient,

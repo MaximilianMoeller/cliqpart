@@ -95,7 +95,15 @@ int main(int argc, char *argv[]) {
 	// everything else needs to be rebuilt for every run
 	for (const string &kRunDir : runs) {
 	  // set log file for this run
-	  const string kLogFile = kRunDir + "log";
+	  auto const now = std::chrono::system_clock::now();
+	  auto in_time_t = std::chrono::system_clock::to_time_t(now);
+
+	  std::stringstream str_stream;
+	  str_stream << std::put_time(std::localtime(&in_time_t), "-%Y-%m-%d-%X");
+
+	  const string kLogFile = kRunDir + "log" + str_stream.str();
+	  PLOGD << "set logfile to " << kLogFile;
+
 	  file_appender.setFileName(kLogFile.c_str());
 
 	  // TODO load run_config.toml here

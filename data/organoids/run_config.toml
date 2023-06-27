@@ -1,2 +1,13 @@
-degree = 90
-offset = 0.4
+name = "baseline"
+
+[data_file]
+row_labels = 1
+column_labels = 1
+
+[run_settings]
+graph_degree = 90
+value_offset = 0.3
+
+[[separators]]
+name = "gw"
+maxcut = 400

@@ -8,16 +8,24 @@
 #include <string>
 #include <toml++/toml.h>
 #include <plog/Log.h>
+#include <variant>
 
 using namespace std;
 
-// TODO read runconfig from config file
+struct GWSeparatorConfig {
+  const int MAXCUT;
+};
+
+struct CubicSeparatorConfig {};
 
 struct RunConfig {
-  const int degree;
-  double obj_offset;
+  int row_labels;
+  int column_labels;
+  const vector<variant<GWSeparatorConfig, CubicSeparatorConfig>> separators;
+  int graph_degree;
+  double value_offset;
 
-  static RunConfig FromFile(const string& path);
+  static RunConfig FromFile(const string &path);
 };
 
 #endif // CLIQPART_SRC_RUN_CONFIG_H_

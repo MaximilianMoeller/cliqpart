@@ -13,7 +13,7 @@ using namespace std;
 
 class CompleteGraph {
  private:
-  // the degree of the complete graph, i.e. the number of nodes
+  // the graph_degree of the complete graph, i.e. the number of nodes
   int degree_;
 
   // edge weights and the actual variables will be stored in continuously allocated memory.
