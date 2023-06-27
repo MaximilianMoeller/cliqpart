@@ -39,6 +39,8 @@ class CompleteGraph {
   // returns the gurobi variable object of a given edge (indices of the adjacent nodes)
   GRBVar GetVar(int v1, int v2) { return vars_[GetIndex(v1, v2)]; };
   GRBVar *GetVars() { return vars_; };
+
+  ~CompleteGraph();
 };
 
 #endif //CLIQPART_SRC_COMPLETE_GRAPH_H_

@@ -21,7 +21,10 @@ double AbstractSeparator::getSolution(int i, int j) {
   if (current_solution_) {
 	return current_solution_[graph_.GetIndex(i, j)];
   } else {
-	PLOGE << "You tried to access the current solution without fetching it first." << endl;
-	exit(-1);
+	PLOGE << "You tried to access the current solution without fetching it first." << endl
+		  << "This could mean that you're trying to access the solution in a callback-code where this is not possible."
+		  << endl
+		  << "Returning 0.0, but please fix this!";
+	return 0.0;
   }
 }

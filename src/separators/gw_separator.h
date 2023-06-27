@@ -9,11 +9,9 @@
 class GWSeparator : public CubicTriangleSeparator {
  protected:
   const int maxcut_;
-  double lastiter_;
   void my_callback() override;
  public:
-  explicit GWSeparator(CompleteGraph &graph, int maxcut)
-	  : CubicTriangleSeparator(graph), maxcut_(maxcut), lastiter_(-GRB_INFINITY) {
+  explicit GWSeparator(CompleteGraph &graph, int maxcut) : CubicTriangleSeparator(graph), maxcut_(maxcut) {
 
   }
 };

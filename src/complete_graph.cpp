@@ -50,3 +50,7 @@ int CompleteGraph::GetIndex(int v1, int v2) const {
   }
   return v1 * (v1 - 1) / 2 + v2;
 }
+CompleteGraph::~CompleteGraph() {
+	delete[] vars_;
+	delete[] weights_;
+}

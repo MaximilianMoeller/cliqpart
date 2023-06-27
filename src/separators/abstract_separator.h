@@ -30,6 +30,12 @@ class AbstractSeparator : public GRBCallback {
   }
   virtual void my_callback() = 0;
   double getSolution(int i, int j);
+
+ public:
+  ~AbstractSeparator() override {
+	delete[] current_solution_;
+	GRBCallback::~GRBCallback();
+  }
 };
 
 #endif // CLIQPART_SRC_SEPARATORS_ABSTRACT_SEPARATOR_H_
