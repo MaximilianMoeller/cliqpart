@@ -8,6 +8,6 @@ column_labels = 1
 graph_degree = 90
 value_offset = 0.3
 
-[[separators]]
-name = "gw"
+[separator]
+type = "gw"
 maxcut = 400

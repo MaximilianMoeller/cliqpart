@@ -2,14 +2,19 @@
 // Created by max on 09.06.23.
 //
 
+#include <plog/Log.h>
 #include "run_config.h"
+#include <string>
+#include <toml++/toml.h>
+
 RunConfig RunConfig::FromFile(const string &path) {
   toml::table tbl;
 
   try {
 	tbl = toml::parse_file(path);
 
-	RunConfig config;
+	// cannot create a struct with empty variant<…>
+	RunConfig config{.separator = CubicSeparatorConfig{}};
 
 	// TODO: (optional) use the field "name" from the config somehow
 
@@ -44,7 +49,35 @@ RunConfig RunConfig::FromFile(const string &path) {
 	config.value_offset = tbl["run_settings"]["value_offset"].value_or(0.0);
 	PLOGD << "Values in CSV table will be offset by " << config.value_offset;
 
-	// TODO actually read the used separator from the config file
+	if (!tbl.contains("separator") || !tbl["separator"].is_table()
+	  || !tbl["separator"].as_table()->contains("type") || !tbl["separator"]["type"].is_string()) {
+	  PLOGF << path << " must contain a table 'separator' with a string value for the key 'type'!";
+	  exit(-1);
+	}
+	auto type = tbl["separator"]["type"];
+	if (type == "gw" ||
+	  type == "GW" ||
+	  type == "GrötschelWakabayashi" ||
+	  type == "GroetschelWakabayashi"
+	  ) {
+	  if (!tbl["separator"].as_table()->contains("maxcut") ||
+		!tbl["separator"]["maxcut"].is_integer()) {
+		PLOGW << "Consider setting the 'maxcut' parameter when using a GrötschelWakabayashi Separator!";
+	  }
+	  GWSeparatorConfig run_config{tbl["separator"]["maxcut"].value_or(400)};
+	  config.separator.emplace<GWSeparatorConfig>(run_config);
+	} else if (type == "ct" ||
+	  type == "CT" ||
+	  type == "CubicTriangle") {
+	  CubicSeparatorConfig run_config;
+	  config.separator.emplace<CubicSeparatorConfig>(run_config);
+	} else {
+	  PLOGF << path << " must contain a table 'separator' with a 'type' from the following list: " << endl
+			<< "Valid for Grötschel-Wakabayashi-Separator: ['gw', 'GW', 'GrötschelWakabayashi', 'GroetschelWakabayashi']"
+			<< endl
+			<< "Valid for the cubic Triangle Separator: ['ct', 'CT', 'CubicTriangle']";
+	  exit(-1);
+	}
 
 	return config;
   } catch (const toml::parse_error &err) {

@@ -21,7 +21,7 @@ struct CubicSeparatorConfig {};
 struct RunConfig {
   int row_labels;
   int column_labels;
-  const vector<variant<GWSeparatorConfig, CubicSeparatorConfig>> separators;
+  variant<GWSeparatorConfig, CubicSeparatorConfig> separator;
   int graph_degree;
   double value_offset;
 
