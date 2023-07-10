@@ -114,6 +114,7 @@ int main(int argc, char *argv[]) {
 
 	  // always create a new environment instead of reusing the old one to ensure fairness between runs
 	  unique_ptr<GRBEnv> env{new GRBEnv};
+	  env->set(GRB_STR_PAR_RESULTFILE, kRunDir + "sol" + str_stream.str() + ".sol");
 	  GRBModel model = GRBModel(*env);
 	  // must set LazyConstraints parameter when using lazy constraints
 	  model.set(GRB_IntParam_LazyConstraints, 1);

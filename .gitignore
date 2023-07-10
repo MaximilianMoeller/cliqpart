@@ -1,6 +1,7 @@
 /build/
 cliqpart
 log*
+*.sol
 
 # Prerequisites
 *.d
