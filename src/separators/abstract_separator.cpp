@@ -7,15 +7,15 @@
 void AbstractSeparator::callback() {
   // fetch current solution if it could be of interest for the current callback
   // and only when this call is even valid
-  if (where == GRB_CB_MIPSOL || (where == GRB_CB_MIPNODE && getIntInfo(GRB_CB_MIPNODE_STATUS) == GRB_OPTIMAL))
-	FetchSolution();
+  if (where == GRB_CB_MIPSOL) {
+	current_solution_ = GRBCallback::getSolution(graph_.GetVars(), graph_.EdgeCount());
+  } else if (where == GRB_CB_MIPNODE && getIntInfo(GRB_CB_MIPNODE_STATUS) == GRB_OPTIMAL) {
+	current_solution_ = GRBCallback::getNodeRel(graph_.GetVars(), graph_.EdgeCount());
+  }
   // actual callback
   my_callback();
   // invalidate old solution
   current_solution_ = nullptr;
-}
-void AbstractSeparator::FetchSolution() {
-  current_solution_ = GRBCallback::getSolution(graph_.GetVars(), graph_.EdgeCount());
 }
 double AbstractSeparator::getSolution(int i, int j) {
   if (current_solution_) {

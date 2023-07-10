@@ -14,7 +14,6 @@ class AbstractSeparator : public GRBCallback {
  private:
   CompleteGraph &graph_;
   double *current_solution_{nullptr};
-  void FetchSolution();;
 
  protected:
   explicit AbstractSeparator(CompleteGraph &graph) : graph_(graph) {}
