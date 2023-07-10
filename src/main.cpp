@@ -6,7 +6,7 @@
 #include <memory>
 #include <string>
 
-#include "separators/cubic_triangle_separator.h"
+#include "separators/triangle_separator.h"
 #include "separators/abstract_separator.h"
 #include "separator_factory.h"
 
@@ -129,8 +129,11 @@ int main(int argc, char *argv[]) {
 	  // load data and create model variables
 	  CompleteGraph graph(config, kRunDir + "data.csv", model);
 
-	  // generate separator based on run_config
-	  unique_ptr<AbstractSeparator> sep = SeparatorFactory::BuildSeparator(config, graph);
+	  // generate separators based on run_config
+	  vector<unique_ptr<AbstractSeparator>> separators = SeparatorFactory::BuildSeparator(config, graph);
+
+	  // TODO: adjust all separators (i.e. the abstract one) to take solutions
+	  // TODO: write while-loop that also iterates over all separators to add constraints to the model and optimize again
 	  model.setCallback(sep.get());
 
 	  // optimize model

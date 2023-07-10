@@ -12,18 +12,27 @@
 
 using namespace std;
 
-struct GWSeparatorConfig {
+struct TriangleSeparatorConfig {
   const int MAXCUT;
 };
 
-struct CubicSeparatorConfig {};
+struct ST_SeparatorConfig {
+  const int MAXCUT;
+};
+
+typedef variant<TriangleSeparatorConfig, ST_SeparatorConfig> variants;
 
 struct RunConfig {
-  int row_labels;
-  int column_labels;
-  variant<GWSeparatorConfig, CubicSeparatorConfig> separator;
+  string name;
+  // run settings
   int graph_degree;
   double value_offset;
+  double integrality_tolerance;
+  // data file settings
+  int row_labels;
+  int column_labels;
+  // list of separators
+  vector<variants> separators;
 
   static RunConfig FromFile(const string &path);
 };

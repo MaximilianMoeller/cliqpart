@@ -12,7 +12,7 @@
 
 class SeparatorFactory {
  public:
-  static unique_ptr<AbstractSeparator> BuildSeparator(RunConfig& config, CompleteGraph& data);
+  static vector<unique_ptr<AbstractSeparator>> BuildSeparator(RunConfig& config, CompleteGraph& data);
 };
 
 #endif //CLIQPART_SRC_SEPARATOR_FACTORY_H_

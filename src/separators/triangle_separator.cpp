@@ -2,13 +2,13 @@
 // Created by max on 26.05.23.
 //
 
-#include "cubic_triangle_separator.h"
+#include "triangle_separator.h"
 #include <gurobi_c++.h>
 #include <iostream>
 
 using namespace std;
 
-void CubicTriangleSeparator::my_callback() {
+void TriangleSeparator::my_callback() {
   try {
 	if (where == GRB_CB_MIPSOL) {
 

@@ -1,4 +1,4 @@
-name = "baseline"
+name = "template"
 
 [data_file]
 row_labels = 1
@@ -7,7 +7,12 @@ column_labels = 1
 [run_settings]
 graph_degree = 90
 value_offset = 0.3
+integrality_tolerance = 1e-5
 
-[separator]
-type = "gw"
-maxcut = 400
+[[separators]]
+inequality = "Δ"
+maxcuts = 400
+
+[[separators]]
+inequality = "[S:T]"
+maxcuts = 400

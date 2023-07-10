@@ -3,10 +3,10 @@
 //
 
 #include <algorithm>
-#include "gw_separator.h"
+#include "st_separator.h"
 typedef tuple<double, GRBVar, GRBVar, GRBVar> triangle_tuple;
 
-void GWSeparator::my_callback() {
+void ST_Separator::my_callback() {
   // in integral solutions only triangle inequalities are separated
   if (where == GRB_CB_MIPSOL) {
 

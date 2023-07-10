@@ -5,18 +5,23 @@
 #include "separator_factory.h"
 
 #include <memory>
-#include "separators/cubic_triangle_separator.h"
-#include "separators/gw_separator.h"
+#include "separators/triangle_separator.h"
+#include "separators/st_separator.h"
 
-unique_ptr<AbstractSeparator> SeparatorFactory::BuildSeparator(RunConfig &config, CompleteGraph &data) {
-  //return  std::make_unique<CubicTriangleSeparator> (data);
-  if (holds_alternative<CubicSeparatorConfig>(config.separator)) {
-	PLOGD << "Creating new Cubic Triangle Separator!";
-	return unique_ptr<AbstractSeparator>{new CubicTriangleSeparator(data)};
-  } else if (holds_alternative<GWSeparatorConfig>(config.separator)) {
-	int maxcut = get<GWSeparatorConfig>(config.separator).MAXCUT;
-	PLOGD << "Creating new Grötschel-Wakabayashi Separator with MAXCUT parameter " << maxcut << " !";
-	return unique_ptr<AbstractSeparator>{new GWSeparator(data, maxcut)};
+vector<unique_ptr<AbstractSeparator>> SeparatorFactory::BuildSeparator(RunConfig &config, CompleteGraph &data) {
+  //return  std::make_unique<TriangleSeparator> (data);
+  vector<unique_ptr<AbstractSeparator>> res;
+  for (auto SepConfig: config.separators){
+	if (holds_alternative<TriangleSeparatorConfig>(SepConfig)) {
+	  int maxcut = get<TriangleSeparatorConfig>(SepConfig).MAXCUT;
+	  PLOGD << "Creating new Δ separator with MAXCUT parameter " << maxcut << " !" ;
+	  res.emplace_back(unique_ptr<AbstractSeparator>{new TriangleSeparator(data)});
+	} else if (holds_alternative<ST_SeparatorConfig>(SepConfig)) {
+	  int maxcut = get<TriangleSeparatorConfig>(SepConfig).MAXCUT;
+	  PLOGD << "Creating new [S:T] separator with MAXCUT parameter " << maxcut << " !" ;
+	  res.emplace_back(unique_ptr<AbstractSeparator>{new ST_Separator(data, maxcut)});
+	}
+
   }
 
 }
