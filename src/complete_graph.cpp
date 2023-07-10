@@ -25,12 +25,14 @@ CompleteGraph::CompleteGraph(RunConfig &config, const string &data_path, GRBMode
 	  auto var = model.addVar(0.0,
 							  1.0,
 							  obj_coefficient,
-							  GRB_BINARY,
+							  GRB_CONTINUOUS,
 							  "x_" + to_string(i) + "_" + to_string(j));
 	  weights_[i * (i - 1) / 2 + j] = obj_coefficient;
 	  vars_[i * (i - 1) / 2 + j] = var;
 	}
   }
+  // dummy variable:
+  model.addVar(0.0, 100.0, 0, GRB_INTEGER, "dummy");
 
 }
 int CompleteGraph::GetIndex(int v1, int v2) const {

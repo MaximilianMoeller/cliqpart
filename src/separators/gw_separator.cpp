@@ -8,9 +8,7 @@ typedef tuple<double, GRBVar, GRBVar, GRBVar> triangle_tuple;
 
 void GWSeparator::my_callback() {
   // in integral solutions only triangle inequalities are separated
-  if (where == GRB_CB_MIPSOL) CubicTriangleSeparator::my_callback();
-	// LP-relaxation has been solved to optimality -> add cuts to tighten it
-  else if (where == GRB_CB_MIPNODE && getIntInfo(GRB_CB_MIPNODE_STATUS) == GRB_OPTIMAL) {
+  if (where == GRB_CB_MIPSOL) {
 
 	int degree = GetDegree();
 	vector<triangle_tuple> triangles;
@@ -37,6 +35,7 @@ void GWSeparator::my_callback() {
 		}
 	  }
 	}
+	PLOGD << "Enumerated " << violated << " violated Δ-inequalities";
 
 	if (!triangles.empty()) {
 
@@ -59,10 +58,11 @@ void GWSeparator::my_callback() {
 		auto x_jk = get<3>(triangle);
 
 		// TODO: dummkopf, du addest gerade cuts für alle dreiecke, die du oben in diesen vector steckst. xD
-		addCut(x_ij + x_ik - x_jk <= 1);
+		addLazy(x_ij + x_ik - x_jk <= 1);
 		violated++;
 
 	  }
+	  PLOGD << "Added " << violated << " Δ-inequalities";
 	  //if (in_inequality[i][j]) continue;
 	  //if (in_inequality[i][k] || in_inequality[j][k]) continue;
 
