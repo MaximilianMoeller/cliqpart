@@ -63,48 +63,55 @@ int main(int argc, char *argv[]) {
 
   CLI::Option *v = app.add_flag("-v", "Level of verbosity increases with every use.");
 
+  bool log_to_file {false};
+  app.add_flag("-l", log_to_file, "Enables logging to file, disabled by default.");
+
   CLI11_PARSE(app, argc, argv)
 
   plog::Severity log_level;
 
   switch (v->count()) {
-	case 0 ... 1:log_level = plog::Severity::fatal;
+	case 0:log_level = plog::Severity::fatal;
 	  break;
-	case 2:log_level = plog::Severity::error;
+	case 1:log_level = plog::Severity::error;
 	  break;
-	case 3:log_level = plog::Severity::warning;
+	case 2:log_level = plog::Severity::warning;
 	  break;
-	case 4:log_level = plog::Severity::info;
+	case 3:log_level = plog::Severity::info;
 	  break;
-	case 5:log_level = plog::Severity::debug;
+	case 4:log_level = plog::Severity::debug;
 	  break;
 	default:log_level = plog::Severity::verbose;
 	  break;
   }
 
-  // log into a file called "log" before the first run and into "{run_dir}/log" afterwards
-  static plog::RollingFileAppender<plog::TxtFormatter> file_appender("log", 16000000, 1000);
   // also display colored console logging
   static plog::ColorConsoleAppender<plog::TxtFormatter> console_appender;
+  // log into a file called "log" before the first run and into "{run_dir}/log" afterwards
+  static plog::RollingFileAppender<plog::TxtFormatter> file_appender("log", 16000000, 1000);
 
-  // Initialize the logger
-  plog::init(log_level,
-			 &file_appender).addAppender(&console_appender);
+  if (log_to_file){
+	// Initialize the logger
+	plog::init(log_level, &file_appender).addAppender(&console_appender);
+  }
+  else{
+	plog::init(log_level, &console_appender);
+  }
 
   try {
 	// everything else needs to be rebuilt for every run
 	for (const string &kRunDir : runs) {
-	  // set log file for this run
+	  // log file for this run is identified by the start time of the run
 	  auto const now = std::chrono::system_clock::now();
 	  auto in_time_t = std::chrono::system_clock::to_time_t(now);
+	  std::stringstream run_identifier;
+	  run_identifier << std::put_time(std::localtime(&in_time_t), "-%Y-%m-%d-%X");
 
-	  std::stringstream str_stream;
-	  str_stream << std::put_time(std::localtime(&in_time_t), "-%Y-%m-%d-%X");
-
-	  const string kLogFile = kRunDir + "log" + str_stream.str();
-	  PLOGD << "set logfile to " << kLogFile;
-
-	  file_appender.setFileName(kLogFile.c_str());
+	  if (log_to_file){
+		const string kLogFile = kRunDir + "log" + run_identifier.str();
+		PLOGD << "Set logfile to " << kLogFile;
+		file_appender.setFileName(kLogFile.c_str());
+	  }
 
 	  // TODO load run_config.toml here
 	  // TODO run_config should allow rerunning the same config multiple times (for robustness in measurement)
@@ -114,7 +121,7 @@ int main(int argc, char *argv[]) {
 
 	  // always create a new environment instead of reusing the old one to ensure fairness between runs
 	  unique_ptr<GRBEnv> env{new GRBEnv};
-	  env->set(GRB_STR_PAR_RESULTFILE, kRunDir + "sol" + str_stream.str() + ".sol");
+	  env->set(GRB_STR_PAR_RESULTFILE, kRunDir + "sol" + run_identifier.str() + ".sol");
 	  GRBModel model = GRBModel(*env);
 	  // must set LazyConstraints parameter when using lazy constraints
 	  model.set(GRB_IntParam_LazyConstraints, 1);
