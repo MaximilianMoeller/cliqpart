@@ -8,11 +8,11 @@
 #include <memory>
 #include "separators/abstract_separator.h"
 #include "run_config.h"
-#include "complete_graph.h"
+#include "model_wrapper.h"
 
 class SeparatorFactory {
  public:
-  static vector<unique_ptr<AbstractSeparator>> BuildSeparator(RunConfig& config, CompleteGraph& data);
+  static vector<unique_ptr<AbstractSeparator>> BuildSeparator(RunConfig& config, ModelWrapper& data);
 };
 
 #endif //CLIQPART_SRC_SEPARATOR_FACTORY_H_

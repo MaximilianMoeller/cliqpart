@@ -6,18 +6,20 @@
 #define CLIQPART_SRC_SEPARATORS_TRIANGLE_SEPARATOR_H_
 
 #include <gurobi_c++.h>
-#include "../complete_graph.h"
+#include "../model_wrapper.h"
 #include "abstract_separator.h"
 
 using namespace std;
 
 class TriangleSeparator : public AbstractSeparator {
+ private:
+  const int maxcut_;
  public:
-  explicit TriangleSeparator(CompleteGraph &graph) : AbstractSeparator(graph) {};
-  ~TriangleSeparator() override = default;
+  explicit TriangleSeparator(ModelWrapper &model, const int maxcut) : AbstractSeparator(model), maxcut_(maxcut) {};
+  ~TriangleSeparator()= default;
 
  protected:
-  void my_callback() override;
+  bool add_Cuts() override;
 };
 
 #endif // CLIQPART_SRC_SEPARATORS_TRIANGLE_SEPARATOR_H_

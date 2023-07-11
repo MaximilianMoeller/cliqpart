@@ -4,52 +4,68 @@
 
 #include "triangle_separator.h"
 #include <gurobi_c++.h>
-#include <iostream>
+#include <algorithm>
 
 using namespace std;
 
-void TriangleSeparator::my_callback() {
-  try {
-	if (where == GRB_CB_MIPSOL) {
+typedef tuple<double, GRBVar, GRBVar, GRBVar> triangle_tuple;
 
-	  // iterate through whole graph to find a violated triangle
-	  for (int i = 2; i < GetDegree(); ++i) {
-		for (int j = 1; j < i; ++j) {
-		  // if the edge is in the CP, i.e. x_ij=1, no triangle inequality can
-		  // be violated -> continue
-		  auto v_ij = getSolution(i, j);
-		  if (v_ij > 0.9)
-			continue;
+bool TriangleSeparator::add_Cuts() {
+	int degree = model_.GetDegree();
+	vector<triangle_tuple> triangles;
 
-		  for (int k = 0; k < j; ++k) {
-			// GetIndex the values of the other two the edge decisions
-			auto v_ik = getSolution(i, k);
-			auto v_jk = getSolution(j, k);
+	// only add up to MAXCUT violated inequalities in one iteration
+	int violated{0};
 
-			// a triangle inequality is violated iff the sum of the other edges
-			// in the triangle is 2; i.e. edge ij is not in the clique
-			// partitioning while edges ik and jk are.
-			double sum = v_ik + v_jk;
-			// gurobi might return values slightly fractional
-			if (1.75 < sum && sum < 2.25) {
-			  addLazy(-GetVar(i, j) + GetVar(i, k) + GetVar(j, k) <= 1);
-			}
+	// iterate through whole graph to find a violated triangle inequalities
+	for (int i = 2; i < degree; ++i) {
+	  // enumerate about 5 * maxcut violated inequalities
+	  if (violated >= 5 * maxcut_) break;
+	  for (int j = 1; j < i; ++j) {
+		auto v_ij = model_.GetSolution(i, j);
+
+		for (int k = 0; k < j; ++k) {
+
+		  auto v_ik = model_.GetSolution(i, k);
+		  auto v_jk = model_.GetSolution(j, k);
+
+		  if (v_ij + v_ik - v_jk > 1) {
+			triangles.emplace_back(v_ij + v_ik - v_jk, model_.getVar(i, j), model_.getVar(i, k), model_.getVar(j, k));
+			violated++;
 		  }
 		}
 	  }
 	}
-  } catch (GRBException &e) {
-	cout << "Error number: " << e.
+	PLOGD << "Enumerated " << violated << " violated Δ-inequalities";
 
-	  getErrorCode()
+	int constraints_added {0};
 
-		 << endl;
-	cout << e.
+	if (!triangles.empty()) {
 
-	  getMessage()
+	  // to prevent the graph from being ‘partially solved’ in one area before any inequality of another area is even considered,
+	  // I will only add one inequality containing a given edge per iteration
+	  bool **in_inequality = new bool *[degree];
+	  for (int i = 0; i < degree; i++) in_inequality[i] = new bool[degree]{false};
 
-		 << endl;
-  } catch (...) {
-	cout << "Error during my_callback" << endl;
-  }
+	  // sort vector by degree of violation
+	  std::sort(triangles.begin(),
+				triangles.end(),
+				[](triangle_tuple a, triangle_tuple b) { return std::get<0>(a) > std::get<0>(b); });
+
+	  for (auto &triangle : triangles) {
+		if (constraints_added >= maxcut_) break;
+		auto x_ij = get<1>(triangle);
+		auto x_ik = get<2>(triangle);
+		auto x_jk = get<3>(triangle);
+
+		model_.addConstr(x_ij + x_ik - x_jk <= 1);
+		constraints_added++;
+
+	  }
+	  PLOGD << "Added " << constraints_added << " Δ-inequalities";
+
+	  for (int i = 0; i < degree; i++) delete[] in_inequality[i];
+	  delete[] in_inequality;
+	}
+  return constraints_added > 0;
 }

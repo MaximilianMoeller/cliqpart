@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
 
   CLI::Option *v = app.add_flag("-v", "Level of verbosity increases with every use.");
 
-  bool log_to_file {false};
+  bool log_to_file{false};
   app.add_flag("-l", log_to_file, "Enables logging to file, disabled by default.");
 
   CLI11_PARSE(app, argc, argv)
@@ -90,28 +90,38 @@ int main(int argc, char *argv[]) {
   // log into a file called "log" before the first run and into "{run_dir}/log" afterwards
   static plog::RollingFileAppender<plog::TxtFormatter> file_appender("log", 16000000, 1000);
 
-  if (log_to_file){
+  if (log_to_file) {
 	// Initialize the logger
 	plog::init(log_level, &file_appender).addAppender(&console_appender);
-  }
-  else{
+  } else {
 	plog::init(log_level, &console_appender);
   }
 
   try {
+
+	// environment can be kept and parametrized, only models need to be build for each run
+	unique_ptr<GRBEnv> env{new GRBEnv};
+
 	// everything else needs to be rebuilt for every run
 	for (const string &kRunDir : runs) {
-	  // log file for this run is identified by the start time of the run
+
+	  // ### BEGIN RUN SETUP ###
+
 	  auto const now = std::chrono::system_clock::now();
 	  auto in_time_t = std::chrono::system_clock::to_time_t(now);
 	  std::stringstream run_identifier;
 	  run_identifier << std::put_time(std::localtime(&in_time_t), "-%Y-%m-%d-%X");
 
-	  if (log_to_file){
+	  if (log_to_file) {
 		const string kLogFile = kRunDir + "log" + run_identifier.str();
 		PLOGD << "Set logfile to " << kLogFile;
 		file_appender.setFileName(kLogFile.c_str());
 	  }
+
+	  env->set(GRB_STR_PAR_RESULTFILE, kRunDir + "sol" + run_identifier.str() + ".sol");
+
+	  // ### END RUN SETUP ###
+
 
 	  // TODO load run_config.toml here
 	  // TODO run_config should allow rerunning the same config multiple times (for robustness in measurement)
@@ -119,25 +129,30 @@ int main(int argc, char *argv[]) {
 	  // TODO this should create directories named with timestamps and adjust the logfile again
 	  RunConfig config = RunConfig::FromFile(kRunDir + "run_config.toml");
 
-	  // always create a new environment instead of reusing the old one to ensure fairness between runs
-	  unique_ptr<GRBEnv> env{new GRBEnv};
-	  env->set(GRB_STR_PAR_RESULTFILE, kRunDir + "sol" + run_identifier.str() + ".sol");
-	  GRBModel model = GRBModel(*env);
-	  // must set LazyConstraints parameter when using lazy constraints
-	  model.set(GRB_IntParam_LazyConstraints, 1);
 
 	  // load data and create model variables
-	  CompleteGraph graph(config, kRunDir + "data.csv", model);
+	  ModelWrapper model_wrapper(*env, config, kRunDir + "data.csv");
 
 	  // generate separators based on run_config
-	  vector<unique_ptr<AbstractSeparator>> separators = SeparatorFactory::BuildSeparator(config, graph);
+	  vector<unique_ptr<AbstractSeparator>> separators = SeparatorFactory::BuildSeparator(config, model_wrapper);
 
 	  // TODO: adjust all separators (i.e. the abstract one) to take solutions
 	  // TODO: write while-loop that also iterates over all separators to add constraints to the model and optimize again
-	  model.setCallback(sep.get());
 
 	  // optimize model
-	  model.optimize();
+	  model_wrapper.optimize();
+
+	  bool constraints_added{true};
+	  while (constraints_added) {
+		constraints_added = false;
+		for (unique_ptr<AbstractSeparator> &separator : separators) {
+		  if (constraints_added) break;
+		  constraints_added = separator->add_Cuts();
+		}
+
+		model_wrapper.optimize();
+	  }
+
 
 	  // Extract solution
 
