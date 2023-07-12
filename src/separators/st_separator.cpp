@@ -4,6 +4,6 @@
 
 #include "st_separator.h"
 
-bool ST_Separator::add_Cuts() {
-  return false;
+int ST_Separator::add_Cuts() {
+  return 0;
 };

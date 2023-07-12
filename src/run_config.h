@@ -25,6 +25,7 @@ typedef variant<TriangleSeparatorConfig, ST_SeparatorConfig> variants;
 struct RunConfig {
   string name;
   // run settings
+  int run_count {1};
   int graph_degree;
   double value_offset;
   double integrality_tolerance;

@@ -19,8 +19,8 @@
 using namespace std;
 
 // validates (non-)existence of the needed files in the run_dir
-struct RunDirValidator : public CLI::Validator {
-  RunDirValidator() {
+struct ConfigDirValidator : public CLI::Validator {
+  ConfigDirValidator() {
 	name_ = "RUNDIR";
 	func_ = [](const std::string &str) {
 	  string result;
@@ -56,10 +56,10 @@ int main(int argc, char *argv[]) {
   CLI::App app("Comparison Implementation of different branch-and-cut "
 			   "algorithms for CLIQUE PARTITIONING.");
 
-  const static RunDirValidator kRunDirVal;
+  const static ConfigDirValidator kConfigDirVal;
   app.add_option("RUNS", runs, "Whitespace separated list of run directories (see README -> Usage).")
 	->required(true)
-	->check(kRunDirVal);
+	->check(kConfigDirVal);
 
   CLI::Option *v = app.add_flag("-v", "Level of verbosity increases with every use.");
 
@@ -103,58 +103,59 @@ int main(int argc, char *argv[]) {
 	unique_ptr<GRBEnv> env{new GRBEnv};
 
 	// everything else needs to be rebuilt for every run
-	for (const string &kRunDir : runs) {
-
-	  // ### BEGIN RUN SETUP ###
-
-	  auto const now = std::chrono::system_clock::now();
-	  auto in_time_t = std::chrono::system_clock::to_time_t(now);
-	  std::stringstream run_identifier;
-	  run_identifier << std::put_time(std::localtime(&in_time_t), "-%Y-%m-%d-%X");
-
-	  if (log_to_file) {
-		const string kLogFile = kRunDir + "log" + run_identifier.str();
-		PLOGD << "Set logfile to " << kLogFile;
-		file_appender.setFileName(kLogFile.c_str());
-	  }
-
-	  env->set(GRB_STR_PAR_RESULTFILE, kRunDir + "sol" + run_identifier.str() + ".sol");
-
-	  // ### END RUN SETUP ###
+	for (const string &kConfigDir : runs) {
 
 
-	  // TODO load run_config.toml here
 	  // TODO run_config should allow rerunning the same config multiple times (for robustness in measurement)
 	  // TODO therefore another loop over the this re-run-count is required
 	  // TODO this should create directories named with timestamps and adjust the logfile again
-	  RunConfig config = RunConfig::FromFile(kRunDir + "run_config.toml");
+	  RunConfig config = RunConfig::FromFile(kConfigDir + "run_config.toml");
+
+	  for (int run_counter = 1; run_counter <= config.run_count; run_counter++) {
 
 
-	  // load data and create model variables
-	  ModelWrapper model_wrapper(*env, config, kRunDir + "data.csv");
+		// ### BEGIN RUN SETUP ###
 
-	  // generate separators based on run_config
-	  vector<unique_ptr<AbstractSeparator>> separators = SeparatorFactory::BuildSeparator(config, model_wrapper);
+		auto const now = std::chrono::system_clock::now();
+		auto in_time_t = std::chrono::system_clock::to_time_t(now);
+		std::stringstream run_start_time;
+		run_start_time << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d-%X");
 
-	  // TODO: adjust all separators (i.e. the abstract one) to take solutions
-	  // TODO: write while-loop that also iterates over all separators to add constraints to the model and optimize again
+		auto const kRunDir = kConfigDir + "run_" + run_start_time.str() + "/";
+		std::filesystem::create_directories(kRunDir);
 
-	  // optimize model
-	  model_wrapper.optimize();
-
-	  bool constraints_added{true};
-	  while (constraints_added) {
-		constraints_added = false;
-		for (unique_ptr<AbstractSeparator> &separator : separators) {
-		  if (constraints_added) break;
-		  constraints_added = separator->add_Cuts();
+		if (log_to_file) {
+		  auto const kLogFile = kRunDir + "log";
+		  PLOGD << "Set logfile to " << kLogFile;
+		  file_appender.setFileName(kLogFile.c_str());
 		}
 
-		model_wrapper.optimize();
-	  }
+		// ### END RUN SETUP ###
 
 
-	  // Extract solution
+		// load data and create model variables
+		ModelWrapper model_wrapper(*env, config, kConfigDir + "data.csv");
+
+		// generate separators based on run_config
+		vector<unique_ptr<AbstractSeparator>> separators = SeparatorFactory::BuildSeparator(config, model_wrapper);
+
+		int constraints_added, iteration{0};
+		do {
+		  iteration++;
+		  model_wrapper.optimize();
+		  model_wrapper.write(kRunDir + "solution_iteration_" + to_string(iteration) + ".sol");
+
+		  constraints_added = 0;
+		  for (unique_ptr<AbstractSeparator> &separator : separators) {
+			if (constraints_added > 0) break;
+			constraints_added = separator->add_Cuts();
+		  }
+		  PLOGI << "Added " << constraints_added << " constraints in iteration " << iteration;
+
+		} while (constraints_added > 0);
+
+
+		// Extract solution
 
 //	if (model.get(GRB_IntAttr_SolCount) > 0) {
 //	  double **sol = new double *[degree];
@@ -174,6 +175,7 @@ int main(int argc, char *argv[]) {
 //	  }
 //	}
 
+	  }
 	}
   } catch (GRBException
 		   e) {

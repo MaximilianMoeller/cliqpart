@@ -16,10 +16,10 @@ class TriangleSeparator : public AbstractSeparator {
   const int maxcut_;
  public:
   explicit TriangleSeparator(ModelWrapper &model, const int maxcut) : AbstractSeparator(model), maxcut_(maxcut) {};
-  ~TriangleSeparator()= default;
+  ~TriangleSeparator() override = default;
 
  protected:
-  bool add_Cuts() override;
+  int add_Cuts() override;
 };
 
 #endif // CLIQPART_SRC_SEPARATORS_TRIANGLE_SEPARATOR_H_

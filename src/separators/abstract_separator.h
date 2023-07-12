@@ -15,7 +15,7 @@ class AbstractSeparator {
   ModelWrapper& model_;
  public:
   explicit AbstractSeparator(ModelWrapper& model): model_(model) {} ;
-  virtual bool add_Cuts() = 0;
+  virtual int add_Cuts() = 0;
 
   virtual ~AbstractSeparator()  = default;
 };

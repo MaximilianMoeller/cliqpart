@@ -12,7 +12,7 @@ class ST_Separator : public AbstractSeparator {
  public:
   explicit ST_Separator(ModelWrapper &model, const int maxcut) : AbstractSeparator(model), maxcut_(maxcut) {};
 
-  bool add_Cuts() override;
+  int add_Cuts() override;
 
   ~ST_Separator()= default;
 };

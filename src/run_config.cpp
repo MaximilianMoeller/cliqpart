@@ -17,6 +17,10 @@ RunConfig RunConfig::FromFile(const string &path) {
 
 	config.name = tbl["name"].value_or("");
 
+	if (tbl.contains("run_count") && tbl["run_count"].is_integer()){
+	  config.run_count = tbl["run_count"].value_or(1);
+	}
+
 	// row and column headers
 	if (!tbl.contains("data_file") || !tbl["data_file"].is_table()
 	  || !tbl["data_file"].as_table()->contains("row_labels")
@@ -104,6 +108,7 @@ RunConfig RunConfig::FromFile(const string &path) {
 			<< "Please make sure to use TOMLs array of table syntax (see template) for the separators." << endl
 			<< "Non-table entries are skipped during parsing.";
 	}
+
 
 	return config;
   } catch (const toml::parse_error &err) {

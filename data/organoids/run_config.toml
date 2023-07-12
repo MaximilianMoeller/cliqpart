@@ -1,4 +1,5 @@
 name = "template"
+run_count = 3
 
 [data_file]
 row_labels = 1

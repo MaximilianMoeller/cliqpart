@@ -10,7 +10,7 @@ using namespace std;
 
 typedef tuple<double, GRBVar, GRBVar, GRBVar> triangle_tuple;
 
-bool TriangleSeparator::add_Cuts() {
+int TriangleSeparator::add_Cuts() {
 	int degree = model_.GetDegree();
 	vector<triangle_tuple> triangles;
 
@@ -67,5 +67,5 @@ bool TriangleSeparator::add_Cuts() {
 	  for (int i = 0; i < degree; i++) delete[] in_inequality[i];
 	  delete[] in_inequality;
 	}
-  return constraints_added > 0;
+  return constraints_added;
 }
