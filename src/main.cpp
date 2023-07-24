@@ -105,10 +105,13 @@ int main(int argc, char *argv[]) {
 	// everything else needs to be rebuilt for every run
 	for (const string &kConfigDir : runs) {
 
+	  if (log_to_file) {
+		auto const kLogFile = kConfigDir + "_log";
+		PLOGD << "Setting logfile to " << kLogFile;
+		file_appender.setFileName(kLogFile.c_str());
+	  }
 
-	  // TODO run_config should allow rerunning the same config multiple times (for robustness in measurement)
-	  // TODO therefore another loop over the this re-run-count is required
-	  // TODO this should create directories named with timestamps and adjust the logfile again
+
 	  RunConfig config = RunConfig::FromFile(kConfigDir + "run_config.toml");
 
 	  for (int run_counter = 1; run_counter <= config.run_count; run_counter++) {
@@ -125,8 +128,8 @@ int main(int argc, char *argv[]) {
 		std::filesystem::create_directories(kRunDir);
 
 		if (log_to_file) {
-		  auto const kLogFile = kRunDir + "log";
-		  PLOGD << "Set logfile to " << kLogFile;
+		  auto const kLogFile = kRunDir + "_log";
+		  PLOGD << "Setting logfile to " << kLogFile;
 		  file_appender.setFileName(kLogFile.c_str());
 		}
 
