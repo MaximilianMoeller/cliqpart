@@ -16,11 +16,11 @@ vector<unique_ptr<AbstractSeparator>> SeparatorFactory::BuildSeparator(RunConfig
 	if (holds_alternative<TriangleSeparatorConfig>(SepConfig)) {
 	  int maxcut = get<TriangleSeparatorConfig>(SepConfig).MAXCUT;
 	  PLOGD << "Creating new Δ separator with MAXCUT parameter " << maxcut << " !" ;
-	  res.emplace_back(make_unique<TriangleSeparator>(data, maxcut));
+	  res.emplace_back(make_unique<TriangleSeparator>(data, config.tolerance, maxcut));
 	} else if (holds_alternative<ST_SeparatorConfig>(SepConfig)) {
 	  int maxcut = get<ST_SeparatorConfig>(SepConfig).MAXCUT;
 	  PLOGD << "Creating new [S:T] separator with MAXCUT parameter " << maxcut << " !" ;
-	  res.emplace_back(make_unique<ST_Separator>(data, maxcut));
+	  res.emplace_back(make_unique<ST_Separator>(data, config.tolerance, maxcut));
 	}
 
   }

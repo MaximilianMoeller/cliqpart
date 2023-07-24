@@ -13,8 +13,9 @@ using namespace std;
 class AbstractSeparator {
  protected:
   ModelWrapper& model_;
+  double tolerance;
  public:
-  explicit AbstractSeparator(ModelWrapper& model): model_(model) {} ;
+  explicit AbstractSeparator(ModelWrapper& model, double precision): model_(model), tolerance(precision) {} ;
   virtual int add_Cuts() = 0;
 
   virtual ~AbstractSeparator()  = default;

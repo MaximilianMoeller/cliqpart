@@ -28,7 +28,8 @@ struct RunConfig {
   int run_count {1};
   int graph_degree;
   double value_offset;
-  double integrality_tolerance;
+  double value_scaling;
+  double tolerance;
   // data file settings
   int row_labels;
   int column_labels;

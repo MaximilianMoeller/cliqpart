@@ -1,14 +1,15 @@
 name = "template"
-run_count = 3
+run_count = 1
 
 [data_file]
 row_labels = 1
 column_labels = 1
 
 [run_settings]
-graph_degree = 90
+graph_degree = 150
 value_offset = 0.4
-integrality_tolerance = 1e-5
+value_scaling = 1e+4
+tolerance = 1e-5
 
 [[separators]]
 inequality = "Δ"

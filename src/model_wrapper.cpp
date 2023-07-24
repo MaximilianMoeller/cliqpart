@@ -19,7 +19,7 @@ ModelWrapper::ModelWrapper(GRBEnv &grb_env, RunConfig &config, const string &dat
 
   for (int i = 1; i < degree_; i++) {
 	for (int j = 0; j < i; j++) {
-	  auto obj_coefficient = doc.GetCell<double>(i, j) - config.value_offset;
+	  auto obj_coefficient = (doc.GetCell<double>(i, j) - config.value_offset) * config.value_scaling;
 	  auto var = addVar(0.0,
 						1.0,
 						obj_coefficient,

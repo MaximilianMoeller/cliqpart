@@ -31,7 +31,7 @@ struct ConfigDirValidator : public CLI::Validator {
 	  // make sure the run directory ends in '/' otherwise the following checks would contain '//'.
 	  if (str.back() != '/') {
 		return string("\nRun directory must be specified with trailing '/': " + str);
-	  };
+	  }
 
 	  // RunDir should contain a "run_config.toml" …
 	  helper = CLI::ExistingFile(str + "run_config.toml");
@@ -98,7 +98,7 @@ int main(int argc, char *argv[]) {
 
   try {
 
-	// environment can be kept and parametrized, only models need to be build for each run
+	// environment can be kept and parametrized, only models need to be built for each run
 	unique_ptr<GRBEnv> env = make_unique<GRBEnv>();
 
 	// everything else needs to be rebuilt for every run
@@ -156,33 +156,11 @@ int main(int argc, char *argv[]) {
 		  PLOGI << "Added " << constraints_added << " constraints in iteration " << iteration;
 
 		} while (constraints_added > 0);
-
-
-		// Extract solution
-
-//	if (model.get(GRB_IntAttr_SolCount) > 0) {
-//	  double **sol = new double *[degree];
-//	  for (int i = 0; i < degree; i++)
-//		sol[i] = model.get(GRB_DoubleAttr_X, vars[i], degree);
-//
-//	  cout << "Solution:" << endl << "\t";
-//	  for (int i = 0; i < degree; ++i) {
-//		cout << i << "\t";
-//	  }
-//	  cout << endl << std::string((degree + 1) * 8, '-') << endl;
-//	  for (int i = 0; i < degree; i++) {
-//		cout << i << "|\t";
-//		std::copy(sol[i], sol[i] + degree,
-//				  std::ostream_iterator<int>(std::cout, "       "));
-//		cout << endl;
-//	  }
-//	}
-
 	  }
 	}
-  } catch (GRBException
+  } catch (GRBException&
 		   e) {
-	PLOGE << "Error number: " << e.getErrorCode() << endl;
+	PLOGE << "Gurobi Error number: " << e.getErrorCode() << endl;
 	PLOGE << e.getMessage() << endl;
   } catch (...) {
 	PLOGF << "Unexpected error occurred." << endl;

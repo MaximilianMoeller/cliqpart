@@ -25,18 +25,18 @@ class ModelWrapper : public GRBModel {
   // and the gurobi environment needed to create the model and its variables
   explicit ModelWrapper(GRBEnv &grb_env, RunConfig &config, const string &data_path);
 
-  [[nodiscard]] int GetDegree() const { return degree_; };
+  [[nodiscard]] int NodeCount() const { return degree_; };
   // often convenient, as the model will have a variable for every edge, not node.
   [[nodiscard]] int EdgeCount() const { return (degree_ * (degree_ - 1)) / 2; };
 
   // returns the current solution of a given edge (indices of the adjacent nodes)
-  double GetSolution(int v1, int v2) { return getVar(v1, v2).get(GRB_DoubleAttr_X); };
+  double GetSolution(int v1, int v2) { return GetVar(v1, v2).get(GRB_DoubleAttr_X); };
 
   // returns the objective weight of a given edge (indices of the adjacent nodes)
-  double GetWeight(int v1, int v2) { return getVar(v1, v2).get(GRB_DoubleAttr_Obj); };
+  double GetWeight(int v1, int v2) { return GetVar(v1, v2).get(GRB_DoubleAttr_Obj); };
 
   // returns the gurobi variable object of a given edge (indices of the adjacent nodes)
-  GRBVar getVar(int v1, int v2) { return vars_[GetIndex(v1, v2)]; };
+  GRBVar GetVar(int v1, int v2) { return vars_[GetIndex(v1, v2)]; };
   GRBVar *GetVars() { return vars_.get(); };
 };
 

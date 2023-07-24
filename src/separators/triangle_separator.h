@@ -14,8 +14,10 @@ using namespace std;
 class TriangleSeparator : public AbstractSeparator {
  private:
   const int maxcut_;
+  const int node_count_;
  public:
-  explicit TriangleSeparator(ModelWrapper &model, const int maxcut) : AbstractSeparator(model), maxcut_(maxcut) {};
+  explicit TriangleSeparator(ModelWrapper &model, double tolerance, const int maxcut)
+	: AbstractSeparator(model, tolerance), maxcut_(maxcut), node_count_(model.NodeCount()) {};
   ~TriangleSeparator() override = default;
 
  protected:

@@ -54,12 +54,21 @@ RunConfig RunConfig::FromFile(const string &path) {
 	config.value_offset = tbl["run_settings"]["value_offset"].value_or(0.0);
 	PLOGD << "Values in CSV table will be offset by " << config.value_offset;
 
+	// scaling for edge costs
+	if (!tbl["run_settings"].as_table()->contains("value_scaling")) {
+	  PLOGI << path << ": no value scaling was given, assuming 1."
+			<< "If you’d like to scale all objective values in the CSV table after offsetting them, please set it under 'run_settings.value_scaling' in "
+			<< path;
+	}
+	config.value_scaling = tbl["run_settings"]["value_scaling"].value_or(1e+0);
+	PLOGD << "Values in CSV table will be scaled by " << config.value_scaling;
+
 	// tolerance to integrality
-	if (!tbl["run_settings"].as_table()->contains("integrality_tolerance")) {
+	if (!tbl["run_settings"].as_table()->contains("tolerance")) {
 	  PLOGI << path << ": no integrality tolerance was given, assuming 1e-5.";
 	}
-	config.integrality_tolerance = tbl["run_settings"]["integrality_tolerance"].value_or(1e-5);
-	PLOGD << "Solutions will be treated as integral with tolerance " << config.integrality_tolerance;
+	config.tolerance = tbl["run_settings"]["tolerance"].value_or(1e-5);
+	PLOGD << "Solutions will be treated as integral with tolerance " << config.tolerance;
 
 	// separators
 	if (!tbl.contains("separators") || !tbl["separators"].is_array_of_tables()) {
@@ -113,5 +122,6 @@ RunConfig RunConfig::FromFile(const string &path) {
 	return config;
   } catch (const toml::parse_error &err) {
 	PLOGF << "Could not parse run_config.toml. Error was: " << endl << err << endl;
+	exit(-1);
   }
 }
