@@ -6,7 +6,7 @@ row_labels = 1
 column_labels = 1
 
 [run_settings]
-graph_degree = 150
+graph_degree = 100
 value_offset = 0.4
 value_scaling = 1e+4
 tolerance = 1e-5

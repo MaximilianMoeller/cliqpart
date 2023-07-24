@@ -27,7 +27,7 @@ int TriangleSeparator::add_Cuts() {
 	  auto v_ij = model_.GetSolution(i, j);
 
 	  // if x_ij is already 1 or more (numerical inaccuracies) the inequality can no longer be violated -> continue
-	  if (v_ij >= 1) continue;
+	  if (v_ij >= 1.0) continue;
 
 	  for (int k = 0; k < j; ++k) {
 
@@ -36,12 +36,15 @@ int TriangleSeparator::add_Cuts() {
 
 		double violation_degree = -v_ij + v_ik + v_jk - 1;
 
-		// examples for tolerance = 0.01
-		// | v_ij | v_ik | v_jk | violation_degree | note
-		// | ==== | ==== | ==== | ================ | ================
-		// | 1    | 1    | 1    | 0				   | should be considered satisfied
-		// | 0.999| 1    | 1    | 1.001 - 1 = 0.001| should be considered satisfied
-		// | 0.99 | 1    | 1    | 1.01 - 1 = 0.01  | should be considered violated
+		// only add triangles if they violate the corresponding inequality by more than the tolerance
+		// prevents an issue where, due to floating point arithmetic, the same inequality would be added over and over again
+		//
+		// examples for tolerance = 0.05 (smaller in reality)
+		// | v_ij  | v_ik  | v_jk  | violation_degree  | note
+		// | ===== | ===== | ===== | ================= | ================
+		// | 1     | 1     | 1     | 0				   | needs to be considered satisfied
+		// | 0.999 | 1     | 1     | 1.001 - 1 = 0.001 | should be considered satisfied
+		// | 0.990 | 1     | 1     | 1.010 - 1 = 0.010 | should be considered violated
 		if (violation_degree > tolerance) {
 		  triangles.emplace_back(-v_ij + v_ik + v_jk, make_tuple(i, j, k));
 		  violated++;
