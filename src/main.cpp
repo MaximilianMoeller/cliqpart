@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
   try {
 
 	// environment can be kept and parametrized, only models need to be build for each run
-	unique_ptr<GRBEnv> env{new GRBEnv};
+	unique_ptr<GRBEnv> env = make_unique<GRBEnv>();
 
 	// everything else needs to be rebuilt for every run
 	for (const string &kConfigDir : runs) {
@@ -121,7 +121,7 @@ int main(int argc, char *argv[]) {
 		std::stringstream run_start_time;
 		run_start_time << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d-%X");
 
-		auto const kRunDir = kConfigDir + "run_" + run_start_time.str() + "/";
+		auto const kRunDir = kConfigDir + "_run_" + run_start_time.str() + "_" + to_string(run_counter) + "_/";
 		std::filesystem::create_directories(kRunDir);
 
 		if (log_to_file) {

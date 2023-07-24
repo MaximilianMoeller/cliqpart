@@ -11,7 +11,7 @@ using namespace std;
 ModelWrapper::ModelWrapper(GRBEnv &grb_env, RunConfig &config, const string &data_path) :
   GRBModel(grb_env),
   degree_(config.graph_degree),
-  vars_(new GRBVar[EdgeCount()]) {
+  vars_(make_unique<GRBVar[]>(EdgeCount())) {
   // TODO add error handling (file not found, wrong value types, too few lines/columns, empty lines/columns, ignore cells (i,i), …)
   // TODO add configuration support (row/column headers (i.e. labels), global objective offset)
   // TODO move opening the file to the main function -> constructor adjustment

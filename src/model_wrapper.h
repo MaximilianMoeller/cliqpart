@@ -16,7 +16,7 @@ class ModelWrapper : public GRBModel {
   // the graph_degree of the complete graph, i.e. the number of nodes
   int degree_;
 
-  GRBVar *vars_;
+  unique_ptr<GRBVar[]> vars_;
   [[nodiscard]] int GetIndex(int v1, int v2) const;
 
  public:
@@ -37,9 +37,7 @@ class ModelWrapper : public GRBModel {
 
   // returns the gurobi variable object of a given edge (indices of the adjacent nodes)
   GRBVar getVar(int v1, int v2) { return vars_[GetIndex(v1, v2)]; };
-  GRBVar *GetVars() { return vars_; };
-
-  ~ModelWrapper() { delete vars_; };
+  GRBVar *GetVars() { return vars_.get(); };
 };
 
 #endif //CLIQPART_SRC_MODEL_WRAPPER_H_
