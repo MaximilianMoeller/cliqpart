@@ -1,7 +1,6 @@
 #include "gurobi_c++.h"
 #include <CLI/App.hpp>
 #include <CLI/CLI.hpp>
-#include <algorithm>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -105,8 +104,17 @@ int main(int argc, char *argv[]) {
 	// everything else needs to be rebuilt for every run
 	for (const string &kConfigDir : runs) {
 
+	  // ### BEGIN RUN SETUP ###
+	  auto const now = std::chrono::system_clock::now();
+	  auto in_time_t = std::chrono::system_clock::to_time_t(now);
+	  std::stringstream run_start_time;
+	  run_start_time << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d-%X");
+
+	  auto const kRunDir = kConfigDir + "_run_" + run_start_time.str() + "/";
+	  std::filesystem::create_directories(kRunDir);
+
 	  if (log_to_file) {
-		auto const kLogFile = kConfigDir + "_log";
+		auto const kLogFile = kRunDir + "log";
 		PLOGD << "Setting logfile to " << kLogFile;
 		file_appender.setFileName(kLogFile.c_str());
 	  }
@@ -116,19 +124,11 @@ int main(int argc, char *argv[]) {
 
 	  for (int run_counter = 1; run_counter <= config.run_count; run_counter++) {
 
-
-		// ### BEGIN RUN SETUP ###
-
-		auto const now = std::chrono::system_clock::now();
-		auto in_time_t = std::chrono::system_clock::to_time_t(now);
-		std::stringstream run_start_time;
-		run_start_time << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d-%X");
-
-		auto const kRunDir = kConfigDir + "_run_" + run_start_time.str() + "_" + to_string(run_counter) + "_/";
-		std::filesystem::create_directories(kRunDir);
+		auto const kNumberedRunDir = kRunDir + to_string(run_counter) + "/";
+		std::filesystem::create_directories(kNumberedRunDir);
 
 		if (log_to_file) {
-		  auto const kLogFile = kRunDir + "_log";
+		  auto const kLogFile = kNumberedRunDir + "log";
 		  PLOGD << "Setting logfile to " << kLogFile;
 		  file_appender.setFileName(kLogFile.c_str());
 		}
@@ -146,7 +146,7 @@ int main(int argc, char *argv[]) {
 		do {
 		  iteration++;
 		  model_wrapper.optimize();
-		  model_wrapper.write(kRunDir + "solution_iteration_" + to_string(iteration) + ".sol");
+		  model_wrapper.write(kNumberedRunDir + "solution_iteration_" + to_string(iteration) + ".sol");
 
 		  constraints_added = 0;
 		  for (unique_ptr<AbstractSeparator> &separator : separators) {
