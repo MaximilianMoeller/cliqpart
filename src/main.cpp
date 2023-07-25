@@ -65,6 +65,9 @@ int main(int argc, char *argv[]) {
   bool log_to_file{false};
   app.add_flag("-l", log_to_file, "Enables logging to file, disabled by default.");
 
+  bool gurobi_console_log{false};
+  app.add_flag("-g", gurobi_console_log, "Enables gurobi console log, disabled by default.");
+
   CLI11_PARSE(app, argc, argv)
 
   plog::Severity log_level;
@@ -100,6 +103,10 @@ int main(int argc, char *argv[]) {
 
 	// environment can be kept and parametrized, only models need to be built for each run
 	unique_ptr<GRBEnv> env = make_unique<GRBEnv>();
+	env->set(GRB_IntParam_LogToConsole, gurobi_console_log);
+	if (!log_to_file){
+	  env->set(GRB_StringParam_LogFile, "");
+	}
 
 	// everything else needs to be rebuilt for every run
 	for (const string &kConfigDir : runs) {
@@ -126,15 +133,21 @@ int main(int argc, char *argv[]) {
 
 		auto const kNumberedRunDir = kRunDir + to_string(run_counter) + "/";
 		std::filesystem::create_directories(kNumberedRunDir);
+		auto const kLogFile = kNumberedRunDir + "log";
+		auto const kGurobiLogFile = kNumberedRunDir + "gurobi.log";
 
 		if (log_to_file) {
-		  auto const kLogFile = kNumberedRunDir + "log";
+		  // own logs
 		  PLOGD << "Setting logfile to " << kLogFile;
 		  file_appender.setFileName(kLogFile.c_str());
+
+		  // gurobi logs
+		  // need to create file manually
+		  std::ofstream outfile (kGurobiLogFile);
+		  env->set(GRB_StringParam_LogFile, kGurobiLogFile);
 		}
 
 		// ### END RUN SETUP ###
-
 
 		// load data and create model variables
 		ModelWrapper model_wrapper(*env, config, kConfigDir + "data.csv");
