@@ -6,6 +6,7 @@
 #include "run_config.h"
 #include <string>
 #include <toml++/toml.h>
+#include <algorithm>
 
 RunConfig RunConfig::FromFile(const string &path) {
   toml::table tbl;
@@ -15,7 +16,14 @@ RunConfig RunConfig::FromFile(const string &path) {
 
 	RunConfig config{};
 
-	config.name = tbl["name"].value_or("");
+	if (!tbl.contains("name") || !tbl["name"].is_string()){
+	  PLOGW << "Please provide a string typed 'name' field in the config file " << path << "! " <<
+	  "Defaulting to the config path with the '/' removed";
+	}
+	auto backup_name = path;
+	std::string::iterator end_pos = std::remove(backup_name.begin(), backup_name.end(), '/');
+	backup_name.erase(end_pos, backup_name.end());
+	config.name = tbl["name"].value_or(backup_name);
 
 	if (tbl.contains("run_count") && tbl["run_count"].is_integer()){
 	  config.run_count = tbl["run_count"].value_or(1);

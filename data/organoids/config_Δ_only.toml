@@ -1,4 +1,4 @@
-name = "template"
+name = "Δ"
 run_count = 1
 
 [data_file]
@@ -13,8 +13,4 @@ tolerance = 1e-5
 
 [[separators]]
 inequality = "Δ"
-maxcut = 400
-
-[[separators]]
-inequality = "ST"
 maxcut = 400
