@@ -20,7 +20,7 @@ vector<unique_ptr<AbstractSeparator>> SeparatorFactory::BuildSeparator(RunConfig
 	} else if (holds_alternative<ST_SeparatorConfig>(SepConfig)) {
 	  int maxcut = get<ST_SeparatorConfig>(SepConfig).MAXCUT;
 	  PLOGD << "Creating new [S:T] separator with MAXCUT parameter " << maxcut << " !" ;
-	  res.emplace_back(make_unique<ST_Separator>(data, config.tolerance, maxcut));
+	  res.emplace_back(make_unique<ST_Separator>(data, config.tolerance, maxcut, ST_Separator_Variant::GW2));
 	}
 
   }
