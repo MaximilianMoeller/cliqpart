@@ -150,7 +150,7 @@ int main(int argc, char *argv[]) {
 		  vector<unique_ptr<IAbstractSeparator>>
 			  separators = SeparatorFactory::BuildSeparator(kRunConfig, model_wrapper);
 
-		  int constraints_added, iteration{0};
+		  int constraints_added{0}, iteration{0};
 
 		  // main LP loop, solving LP relaxation and adding violated constraints
 		  do {
@@ -159,7 +159,7 @@ int main(int argc, char *argv[]) {
 			model_wrapper.write(kNumberedRunDir / (to_string(iteration) + ".sol"));
 
 			constraints_added = 0;
-			for (unique_ptr<IAbstractSeparator> &separator : separators) {
+			for (auto &separator : separators) {
 			  if (constraints_added > 0) break;
 			  constraints_added = separator->AddCuts();
 			}

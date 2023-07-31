@@ -11,12 +11,12 @@
 class TriangleSeparatorConfig : public AbstractSeparatorConfig {
  public:
   const int maxcut_;
-  TriangleSeparatorConfig(double tolerance, int maxcut) : AbstractSeparatorConfig(tolerance), maxcut_(maxcut) {};
+  TriangleSeparatorConfig(double tolerance, const int maxcut) : AbstractSeparatorConfig(tolerance), maxcut_(maxcut) {};
 };
 
 class TriangleSeparator : public AbstractSeparator<TriangleSeparatorConfig> {
  public:
-  TriangleSeparator(ModelWrapper &model, TriangleSeparatorConfig &config) : AbstractSeparator(model, config) {}
+  TriangleSeparator(ModelWrapper &model, const TriangleSeparatorConfig &config) : AbstractSeparator(model, config) {}
 
  protected:
   int AddCuts() override;

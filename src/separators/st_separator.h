@@ -9,15 +9,14 @@
 #include "../model_wrapper.h"
 
 enum class StSeparatorHeuristic {
-  GW1,
-  GW2
+  GW1, GW2
 };
 
 class StSeparatorConfig : public AbstractSeparatorConfig {
  public:
-  int maxcut_;
-  StSeparatorHeuristic heuristic_;
-  StSeparatorConfig(double tolerance, int maxcut, StSeparatorHeuristic heuristic)
+  const int maxcut_;
+  const StSeparatorHeuristic heuristic_;
+  StSeparatorConfig(double tolerance, const int maxcut, const StSeparatorHeuristic heuristic)
 	  : AbstractSeparatorConfig(tolerance), maxcut_(maxcut), heuristic_(heuristic) {};
 
 };
@@ -25,9 +24,9 @@ class StSeparatorConfig : public AbstractSeparatorConfig {
 #include "triangle_separator.h"
 class StSeparator : public AbstractSeparator<StSeparatorConfig> {
  public:
-  explicit StSeparator(ModelWrapper &model, StSeparatorConfig &config)
-	  : AbstractSeparator(model, config) {};
+  explicit StSeparator(ModelWrapper &model, const StSeparatorConfig &config) : AbstractSeparator(model, config) {};
 
+ protected:
   int AddCuts() override;
 };
 

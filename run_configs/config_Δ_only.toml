@@ -1,12 +1,7 @@
 name = "Δ"
-run_count = 5
-tolerance = 1e-5
+run_count = 1
+tolerance = 1e-6
 
 [[separators]]
 inequality = "Δ"
-maxcut = 400
-
-[[separators]]
-inequality = "ST"
-heuristic = 1
 maxcut = 400

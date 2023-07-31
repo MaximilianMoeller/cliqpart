@@ -1,20 +1,12 @@
 name = "Δ_st"
 run_count = 1
+tolerance = 1e-6
 
-[data_file]
-row_labels = 1
-column_labels = 1
-
-[run_settings]
-graph_degree = 100
-value_offset = 0.4
-value_scaling = 1e+4
-tolerance = 1e-5
-
-[[separator_configs]]
+[[separators]]
 inequality = "Δ"
 maxcut = 400
 
-[[separator_configs]]
+[[separators]]
 inequality = "ST"
+heuristic = 1
 maxcut = 400
