@@ -5,21 +5,30 @@
 #ifndef CLIQPART_SRC_SEPARATORS_ST_SEPARATOR_H_
 #define CLIQPART_SRC_SEPARATORS_ST_SEPARATOR_H_
 
-enum class ST_Separator_Variant{
+#include "abstract_separator.h"
+#include "../model_wrapper.h"
+
+enum class StSeparatorHeuristic {
   GW1,
   GW2
 };
 
-#include "triangle_separator.h"
-class ST_Separator : public AbstractSeparator {
- protected:
-  const int maxcut_;
-  const ST_Separator_Variant variant_;
+class StSeparatorConfig : public AbstractSeparatorConfig {
  public:
-  explicit ST_Separator(ModelWrapper &model, double tolerance, const int maxcut, ST_Separator_Variant variant)
-	: AbstractSeparator(model, tolerance), maxcut_(maxcut), variant_(variant) {};
+  int maxcut_;
+  StSeparatorHeuristic heuristic_;
+  StSeparatorConfig(double tolerance, int maxcut, StSeparatorHeuristic heuristic)
+	  : AbstractSeparatorConfig(tolerance), maxcut_(maxcut), heuristic_(heuristic) {};
 
-  int add_Cuts() override;
+};
+
+#include "triangle_separator.h"
+class StSeparator : public AbstractSeparator<StSeparatorConfig> {
+ public:
+  explicit StSeparator(ModelWrapper &model, StSeparatorConfig &config)
+	  : AbstractSeparator(model, config) {};
+
+  int AddCuts() override;
 };
 
 #endif //CLIQPART_SRC_SEPARATORS_ST_SEPARATOR_H_

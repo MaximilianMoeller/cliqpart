@@ -6,21 +6,19 @@
 #include <gurobi_c++.h>
 #include <algorithm>
 
-using namespace std;
+typedef tuple<double, tuple<int, int, int>> TriangleTuple;
 
-typedef tuple<double, tuple<int, int, int>> triangle_tuple;
-
-int TriangleSeparator::add_Cuts() {
-  vector<triangle_tuple> triangles;
+int TriangleSeparator::AddCuts() {
+  vector<TriangleTuple> triangles;
   // only add up to MAXCUT violated inequalities in one iteration
   int violated{0};
 
   // iterate through whole graph to find a violated triangle inequalities
   // we only look at the inequality -x_ij + x_ik + x_jk <= 1 here
   // and deal with the other inequalities by iterating over all pairs {(i,j,k) \in \Z_{degree}^3}
-  for (int i = 2; i < node_count_; ++i) {
+  for (int i = 2; i < model_.NodeCount(); ++i) {
 	// enumerate about 5 * maxcut violated inequalities
-	if (violated >= 5 * maxcut_) break;
+	if (violated >= 5 * config_.maxcut_) break;
 
 	for (int j = 1; j < i; ++j) {
 
@@ -45,7 +43,7 @@ int TriangleSeparator::add_Cuts() {
 		// | 1     | 1     | 1     | 0				   | needs to be considered satisfied
 		// | 0.999 | 1     | 1     | 1.001 - 1 = 0.001 | should be considered satisfied
 		// | 0.990 | 1     | 1     | 1.010 - 1 = 0.010 | should be considered violated
-		if (violation_degree > tolerance) {
+		if (violation_degree > config_.tolerance_) {
 		  triangles.emplace_back(-v_ij + v_ik + v_jk, make_tuple(i, j, k));
 		  violated++;
 		}
@@ -60,22 +58,22 @@ int TriangleSeparator::add_Cuts() {
 
 	// to prevent the graph from being ‘partially solved’ in one area before any inequality of another area is even considered,
 	// I will only add one inequality containing a given edge per iteration
-	std::vector<std::vector<bool>> in_inequality(node_count_, std::vector<bool>(node_count_, false));
+	std::vector<std::vector<bool>> in_inequality(model_.NodeCount(), std::vector<bool>(model_.NodeCount(), false));
 
 
 	// sort vector by degree of violation
 	std::sort(triangles.begin(),
 			  triangles.end(),
-			  [](triangle_tuple a, triangle_tuple b) { return std::get<0>(a) > std::get<0>(b); });
+			  [](TriangleTuple a, TriangleTuple b) { return std::get<0>(a) > std::get<0>(b); });
 
 	for (auto &triangle : triangles) {
-	  if (constraints_added >= maxcut_) break;
+	  if (constraints_added >= config_.maxcut_) break;
 	  auto [i, j, k] = std::get<1>(triangle);
 
 	  if (in_inequality[i][j] || in_inequality[i][k] || in_inequality[j][k]) continue;
 
 	  in_inequality[i][j], in_inequality[j][i], in_inequality[i][k], in_inequality[k][i], in_inequality[j][k],
-		in_inequality[k][j] = true;
+		  in_inequality[k][j] = true;
 
 	  model_.addConstr(-model_.GetVar(i, j) + model_.GetVar(i, k) + model_.GetVar(j, k) <= 1);
 	  constraints_added++;

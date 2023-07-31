@@ -1,0 +1,12 @@
+name = "Δ"
+run_count = 5
+tolerance = 1e-5
+
+[[separators]]
+inequality = "Δ"
+maxcut = 400
+
+[[separators]]
+inequality = "ST"
+heuristic = 1
+maxcut = 400

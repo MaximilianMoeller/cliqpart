@@ -7,7 +7,7 @@
 
 #include <vector>
 #include "gurobi_c++.h"
-#include "run_config.h"
+#include "data.h"
 
 using namespace std;
 
@@ -23,7 +23,7 @@ class ModelWrapper : public GRBModel {
   // needs information from the run config to generate edge weights,
   // a path to the CSV data_path,
   // and the gurobi environment needed to create the model and its variables
-  explicit ModelWrapper(GRBEnv &grb_env, RunConfig &config, const string &data_path);
+  explicit ModelWrapper(GRBEnv &grb_env, const string &data_path, DataConfig config);
 
   [[nodiscard]] int NodeCount() const { return degree_; };
   // often convenient, as the model will have a variable for every edge, not node.

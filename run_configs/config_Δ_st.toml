@@ -1,4 +1,4 @@
-name = "Δ"
+name = "Δ_st"
 run_count = 1
 
 [data_file]
@@ -11,6 +11,10 @@ value_offset = 0.4
 value_scaling = 1e+4
 tolerance = 1e-5
 
-[[separators]]
+[[separator_configs]]
 inequality = "Δ"
+maxcut = 400
+
+[[separator_configs]]
+inequality = "ST"
 maxcut = 400

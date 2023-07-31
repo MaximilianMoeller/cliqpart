@@ -8,7 +8,7 @@
 #include "model_wrapper.h"
 
 using namespace std;
-ModelWrapper::ModelWrapper(GRBEnv &grb_env, RunConfig &config, const string &data_path) :
+ModelWrapper::ModelWrapper(GRBEnv &grb_env, const string &data_path, DataConfig config) :
   GRBModel(grb_env),
   degree_(config.graph_degree),
   vars_(make_unique<GRBVar[]>(EdgeCount())) {

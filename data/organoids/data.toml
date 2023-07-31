@@ -1,0 +1,7 @@
+graph_degree = 100
+
+row_labels = 1
+column_labels = 1
+
+value_offset = 0.4
+value_scaling = 1e+4

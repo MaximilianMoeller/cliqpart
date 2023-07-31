@@ -7,127 +7,95 @@
 #include <string>
 #include <toml++/toml.h>
 #include <algorithm>
+#include "separators/st_separator.h"
 
-RunConfig RunConfig::FromFile(const string &path) {
+RunConfig::RunConfig(string &run_config_file) {
   toml::table tbl;
 
   try {
-	tbl = toml::parse_file(path);
+	tbl = toml::parse_file(run_config_file);
 
-	RunConfig config{};
-
-	if (!tbl.contains("name") || !tbl["name"].is_string()){
-	  PLOGW << "Please provide a string typed 'name' field in the config file " << path << "! " <<
-	  "Defaulting to the config path with the '/' removed";
+	if (!tbl.contains("name") || !tbl["name"].is_string()) {
+	  PLOGW << "Please provide a string typed 'name' field in the config file " << run_config_file << "! ";
 	}
-	auto backup_name = path;
+	auto backup_name = run_config_file;
 	std::string::iterator end_pos = std::remove(backup_name.begin(), backup_name.end(), '/');
 	backup_name.erase(end_pos, backup_name.end());
-	config.name = tbl["name"].value_or(backup_name);
+	name = tbl["name"].value_or(backup_name);
+	PLOGD << "Result of parsing " << run_config_file << " will be named " << name << ".";
 
-	if (tbl.contains("run_count") && tbl["run_count"].is_integer()){
-	  config.run_count = tbl["run_count"].value_or(1);
+	if (!tbl.contains("run_count") || !tbl["run_count"].is_integer()) {
+	  PLOGI << "No 'run_count' key was given in " << run_config_file << ". Assuming 1.";
 	}
-
-	// row and column headers
-	if (!tbl.contains("data_file") || !tbl["data_file"].is_table()
-	  || !tbl["data_file"].as_table()->contains("row_labels")
-	  || !tbl["data_file"].as_table()->contains("column_labels")) {
-	  PLOGW << "Please consider configuring the 'row_labels' and 'column_labels' values in the 'data_file' table in "
-			<< path << "! " << "Missing values will be assumed 0, i.e. no row or column headers exist.";
-	} else if (!tbl["data_file"]["row_labels"].is_integer() || !tbl["data_file"]["row_labels"].is_integer()) {
-	  PLOGW << "Fields 'row_labels' and 'column_labels' must be integer! Assuming 0.";
-	}
-	config.column_labels = tbl["data_file"]["column_labels"].value_or(0);
-	config.row_labels = tbl["data_file"]["row_labels"].value_or(0);
-	PLOGD << "CSV data is assumed to have " << config.column_labels << " row(s) of column labels and "
-		  << config.row_labels << " column(s) of row labels.";
-
-	// degree of the graph
-	if (!tbl.contains("run_settings") || !tbl["run_settings"].is_table()
-	  || !tbl["run_settings"].as_table()->contains("graph_degree")
-	  || !tbl["run_settings"]["graph_degree"].is_integer()) {
-	  PLOGF << path << " must contain a table 'run_settings' with an integer value for the key 'graph_degree'!";
-	  exit(-1);
-	}
-	config.graph_degree = tbl["run_settings"]["graph_degree"].value_or(-1);
-	PLOGD << "Graph degree set to " << config.graph_degree;
-
-	// offset for edge costs
-	if (!tbl["run_settings"].as_table()->contains("value_offset")) {
-	  PLOGI << path << ": no value offset was given, assuming 0."
-			<< "If you’d like to subtract a constant offset from all values in the CSV table, please set it under 'run_settings.value_offset' in "
-			<< path;
-	}
-	config.value_offset = tbl["run_settings"]["value_offset"].value_or(0.0);
-	PLOGD << "Values in CSV table will be offset by " << config.value_offset;
-
-	// scaling for edge costs
-	if (!tbl["run_settings"].as_table()->contains("value_scaling")) {
-	  PLOGI << path << ": no value scaling was given, assuming 1."
-			<< "If you’d like to scale all objective values in the CSV table after offsetting them, please set it under 'run_settings.value_scaling' in "
-			<< path;
-	}
-	config.value_scaling = tbl["run_settings"]["value_scaling"].value_or(1e+0);
-	PLOGD << "Values in CSV table will be scaled by " << config.value_scaling;
+	run_count = tbl["run_count"].value_or(1);
+	PLOGD << "Run count of the configuration " << name << " set to " << run_count << ".";
 
 	// tolerance to integrality
-	if (!tbl["run_settings"].as_table()->contains("tolerance")) {
-	  PLOGI << path << ": no integrality tolerance was given, assuming 1e-5.";
+	if (!tbl.contains("tolerance")) {
+	  PLOGI << run_config_file << ": no integrality tolerance was given, assuming 1e-6.";
 	}
-	config.tolerance = tbl["run_settings"]["tolerance"].value_or(1e-5);
-	PLOGD << "Solutions will be treated as integral with tolerance " << config.tolerance;
+	tolerance = tbl["tolerance"].value_or(1e-6);
+	PLOGD << "Solutions will be treated as integral with tolerance " << tolerance;
 
 	// separators
 	if (!tbl.contains("separators") || !tbl["separators"].is_array_of_tables()) {
-	  PLOGF << path << " must contain an array of tables called 'separators'!";
+	  PLOGF << run_config_file << " must contain an array of tables called 'separators'!";
 	  exit(-1);
 	}
 
-	vector<variants> separators{};
-
 	toml::array seps = *tbl["separators"].as_array();
-	PLOGD << path << " contains " << seps.size() << " entries in the 'separators' array.";
-	seps.for_each([&path, &config](toml::table &elem) mutable {
+	PLOGD << run_config_file << " contains " << seps.size() << " entries in the 'separators' array.";
+	seps.for_each([&run_config_file, this](toml::table &elem) mutable {
 	  if (!elem.contains("inequality") || !elem["inequality"].is_string()) {
 
-		PLOGF << path
+		PLOGF << run_config_file
 			  << ": each table of the 'separators' array must contain a 'inequality' key with a value from the following list: "
-			  << endl
-			  << "Valid for triangle inequalities: ['Δ', 'Triangle', 'triangle', 'T', 't']" << endl
+			  << endl << "Valid for triangle inequalities: ['Δ', 'Triangle', 'triangle', 'T', 't']" << endl
 			  << "Valid for [S:T]-inequalities: ['st', 'ST', 's:t', 'S:T']" << endl
 			  << "Skipping the current separator because these conditions were not met.";
 		return;
 	  }
 	  auto ineq = elem["inequality"];
 	  if (ineq == "Δ" || ineq == "Triangle" || ineq == "triangle" || ineq == "T" || ineq == "t") {
-		if (!elem.contains("maxcut") || !elem["maxcut"].is_integer())
+		if (!elem.contains("maxcut") || !elem["maxcut"].is_integer()) {
 		  PLOGW << "Consider setting the 'maxcut' parameter when using a separator for Δ inequalities!"
 				<< "Defaulting to -1, i.e. no limit on the number of inequalities added per iteration.";
-		TriangleSeparatorConfig separator{elem["maxcut"].value_or(-1)};
-		config.separators.emplace_back(separator);
+		}
+		separator_configs.emplace_back(TriangleSeparatorConfig{tolerance, elem["maxcut"].value_or(-1)});
 	  } else if (ineq == "st" || ineq == "ST" || ineq == "s:t" || ineq == "S:T") {
-		if (!elem.contains("maxcut") || !elem["maxcut"].is_integer())
+		if (!elem.contains("maxcut") || !elem["maxcut"].is_integer()) {
 		  PLOGW << "Consider setting the 'maxcut' parameter when using a separator for [S:T] inequalities!"
 				<< "Defaulting to -1, i.e. no limit on the number of inequalities added per iteration.";
-		ST_SeparatorConfig separator{elem["maxcut"].value_or(-1)};
-		config.separators.emplace_back(separator);
+		}
+		StSeparatorHeuristic heuristic;
+		if (!elem.contains("heuristic") || !elem["heuristic"].is_integer()) {
+		  PLOGW << "No heuristic was given for a [S:T]-separator in " << run_config_file
+				<< ". Assuming a default one.";
+		}
+		int h = elem["heuristic"].value_or(0);
+		switch (h) {
+		  case 1: heuristic = StSeparatorHeuristic::GW1;
+			break;
+		  case 2: heuristic = StSeparatorHeuristic::GW2;
+			break;
+		  default: heuristic = StSeparatorHeuristic::GW1;
+		}
+		separator_configs.emplace_back(StSeparatorConfig{tolerance,
+														 elem["maxcut"].value_or(-1),
+														 heuristic});
 	  } else {
-		PLOGW << path << " contains a table in the 'separators' entry with the 'inequality' attribute specified to "
-			  << ineq.as_string()
-			  << " but this inequality is not supported (yet).";
+		PLOGW << run_config_file
+			  << " contains a table in the 'separators' entry with the 'inequality' attribute specified to "
+			  << ineq.as_string() << " but this inequality is not supported (yet).";
 	  }
 
 	});
-	if (seps.size() != config.separators.size()) {
-	  PLOGW << "Only" << separators.size() << " of " << seps.size()
+	if (seps.size() != separator_configs.size()) {
+	  PLOGW << "Only" << separator_configs.size() << " of " << seps.size()
 			<< " entries of the 'separators' array could be parsed into separators."
 			<< "Please make sure to use TOMLs array of table syntax (see template) for the separators." << endl
 			<< "Non-table entries are skipped during parsing.";
 	}
-
-
-	return config;
   } catch (const toml::parse_error &err) {
 	PLOGF << "Could not parse run_config.toml. Error was: " << endl << err << endl;
 	exit(-1);

@@ -6,22 +6,28 @@
 #define CLIQPART_SRC_SEPARATORS_ABSTRACT_SEPARATOR_H_
 
 #include "../model_wrapper.h"
-#include <gurobi_c++.h>
 
 using namespace std;
 
-class AbstractSeparator {
+class IAbstractSeparator {
+ public:
+  virtual int AddCuts() = 0;
+};
+
+class AbstractSeparatorConfig {
+ public:
+  double tolerance_{1e-6};
+  explicit AbstractSeparatorConfig(double tolerance) : tolerance_(tolerance) {};
+};
+
+template<typename SeparatorConfig, typename = enable_if_t<is_base_of_v<AbstractSeparatorConfig, SeparatorConfig>>>
+class AbstractSeparator : public IAbstractSeparator {
  protected:
   ModelWrapper &model_;
-  double tolerance;
-  int node_count_;
-  int edge_count_;
+  SeparatorConfig &config_;
  public:
-  explicit AbstractSeparator(ModelWrapper &model, double precision)
-	: model_(model), tolerance(precision), node_count_(model_.NodeCount()), edge_count_(model_.EdgeCount()) {};
-  virtual int add_Cuts() = 0;
-
-  virtual ~AbstractSeparator() = default;
+  explicit AbstractSeparator(ModelWrapper &model, SeparatorConfig &config)
+	  : model_(model), config_(config) {};
 };
 
 #endif // CLIQPART_SRC_SEPARATORS_ABSTRACT_SEPARATOR_H_
