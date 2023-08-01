@@ -18,7 +18,7 @@ int TriangleSeparator::AddCuts() {
   // and deal with the other inequalities by iterating over all pairs {(i,j,k) \in \Z_{degree}^3}
   for (int i = 2; i < model_.NodeCount(); ++i) {
 	// enumerate about 5 * maxcut violated inequalities
-	if (violated >= 5 * config_.maxcut_) break;
+	if (config_.maxcut_ > 0 && violated >= 5 * config_.maxcut_) break;
 
 	for (int j = 1; j < i; ++j) {
 
@@ -57,8 +57,11 @@ int TriangleSeparator::AddCuts() {
   if (!triangles.empty()) {
 
 	// to prevent the graph from being ‘partially solved’ in one area before any inequality of another area is even considered,
-	// I will only add one inequality containing a given edge per iteration
-	std::vector<std::vector<bool>> in_inequality(model_.NodeCount(), std::vector<bool>(model_.NodeCount(), false));
+	// configurable via the variable_once_ attribute in the run config
+	std::vector<std::vector<bool>> in_inequality;
+	if (config_.variable_once_) {
+	  in_inequality = vector(model_.NodeCount(), std::vector<bool>(model_.NodeCount(), false));
+	};
 
 
 	// sort vector by degree of violation
@@ -67,13 +70,16 @@ int TriangleSeparator::AddCuts() {
 			  [](TriangleTuple a, TriangleTuple b) { return std::get<0>(a) > std::get<0>(b); });
 
 	for (auto &triangle : triangles) {
-	  if (constraints_added >= config_.maxcut_) break;
+	  if (config_.maxcut_ > 0 && constraints_added >= config_.maxcut_) break;
 	  auto [i, j, k] = std::get<1>(triangle);
 
-	  if (in_inequality[i][j] || in_inequality[i][k] || in_inequality[j][k]) continue;
+	  if (config_.variable_once_) {
+		if (in_inequality[i][j] || in_inequality[i][k] || in_inequality[j][k]) continue;
 
-	  in_inequality[i][j], in_inequality[j][i], in_inequality[i][k], in_inequality[k][i], in_inequality[j][k],
-		  in_inequality[k][j] = true;
+		in_inequality[i][j] = in_inequality[j][i]
+			= in_inequality[i][k] = in_inequality[k][i]
+			= in_inequality[j][k] = in_inequality[k][j] = true;
+	  }
 
 	  model_.addConstr(-model_.GetVar(i, j) + model_.GetVar(i, k) + model_.GetVar(j, k) <= 1);
 	  constraints_added++;

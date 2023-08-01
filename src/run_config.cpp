@@ -50,27 +50,35 @@ RunConfig::RunConfig(string &run_config_file) {
 
 		PLOGF << run_config_file
 			  << ": each table of the 'separators' array must contain a 'inequality' key with a value from the following list: "
-			  << endl << "Valid for triangle inequalities: ['Δ', 'Triangle', 'triangle', 'T', 't']" << endl
-			  << "Valid for [S:T]-inequalities: ['st', 'ST', 's:t', 'S:T']" << endl
+			  << "Valid for triangle inequalities: ['Δ', 'Triangle', 'triangle', 'T', 't']. "
+			  << "Valid for [S:T]-inequalities: ['st', 'ST', 's:t', 'S:T']. "
 			  << "Skipping the current separator because these conditions were not met.";
 		return;
 	  }
 	  auto ineq = elem["inequality"];
+	  // ### Δ inequalities
 	  if (ineq == "Δ" || ineq == "Triangle" || ineq == "triangle" || ineq == "T" || ineq == "t") {
 		if (!elem.contains("maxcut") || !elem["maxcut"].is_integer()) {
-		  PLOGW << "Consider setting the 'maxcut' parameter when using a separator for Δ inequalities!"
+		  PLOGW << "Consider setting the 'maxcut' parameter when using a separator for Δ inequalities! "
 				<< "Defaulting to -1, i.e. no limit on the number of inequalities added per iteration.";
 		}
-		separator_configs.emplace_back(TriangleSeparatorConfig{tolerance, elem["maxcut"].value_or(-1)});
-	  } else if (ineq == "st" || ineq == "ST" || ineq == "s:t" || ineq == "S:T") {
+		if (!elem.contains("variable_once") || !elem["variable_once"].is_boolean()) {
+		  PLOGW << "Consider setting the 'variable_once' flag when using a separator for Δ inequalities! "
+				<< "If set to 'true', for each variable there will be at most one Δ inequality containing that variable added per iteration. "
+				<< "Defaulting to 'false'.";
+		}
+		separator_configs.emplace_back(TriangleSeparatorConfig{tolerance, elem["maxcut"].value_or(-1),
+															   elem["variable_once"].value_or(false)});
+	  }
+		// ### [S:T] inequalities
+	  else if (ineq == "st" || ineq == "ST" || ineq == "s:t" || ineq == "S:T") {
 		if (!elem.contains("maxcut") || !elem["maxcut"].is_integer()) {
-		  PLOGW << "Consider setting the 'maxcut' parameter when using a separator for [S:T] inequalities!"
+		  PLOGW << "Consider setting the 'maxcut' parameter when using a separator for [S:T] inequalities! "
 				<< "Defaulting to -1, i.e. no limit on the number of inequalities added per iteration.";
 		}
 		StSeparatorHeuristic heuristic;
 		if (!elem.contains("heuristic") || !elem["heuristic"].is_integer()) {
-		  PLOGW << "No heuristic was given for a [S:T]-separator in " << run_config_file
-				<< ". Assuming a default one.";
+		  PLOGW << "No heuristic was given for a [S:T]-separator in " << run_config_file << ". Assuming a default one.";
 		}
 		int h = elem["heuristic"].value_or(0);
 		switch (h) {
@@ -80,9 +88,7 @@ RunConfig::RunConfig(string &run_config_file) {
 			break;
 		  default: heuristic = StSeparatorHeuristic::GW1;
 		}
-		separator_configs.emplace_back(StSeparatorConfig{tolerance,
-														 elem["maxcut"].value_or(-1),
-														 heuristic});
+		separator_configs.emplace_back(StSeparatorConfig{tolerance, elem["maxcut"].value_or(-1), heuristic});
 	  } else {
 		PLOGW << run_config_file
 			  << " contains a table in the 'separators' entry with the 'inequality' attribute specified to "
@@ -91,13 +97,13 @@ RunConfig::RunConfig(string &run_config_file) {
 
 	});
 	if (seps.size() != separator_configs.size()) {
-	  PLOGW << "Only" << separator_configs.size() << " of " << seps.size()
-			<< " entries of the 'separators' array could be parsed into separators."
-			<< "Please make sure to use TOMLs array of table syntax (see template) for the separators." << endl
+	  PLOGW << "Only " << separator_configs.size() << " of " << seps.size()
+			<< " entries of the 'separators' array could be parsed into separators. "
+			<< "Please make sure to use TOMLs array of table syntax (see template) for the separators. "
 			<< "Non-table entries are skipped during parsing.";
 	}
   } catch (const toml::parse_error &err) {
-	PLOGF << "Could not parse run_config.toml. Error was: " << endl << err << endl;
+	PLOGF << "Could not parse run_config.toml. Error was: " << err;
 	exit(-1);
   }
 }

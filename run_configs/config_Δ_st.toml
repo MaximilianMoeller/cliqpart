@@ -4,6 +4,7 @@ tolerance = 1e-6
 
 [[separators]]
 inequality = "Δ"
+variable_once = true
 maxcut = 400
 
 [[separators]]
