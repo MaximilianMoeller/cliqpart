@@ -10,29 +10,50 @@
 using namespace std;
 
 class IAbstractSeparator {
+ protected:
+  const int degree_;
+  [[nodiscard]] int EdgeCount() const { return (degree_ * (degree_ - 1)) / 2; };
+  [[nodiscard]] int NodesToEdge(int v1, int v2) const {
+	if (v1 < 0 || v2 < 0 || v1 >= degree_ || v2 >= degree_) {
+	  PLOGF << "Access to variable v_" << v1 << "_" << v2
+			<< " was requested, but graph only has vertices from index 0 to " << degree_ - 1 << "!"
+			<< "This is most likely a mistake in the program logic of a separator.";
+	  exit(-1);
+	}
+	if (v1 == v2) {
+	  PLOGF << "Access to variable v_" << v1 << "_" << v2
+			<< " was requested, but graph does not contain reflexive edges."
+			<< "This is most likely a mistake in the program logic of a separator.";
+	  exit(-1);
+	}
+
+	if (v1 < v2) {
+	  return v2 * (v2 - 1) / 2 + v1;
+	}
+	return v1 * (v1 - 1) / 2 + v2;
+  };
+
  public:
+  explicit IAbstractSeparator(int degree) : degree_(degree) {};
   virtual ~IAbstractSeparator() = default;
-  virtual int AddCuts() = 0;
+  virtual vector<GRBTempConstr> AddCuts(double *solution, GRBVar *vars) = 0;
 };
 
 class AbstractSeparatorConfig {
  public:
   const double tolerance_{1e-6};
   explicit AbstractSeparatorConfig(const double tolerance) : tolerance_(tolerance) {};
+  AbstractSeparatorConfig() = default;
   virtual ~AbstractSeparatorConfig() = default;
 };
 
 template<typename SeparatorConfig, typename = enable_if_t<is_base_of_v<AbstractSeparatorConfig, SeparatorConfig>>>
 class AbstractSeparator : public IAbstractSeparator {
  protected:
-  ModelWrapper &model_;
-  // I thought this should be a 'const SeparatorConfig &config_',
-  // but the runs just make noooo sense if it is, i.e. the maxcut member variable of a TriangleSeparatorConfig gets
-  // changed even when constant.
-  // I guess my C++ is not good enough to understand this.
   const SeparatorConfig config_;
  public:
-  explicit AbstractSeparator(ModelWrapper &model, const SeparatorConfig &config) : model_(model), config_(config) {};
+  explicit AbstractSeparator(int degree, const SeparatorConfig &config)
+	  : IAbstractSeparator(degree), config_(config) {};
 };
 
 #endif // CLIQPART_SRC_SEPARATORS_ABSTRACT_SEPARATOR_H_

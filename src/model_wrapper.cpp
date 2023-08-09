@@ -8,10 +8,10 @@
 #include "model_wrapper.h"
 
 using namespace std;
-ModelWrapper::ModelWrapper(GRBEnv &grb_env, const string &data_path, DataConfig config) :
-  GRBModel(grb_env),
-  degree_(config.graph_degree),
-  vars_(make_unique<GRBVar[]>(EdgeCount())) {
+ModelWrapper::ModelWrapper(GRBEnv &grb_env, const string &data_path, DataConfig config, bool continuous) :
+	GRBModel(grb_env),
+	degree_(config.graph_degree),
+	vars_(make_unique<GRBVar[]>(EdgeCount())) {
   // TODO add error handling (file not found, wrong value types, too few lines/columns, empty lines/columns, ignore cells (i,i), …)
   // TODO add configuration support (row/column headers (i.e. labels), global objective offset)
   // TODO move opening the file to the main function -> constructor adjustment
@@ -23,9 +23,9 @@ ModelWrapper::ModelWrapper(GRBEnv &grb_env, const string &data_path, DataConfig 
 	  auto var = addVar(0.0,
 						1.0,
 						obj_coefficient,
-						GRB_CONTINUOUS,
+						continuous ? GRB_CONTINUOUS : GRB_BINARY,
 						"x_" + to_string(i) + "_" + to_string(j));
-	  vars_[GetIndex(i,j)] = var;
+	  vars_[GetIndex(i, j)] = var;
 	}
   }
 
@@ -33,12 +33,14 @@ ModelWrapper::ModelWrapper(GRBEnv &grb_env, const string &data_path, DataConfig 
 int ModelWrapper::GetIndex(int v1, int v2) const {
   if (v1 < 0 || v2 < 0 || v1 >= degree_ || v2 >= degree_) {
 	PLOGF << "Access to variable v_" << v1 << "_" << v2
-		  << " was requested, but graph only has vertices from index 0 to " << degree_ - 1 << endl;
+		  << " was requested, but graph only has vertices from index 0 to " << degree_ - 1 << "!"
+		  << "This is most likely a mistake in the program logic of a separator.";
 	exit(-1);
   }
   if (v1 == v2) {
 	PLOGF << "Access to variable v_" << v1 << "_" << v2
-		  << " was requested, but graph does not contain reflexive edges.";
+		  << " was requested, but graph does not contain reflexive edges."
+		  << "This is most likely a mistake in the program logic of a separator.";
 	exit(-1);
   }
 

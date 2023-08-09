@@ -14,20 +14,19 @@ enum class StSeparatorHeuristic {
 
 class StSeparatorConfig : public AbstractSeparatorConfig {
  public:
-  const int maxcut_;
-  const StSeparatorHeuristic heuristic_;
+  const int maxcut_{-1};
+  const StSeparatorHeuristic heuristic_{StSeparatorHeuristic::GW1};
   StSeparatorConfig(double tolerance, const int maxcut, const StSeparatorHeuristic heuristic)
 	  : AbstractSeparatorConfig(tolerance), maxcut_(maxcut), heuristic_(heuristic) {};
+  StSeparatorConfig() = default;
 
 };
 
 #include "triangle_separator.h"
 class StSeparator : public AbstractSeparator<StSeparatorConfig> {
  public:
-  explicit StSeparator(ModelWrapper &model, const StSeparatorConfig &config) : AbstractSeparator(model, config) {};
-
- protected:
-  int AddCuts() override;
+  explicit StSeparator(const int degree, const StSeparatorConfig &config) : AbstractSeparator(degree, config) {};
+  vector<GRBTempConstr> AddCuts(double *solution, GRBVar *vars) override;
 };
 
 #endif //CLIQPART_SRC_SEPARATORS_ST_SEPARATOR_H_

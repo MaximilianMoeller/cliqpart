@@ -12,7 +12,7 @@
 
 class SeparatorFactory {
  public:
-  static vector<unique_ptr<IAbstractSeparator>> BuildSeparator(const RunConfig &config, ModelWrapper& data);
+  static vector<unique_ptr<IAbstractSeparator>> BuildSeparator(int degree, const RunConfig &config);
 };
 
 #endif //CLIQPART_SRC_SEPARATOR_FACTORY_H_

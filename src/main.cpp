@@ -19,6 +19,11 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
 
+  /* ###########################
+   * # Command line arguments #
+   * ##########################
+  */
+
   CLI::App
 	  app("Comparison Implementation of different heuristics for solving the LP-relaxation of CLIQUE PARTITIONING.");
 
@@ -44,7 +49,7 @@ int main(int argc, char *argv[]) {
   app.add_flag("-g", gurobi_console_log, "Enables gurobi console log, disabled by default.");
 
   bool lp_only{false};
-  app.add_flag("--lp-only", gurobi_console_log, "Scip solving the ILP to optimality and only solve the LP relaxation");
+  app.add_flag("--lp-only", lp_only, "Scip solving the ILP to optimality and only solve the LP relaxation");
 
   CLI11_PARSE(app, argc, argv)
 
@@ -65,6 +70,11 @@ int main(int argc, char *argv[]) {
 	  break;
   }
 
+  /* ################################
+   * # Setup of results and logging #
+   * ################################
+  */
+
   filesystem::path results_dir{"results/"};
   filesystem::create_directories(results_dir);
 
@@ -84,6 +94,11 @@ int main(int argc, char *argv[]) {
 	plog::init(log_level, &file_appender).addAppender(&console_appender);
   }
 
+  /* ##########################
+   * # Loading configurations #
+   * ##########################
+  */
+
   vector<RunConfig> run_configs{};
   for (auto run_config_path : run_config_paths) {
 	RunConfig run_config{run_config_path};
@@ -92,7 +107,7 @@ int main(int argc, char *argv[]) {
 
   try {
 
-	// environment can be kept and parametrized, only models need to be built for each run
+	// gurobi environment can be kept and parametrized, only models need to be built for each run
 	unique_ptr<GRBEnv> env = make_unique<GRBEnv>();
 	env->set(GRB_IntParam_LogToConsole, gurobi_console_log);
 	if (no_logs) {
@@ -102,7 +117,9 @@ int main(int argc, char *argv[]) {
 	// everything else needs to be rebuilt for every base dir
 	for (auto &data_dir_path : data_dir_paths) {
 
-	  // TODO do the optimal solution here (and only if not already present)
+	  DataConfig data_config{data_dir_path / "data.toml"};
+
+	  // one base directory per data directory
 	  auto basedir = results_dir / data_dir_path.parent_path().filename();
 	  filesystem::create_directories(basedir);
 	  for (const auto &kRunConfig : run_configs) {
@@ -126,10 +143,10 @@ int main(int argc, char *argv[]) {
 
 		  auto const kNumberedRunDir = kRunDir / to_string(run_counter);
 		  std::filesystem::create_directories(kNumberedRunDir);
-		  auto const kLogFile = kNumberedRunDir / "log";
-		  auto const kGurobiLogFile = kNumberedRunDir / "gurobi.log";
 
 		  if (!no_logs) {
+			auto const kLogFile = kNumberedRunDir / "log";
+			auto const kGurobiLogFile = kNumberedRunDir / "gurobi.log";
 			// own logs
 			PLOGD << "Setting logfile to " << kLogFile;
 			file_appender.setFileName(kLogFile.c_str());
@@ -142,30 +159,37 @@ int main(int argc, char *argv[]) {
 
 		  // ### END RUN SETUP ###
 
-		  // load data and create model variables
-		  DataConfig data_config{data_dir_path / "data.toml"};
-		  ModelWrapper model_wrapper(*env, data_dir_path / "data.csv", data_config);
-
 		  // generate separators based on run_config
 		  vector<unique_ptr<IAbstractSeparator>>
-			  separators = SeparatorFactory::BuildSeparator(kRunConfig, model_wrapper);
+			  separators = SeparatorFactory::BuildSeparator(data_config.graph_degree, kRunConfig);
 
-		  int constraints_added{0}, iteration{0};
+		  // load data and create model variables
+		  ModelWrapper model_wrapper(*env, data_dir_path / "data.csv", data_config);
+
+		  int iteration{0};
+		  vector<GRBTempConstr> violated_constraints;
 
 		  // main LP loop, solving LP relaxation and adding violated constraints
 		  do {
+			// solving LP and writing solution to file
 			iteration++;
 			model_wrapper.optimize();
 			model_wrapper.write(kNumberedRunDir / (to_string(iteration) + ".sol"));
 
-			constraints_added = 0;
+			// enumerating violated constraints
+			violated_constraints = {};
 			for (auto &separator : separators) {
-			  if (constraints_added > 0) break;
-			  constraints_added = separator->AddCuts();
+			  violated_constraints = separator->AddCuts(model_wrapper.GetSolution(), model_wrapper.GetVars());
+			  if (!violated_constraints.empty()) break;
 			}
-			PLOGI << "Added " << constraints_added << " constraints in iteration " << iteration;
 
-		  } while (constraints_added > 0);
+			// adding violated constraints to model
+			for (const auto &constraint : violated_constraints) {
+			  model_wrapper.addConstr(constraint);
+			}
+			PLOGI << "Added " << violated_constraints.size() << " constraints in iteration " << iteration;
+
+		  } while (!violated_constraints.empty());
 		}
 
 	  }

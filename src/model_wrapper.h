@@ -23,7 +23,7 @@ class ModelWrapper : public GRBModel {
   // needs information from the run config to generate edge weights,
   // a path to the CSV data_path,
   // and the gurobi environment needed to create the model and its variables
-  explicit ModelWrapper(GRBEnv &grb_env, const string &data_path, DataConfig config);
+  explicit ModelWrapper(GRBEnv &grb_env, const string &data_path, DataConfig config, bool continuous = true);
 
   [[nodiscard]] int NodeCount() const { return degree_; };
   // often convenient, as the model will have a variable for every edge, not node.
@@ -31,6 +31,7 @@ class ModelWrapper : public GRBModel {
 
   // returns the current solution of a given edge (indices of the adjacent nodes)
   double GetSolution(int v1, int v2) { return GetVar(v1, v2).get(GRB_DoubleAttr_X); };
+  double *GetSolution() { return get(GRB_DoubleAttr_X, vars_.get(), EdgeCount()); }
 
   // returns the objective weight of a given edge (indices of the adjacent nodes)
   double GetWeight(int v1, int v2) { return GetVar(v1, v2).get(GRB_DoubleAttr_Obj); };
