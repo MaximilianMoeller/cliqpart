@@ -6,7 +6,7 @@
 #define CLIQPART_SRC_SEPARATORS_TRIANGLE_SEPARATOR_H_
 
 #include "abstract_separator.h"
-#include "../model_wrapper.h"
+#include "../clique_part_model.h"
 
 class TriangleSeparatorConfig : public AbstractSeparatorConfig {
  public:
@@ -20,7 +20,7 @@ class TriangleSeparatorConfig : public AbstractSeparatorConfig {
 class TriangleSeparator : public AbstractSeparator<TriangleSeparatorConfig> {
  public:
   TriangleSeparator(int degree, const TriangleSeparatorConfig &config) : AbstractSeparator(degree, config) {}
-  vector<GRBTempConstr> AddCuts(double *solution, GRBVar *vars) override;
+  vector<GRBTempConstr> SeparateSolution(double *solution, GRBVar *vars) override;
 };
 
 #endif // CLIQPART_SRC_SEPARATORS_TRIANGLE_SEPARATOR_H_

@@ -8,7 +8,7 @@
 #include <memory>
 #include "separators/abstract_separator.h"
 #include "run_config.h"
-#include "model_wrapper.h"
+#include "clique_part_model.h"
 
 class SeparatorFactory {
  public:

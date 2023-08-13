@@ -38,7 +38,7 @@ DataConfig::DataConfig(const string &data_description_file) {
 
 	// offset for edge costs
 	if (!tbl.contains("value_offset")) {
-	  PLOGI << data_description_file << ": no value offset was given, assuming 0."
+	  PLOGW << data_description_file << ": no value offset was given, assuming 0."
 			<< "If you’d like to subtract a constant offset from all values in the "
 			   "CSV table, please use the key 'value_offset' in " << data_description_file;
 	}
@@ -47,7 +47,7 @@ DataConfig::DataConfig(const string &data_description_file) {
 
 	// scaling for edge costs
 	if (!tbl.contains("value_scaling")) {
-	  PLOGI << data_description_file << ": no value scaling was given, assuming 1."
+	  PLOGW << data_description_file << ": no value scaling was given, assuming 1."
 			<< "If you’d like to scale all objective values in the CSV table "
 			   "after offsetting them, please use the key 'value_scaling' in " << data_description_file;
 	}

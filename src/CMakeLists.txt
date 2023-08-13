@@ -4,8 +4,8 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
         run_config.cpp
         data.h
         data.cpp
-        model_wrapper.h
-        model_wrapper.cpp
+        clique_part_model.h
+        clique_part_model.cpp
         separator_factory.h
         separator_factory.cpp
         separators/abstract_separator.h
@@ -13,4 +13,6 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
         separators/triangle_separator.cpp
         separators/st_separator.h
         separators/st_separator.cpp
+        ilp_callback.cpp
+        ilp_callback.h
         )

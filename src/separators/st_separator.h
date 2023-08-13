@@ -6,7 +6,7 @@
 #define CLIQPART_SRC_SEPARATORS_ST_SEPARATOR_H_
 
 #include "abstract_separator.h"
-#include "../model_wrapper.h"
+#include "../clique_part_model.h"
 
 enum class StSeparatorHeuristic {
   GW1, GW2
@@ -26,7 +26,7 @@ class StSeparatorConfig : public AbstractSeparatorConfig {
 class StSeparator : public AbstractSeparator<StSeparatorConfig> {
  public:
   explicit StSeparator(const int degree, const StSeparatorConfig &config) : AbstractSeparator(degree, config) {};
-  vector<GRBTempConstr> AddCuts(double *solution, GRBVar *vars) override;
+  vector<GRBTempConstr> SeparateSolution(double *solution, GRBVar *vars) override;
 };
 
 #endif //CLIQPART_SRC_SEPARATORS_ST_SEPARATOR_H_

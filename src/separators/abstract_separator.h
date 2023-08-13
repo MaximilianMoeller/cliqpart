@@ -5,7 +5,7 @@
 #ifndef CLIQPART_SRC_SEPARATORS_ABSTRACT_SEPARATOR_H_
 #define CLIQPART_SRC_SEPARATORS_ABSTRACT_SEPARATOR_H_
 
-#include "../model_wrapper.h"
+#include "../clique_part_model.h"
 
 using namespace std;
 
@@ -13,7 +13,7 @@ class IAbstractSeparator {
  protected:
   const int degree_;
   [[nodiscard]] int EdgeCount() const { return (degree_ * (degree_ - 1)) / 2; };
-  [[nodiscard]] int NodesToEdge(int v1, int v2) const {
+  [[nodiscard]] int EdgeIndex(int v1, int v2) const {
 	if (v1 < 0 || v2 < 0 || v1 >= degree_ || v2 >= degree_) {
 	  PLOGF << "Access to variable v_" << v1 << "_" << v2
 			<< " was requested, but graph only has vertices from index 0 to " << degree_ - 1 << "!"
@@ -36,7 +36,7 @@ class IAbstractSeparator {
  public:
   explicit IAbstractSeparator(int degree) : degree_(degree) {};
   virtual ~IAbstractSeparator() = default;
-  virtual vector<GRBTempConstr> AddCuts(double *solution, GRBVar *vars) = 0;
+  virtual vector<GRBTempConstr> SeparateSolution(double *solution, GRBVar *vars) = 0;
 };
 
 class AbstractSeparatorConfig {

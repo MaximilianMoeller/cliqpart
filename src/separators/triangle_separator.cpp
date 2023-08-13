@@ -8,10 +8,11 @@
 
 typedef tuple<double, tuple<int, int, int>> TriangleTuple;
 
-vector<GRBTempConstr> TriangleSeparator::AddCuts(double *solution, GRBVar *vars) {
+vector<GRBTempConstr> TriangleSeparator::SeparateSolution(double *solution, GRBVar *vars) {
   vector<TriangleTuple> triangles;
   // only add up to MAXCUT violated inequalities in one iteration
   int violated{0};
+  PLOGV << "Starting enumeration of Δ-inequalities.";
 
   // iterate through whole graph to find a violated triangle inequalities
   // we only look at the inequality -x_ij + x_ik + x_jk <= 1 here
@@ -22,15 +23,15 @@ vector<GRBTempConstr> TriangleSeparator::AddCuts(double *solution, GRBVar *vars)
 
 	for (int j = 1; j < i; ++j) {
 
-	  auto v_ij = solution[NodesToEdge(i, j)];
+	  auto v_ij = solution[EdgeIndex(i, j)];
 
 	  // if x_ij is already 1 or more (numerical inaccuracies) the inequality can no longer be violated -> continue
 	  if (v_ij >= 1.0 - config_.tolerance_) continue;
 
 	  for (int k = 0; k < j; ++k) {
 
-		auto v_ik = solution[NodesToEdge(i, k)];
-		auto v_jk = solution[NodesToEdge(j, k)];
+		auto v_ik = solution[EdgeIndex(i, k)];
+		auto v_jk = solution[EdgeIndex(j, k)];
 
 		double violation_degree = -v_ij + v_ik + v_jk - 1;
 
@@ -82,7 +83,7 @@ vector<GRBTempConstr> TriangleSeparator::AddCuts(double *solution, GRBVar *vars)
 		in_inequality[k][j] = true;
 	  }
 
-	  result.emplace_back(-vars[NodesToEdge(i, j)] + vars[NodesToEdge(i, k)] + vars[NodesToEdge(j, k)] <= 1);
+	  result.emplace_back(-vars[EdgeIndex(i, j)] + vars[EdgeIndex(i, k)] + vars[EdgeIndex(j, k)] <= 1);
 	  constraints_added++;
 
 	}

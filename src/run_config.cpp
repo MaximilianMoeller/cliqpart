@@ -25,14 +25,14 @@ RunConfig::RunConfig(string &run_config_file) {
 	PLOGD << "Result of parsing " << run_config_file << " will be named " << name << ".";
 
 	if (!tbl.contains("run_count") || !tbl["run_count"].is_integer()) {
-	  PLOGI << "No 'run_count' key was given in " << run_config_file << ". Assuming 1.";
+	  PLOGW << "No 'run_count' key was given in " << run_config_file << ". Assuming 1.";
 	}
 	run_count = tbl["run_count"].value_or(1);
 	PLOGD << "Run count of the configuration " << name << " set to " << run_count << ".";
 
 	// tolerance to integrality
 	if (!tbl.contains("tolerance")) {
-	  PLOGI << run_config_file << ": no integrality tolerance was given, assuming 1e-6.";
+	  PLOGW << run_config_file << ": no integrality tolerance was given, assuming 1e-6.";
 	}
 	tolerance = tbl["tolerance"].value_or(1e-6);
 	PLOGD << "Solutions will be treated as integral with tolerance " << tolerance;
@@ -97,7 +97,7 @@ RunConfig::RunConfig(string &run_config_file) {
 
 	});
 	if (seps.size() != separator_configs.size()) {
-	  PLOGW << "Only " << separator_configs.size() << " of " << seps.size()
+	  PLOGW << "Only " << separator_configs.size() << " out of " << seps.size()
 			<< " entries of the 'separators' array could be parsed into separators. "
 			<< "Please make sure to use TOMLs array of table syntax (see template) for the separators. "
 			<< "Non-table entries are skipped during parsing.";

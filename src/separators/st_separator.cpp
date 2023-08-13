@@ -7,9 +7,11 @@
 #include <vector>
 #include <random>
 
-vector<GRBTempConstr> StSeparator::AddCuts(double *solution, GRBVar *vars) {
+vector<GRBTempConstr> StSeparator::SeparateSolution(double *solution, GRBVar *vars) {
   int cuts_added{0};
   vector<GRBTempConstr> result;
+
+  PLOGV << "Starting enumeration of st-inequalities.";
 
   // "For every node v \in V_n, we do the following […]"
   for (int v = 0; v < degree_; ++v) {
@@ -19,7 +21,7 @@ vector<GRBTempConstr> StSeparator::AddCuts(double *solution, GRBVar *vars) {
 	vector<int> w_1;
 	for (int w = 0; w < degree_; ++w) {
 	  if (w == v) continue;
-	  auto v_vw = solution[NodesToEdge(v, w)];
+	  auto v_vw = solution[EdgeIndex(v, w)];
 	  if (0.0 + config_.tolerance_ < v_vw && v_vw < 1.0 - config_.tolerance_) {
 		w_1.emplace_back(w);
 	  }
@@ -48,7 +50,7 @@ vector<GRBTempConstr> StSeparator::AddCuts(double *solution, GRBVar *vars) {
 		  case StSeparatorHeuristic::GW1: {
 			for (auto j : t) {
 			  if (kI == j) continue;
-			  if (solution[NodesToEdge(kI, j)] >= config_.tolerance_) {
+			  if (solution[EdgeIndex(kI, j)] >= config_.tolerance_) {
 				add_i = false;
 				break;
 			  }
@@ -60,9 +62,9 @@ vector<GRBTempConstr> StSeparator::AddCuts(double *solution, GRBVar *vars) {
 			auto sum_ij{0.0};
 			for (auto j : t) {
 			  if (kI == j) continue;
-			  sum_ij += solution[NodesToEdge(kI, j)];
+			  sum_ij += solution[EdgeIndex(kI, j)];
 			}
-			if (solution[NodesToEdge(kI, v)] - sum_ij < config_.tolerance_) add_i = false;
+			if (solution[EdgeIndex(kI, v)] - sum_ij < config_.tolerance_) add_i = false;
 		  }
 			break;
 		}
@@ -74,20 +76,20 @@ vector<GRBTempConstr> StSeparator::AddCuts(double *solution, GRBVar *vars) {
 	  }
 	  double sum{0};
 	  for_each(t.begin(), t.end(), [&](int n) {
-		sum += solution[NodesToEdge(v, n)];
+		sum += solution[EdgeIndex(v, n)];
 	  });
 
 	  if (sum > 1 + config_.tolerance_) {
 		// add all the terms to the constraints
 		GRBLinExpr constraint;
 		for_each(t.begin(), t.end(), [&](int n) {
-		  constraint += vars[NodesToEdge(v, n)];
+		  constraint += vars[EdgeIndex(v, n)];
 		});
 		result.emplace_back(constraint <= 1);
 		cuts_added++;
 	  }
 	}
   }
-  PLOGD << "Added " << cuts_added << " [S:T]-inequalities";
+  PLOGD << "Enumerated " << cuts_added << " violated [S:T]-inequalities";
   return result;
 };

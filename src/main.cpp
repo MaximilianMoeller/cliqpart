@@ -14,6 +14,7 @@
 #include "separator_factory.h"
 #include "data.h"
 #include "run_config.h"
+#include "ilp_callback.h"
 
 using namespace std;
 
@@ -43,10 +44,10 @@ int main(int argc, char *argv[]) {
   CLI::Option *v = app.add_flag("-v", "Level of verbosity; increases with each use.");
 
   bool no_logs{false};
-  app.add_flag("--no-logs", no_logs, "Enables logging to file, disabled by default.");
+  app.add_flag("--no-logs", no_logs, "Disables logging to file, enabled by default.");
 
   bool gurobi_console_log{false};
-  app.add_flag("-g", gurobi_console_log, "Enables gurobi console log, disabled by default.");
+  app.add_flag("-g", gurobi_console_log, "Enables gurobi log in console, disabled by default.");
 
   bool lp_only{false};
   app.add_flag("--lp-only", lp_only, "Scip solving the ILP to optimality and only solve the LP relaxation");
@@ -78,9 +79,8 @@ int main(int argc, char *argv[]) {
   filesystem::path results_dir{"results/"};
   filesystem::create_directories(results_dir);
 
-  // also display colored console logging
+  // display colored console logging
   static plog::ColorConsoleAppender<plog::TxtFormatter> console_appender;
-  // log into a file called "log" before the first run and into "{run_dir}/log" afterward
   filesystem::path initial_log_file = results_dir / "log";
   if (!no_logs) {
 	cout << "Setting logfile to " << initial_log_file.c_str() << endl;
@@ -116,12 +116,43 @@ int main(int argc, char *argv[]) {
 
 	// everything else needs to be rebuilt for every base dir
 	for (auto &data_dir_path : data_dir_paths) {
-
+	  // load data description file
 	  DataConfig data_config{data_dir_path / "data.toml"};
+
+	  if (!lp_only && !filesystem::exists(data_dir_path / "optimal.sol")) {
+		if (!no_logs) {
+		  auto const kLogFile = data_dir_path / "log";
+		  PLOGD << "Setting logfile to " << kLogFile << endl;
+		  file_appender.setFileName(kLogFile.c_str());
+
+		  auto const kGurobiLogFile = data_dir_path / "gurobi.log";
+		  std::ofstream outfile(kGurobiLogFile);
+		  env->set(GRB_StringParam_LogFile, kGurobiLogFile);
+		}
+
+		PLOGI << "Creating ILP model.";
+		CliquePartModel ilp_model{*env, data_dir_path / "data.csv", data_config, false};
+		ilp_model.set(GRB_IntParam_LazyConstraints, 1);
+
+		ILPCallback ilp_callback{ilp_model};
+		ilp_model.setCallback(&ilp_callback);
+
+		PLOGI << "Starting optimal solving";
+
+		ilp_model.optimize();
+		ilp_model.write(data_dir_path / "optimal.sol");
+		PLOGI << "Finished optimal solving";
+	  }
 
 	  // one base directory per data directory
 	  auto basedir = results_dir / data_dir_path.parent_path().filename();
 	  filesystem::create_directories(basedir);
+	  if (!no_logs) {
+		auto const kLogFile = basedir / "log";
+		PLOGD << "Setting logfile to " << kLogFile << endl;
+		file_appender.setFileName(kLogFile.c_str());
+	  }
+
 	  for (const auto &kRunConfig : run_configs) {
 
 		// ### BEGIN RUN SETUP ###
@@ -164,7 +195,7 @@ int main(int argc, char *argv[]) {
 			  separators = SeparatorFactory::BuildSeparator(data_config.graph_degree, kRunConfig);
 
 		  // load data and create model variables
-		  ModelWrapper model_wrapper(*env, data_dir_path / "data.csv", data_config);
+		  CliquePartModel model{*env, data_dir_path / "data.csv", data_config};
 
 		  int iteration{0};
 		  vector<GRBTempConstr> violated_constraints;
@@ -173,19 +204,19 @@ int main(int argc, char *argv[]) {
 		  do {
 			// solving LP and writing solution to file
 			iteration++;
-			model_wrapper.optimize();
-			model_wrapper.write(kNumberedRunDir / (to_string(iteration) + ".sol"));
+			model.optimize();
+			model.write(kNumberedRunDir / (to_string(iteration) + ".sol"));
 
 			// enumerating violated constraints
 			violated_constraints = {};
 			for (auto &separator : separators) {
-			  violated_constraints = separator->AddCuts(model_wrapper.GetSolution(), model_wrapper.GetVars());
+			  violated_constraints = separator->SeparateSolution(model.GetSolution(), model.GetVars());
 			  if (!violated_constraints.empty()) break;
 			}
 
 			// adding violated constraints to model
 			for (const auto &constraint : violated_constraints) {
-			  model_wrapper.addConstr(constraint);
+			  model.addConstr(constraint);
 			}
 			PLOGI << "Added " << violated_constraints.size() << " constraints in iteration " << iteration;
 
