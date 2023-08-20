@@ -55,7 +55,6 @@ int main(int argc, char *argv[]) {
   CLI11_PARSE(app, argc, argv)
 
   plog::Severity log_level;
-
   switch (v->count()) {
 	case 0:log_level = plog::Severity::fatal;
 	  break;
@@ -100,7 +99,7 @@ int main(int argc, char *argv[]) {
   */
 
   vector<RunConfig> run_configs{};
-  for (auto run_config_path : run_config_paths) {
+  for (auto &run_config_path : run_config_paths) {
 	RunConfig run_config{run_config_path};
 	run_configs.emplace_back(run_config);
   }
@@ -119,6 +118,8 @@ int main(int argc, char *argv[]) {
 	  // load data description file
 	  DataConfig data_config{data_dir_path / "data.toml"};
 
+	  // only solve to optimality if it has neither been disabled by the user
+	  // nor has been solved before
 	  if (!lp_only && !filesystem::exists(data_dir_path / "optimal.sol")) {
 		if (!no_logs) {
 		  auto const kLogFile = data_dir_path / "log";
@@ -141,6 +142,7 @@ int main(int argc, char *argv[]) {
 
 		ilp_model.optimize();
 		ilp_model.write(data_dir_path / "optimal.sol");
+		//ilp_model.write(data_dir_path / "ilp_model.mps");
 		PLOGI << "Finished optimal solving";
 	  }
 
@@ -205,6 +207,7 @@ int main(int argc, char *argv[]) {
 			// solving LP and writing solution to file
 			iteration++;
 			model.optimize();
+			PLOGD << "Iteration " << iteration << " took " << model.get(GRB_DoubleAttr_Runtime) << " to optimize.";
 			model.write(kNumberedRunDir / (to_string(iteration) + ".sol"));
 
 			// enumerating violated constraints
@@ -219,10 +222,10 @@ int main(int argc, char *argv[]) {
 			  model.addConstr(constraint);
 			}
 			PLOGI << "Added " << violated_constraints.size() << " constraints in iteration " << iteration;
+			// TODO: add CSV logging for easier analysis
 
 		  } while (!violated_constraints.empty());
 		}
-
 	  }
 	}
   } catch (GRBException &e) {

@@ -4,8 +4,10 @@
 
 #include "ilp_callback.h"
 #include "separators/triangle_separator.h"
+#include "separators/st_separator.h"
 ILPCallback::ILPCallback(CliquePartModel &model) : model(model) {
   triangle_separator_ = make_unique<TriangleSeparator>(model.NodeCount(), TriangleSeparatorConfig());
+  //lp_separators_.emplace_back(make_unique<StSeparator>(model.NodeCount(), StSeparatorConfig()));
 }
 
 void ILPCallback::callback() {
@@ -20,6 +22,15 @@ void ILPCallback::callback() {
 	}
   } else if (where == GRB_CB_MIPNODE && getIntInfo(GRB_CB_MIPNODE_STATUS) == GRB_OPTIMAL) {
 	solution = getNodeRel(model.GetVars(), model.EdgeCount());
-  }
 
+	// enumerating violated constraints
+	vector<GRBTempConstr> violated_constraints = {};
+	for (auto &separator : lp_separators_) {
+	  violated_constraints = separator->SeparateSolution(solution, model.GetVars());
+	  if (!violated_constraints.empty()) break;
+	}
+	for (const auto &constraint : violated_constraints) {
+	  addCut(constraint);
+	}
+  }
 }
