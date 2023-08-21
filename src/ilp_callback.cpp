@@ -16,8 +16,8 @@ void ILPCallback::callback() {
   double *solution;
   if (where == GRB_CB_MIPSOL) {
 	solution = getSolution(model.GetVars(), model.EdgeCount());
-	auto lazy_Constraints = triangle_separator_->SeparateSolution(solution, model.GetVars());
-	for (const auto &constraint : lazy_Constraints) {
+	auto lazy_constraints = triangle_separator_->SeparateSolution(solution, model.GetVars());
+	for (const auto &constraint : lazy_constraints) {
 	  addLazy(constraint);
 	}
   } else if (where == GRB_CB_MIPNODE && getIntInfo(GRB_CB_MIPNODE_STATUS) == GRB_OPTIMAL) {

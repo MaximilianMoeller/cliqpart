@@ -18,6 +18,8 @@ class StSeparatorConfig : public AbstractSeparatorConfig {
   const StSeparatorHeuristic heuristic_{StSeparatorHeuristic::GW1};
   StSeparatorConfig(double tolerance, const int maxcut, const StSeparatorHeuristic heuristic)
 	  : AbstractSeparatorConfig(tolerance), maxcut_(maxcut), heuristic_(heuristic) {};
+  explicit StSeparatorConfig(const StSeparatorHeuristic heuristic)
+	  : heuristic_(heuristic) {};
   StSeparatorConfig() = default;
 
 };

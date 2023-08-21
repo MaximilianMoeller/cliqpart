@@ -29,7 +29,7 @@ vector<GRBTempConstr> StSeparator::SeparateSolution(double *solution, GRBVar *va
 	if (w_1.empty()) continue;
 
 	// "[…] and choose some ordering of the nodes of W"
-	std::shuffle(w_1.begin(), w_1.end(), std::mt19937(std::random_device()()));
+	//std::shuffle(w_1.begin(), w_1.end(), std::mt19937(std::random_device()()));
 
 	// "[…] We repeat this procedure with converse ordering of W"
 	vector<int> w_2{w_1};
@@ -49,7 +49,6 @@ vector<GRBTempConstr> StSeparator::SeparateSolution(double *solution, GRBVar *va
 
 		  case StSeparatorHeuristic::GW1: {
 			for (auto j : t) {
-			  if (kI == j) continue;
 			  if (solution[EdgeIndex(kI, j)] >= config_.tolerance_) {
 				add_i = false;
 				break;
@@ -61,7 +60,6 @@ vector<GRBTempConstr> StSeparator::SeparateSolution(double *solution, GRBVar *va
 		  case StSeparatorHeuristic::GW2: {
 			auto sum_ij{0.0};
 			for (auto j : t) {
-			  if (kI == j) continue;
 			  sum_ij += solution[EdgeIndex(kI, j)];
 			}
 			if (solution[EdgeIndex(kI, v)] - sum_ij < config_.tolerance_) add_i = false;
@@ -69,22 +67,35 @@ vector<GRBTempConstr> StSeparator::SeparateSolution(double *solution, GRBVar *va
 			break;
 		}
 
-		if (add_i) {
+		// add the first element of W
+		if (add_i || t.empty()) {
 		  // "[…] T := T u {i}"
 		  t.emplace_back(kI);
 		}
 	  }
+	  if (t.size() == 1) {
+		continue;
+	  }
 	  double sum{0};
-	  for_each(t.begin(), t.end(), [&](int n) {
-		sum += solution[EdgeIndex(v, n)];
-	  });
+	  for (auto n : t) {
+		auto index = EdgeIndex(v, n);
+		sum += solution[index];
+	  }
 
 	  if (sum > 1 + config_.tolerance_) {
-		// add all the terms to the constraints
+		// add all positive terms to the constraints
 		GRBLinExpr constraint;
-		for_each(t.begin(), t.end(), [&](int n) {
+		for (auto n : t) {
 		  constraint += vars[EdgeIndex(v, n)];
-		});
+		};
+		// add all negative terms, i.e. the edges in T
+		for (auto first = t.begin(); first != t.end(); ++first) {
+		  for (auto second = first + 1; second != t.end(); ++second) {
+			constraint -= vars[EdgeIndex(*first, *second)];
+		  }
+		}
+
+		PLOGV << "Found violated constraint: " << constraint << "<= 1";
 		result.emplace_back(constraint <= 1);
 		cuts_added++;
 	  }

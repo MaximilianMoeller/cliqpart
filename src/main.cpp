@@ -142,6 +142,9 @@ int main(int argc, char *argv[]) {
 
 		ilp_model.optimize();
 		ilp_model.write(data_dir_path / "optimal.sol");
+		StSeparator sep {data_config.graph_degree, StSeparatorConfig{StSeparatorHeuristic::GW1}};
+		sep.SeparateSolution(ilp_model.GetSolution(), ilp_model.GetVars());
+		exit(0);
 		//ilp_model.write(data_dir_path / "ilp_model.mps");
 		PLOGI << "Finished optimal solving";
 	  }
@@ -207,7 +210,7 @@ int main(int argc, char *argv[]) {
 			// solving LP and writing solution to file
 			iteration++;
 			model.optimize();
-			PLOGD << "Iteration " << iteration << " took " << model.get(GRB_DoubleAttr_Runtime) << " to optimize.";
+			PLOGV << "Iteration " << iteration << " took " << model.get(GRB_DoubleAttr_Runtime) << " to optimize.";
 			model.write(kNumberedRunDir / (to_string(iteration) + ".sol"));
 
 			// enumerating violated constraints
@@ -225,6 +228,7 @@ int main(int argc, char *argv[]) {
 			// TODO: add CSV logging for easier analysis
 
 		  } while (!violated_constraints.empty());
+		  model.write(kNumberedRunDir / "0_last.sol");
 		}
 	  }
 	}
