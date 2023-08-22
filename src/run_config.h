@@ -9,34 +9,23 @@
 #include <toml++/toml.h>
 #include <plog/Log.h>
 #include <variant>
+#include "separators/triangle_separator.h"
+#include "separators/st_separator.h"
 
 using namespace std;
 
-struct TriangleSeparatorConfig {
-  const int MAXCUT;
-};
-
-struct ST_SeparatorConfig {
-  const int MAXCUT;
-};
-
-typedef variant<TriangleSeparatorConfig, ST_SeparatorConfig> variants;
+typedef variant<TriangleSeparatorConfig, StSeparatorConfig> ConfigVariant;
 
 struct RunConfig {
+ private:
+  double tolerance;
+ public:
   string name;
   // run settings
-  int run_count {1};
-  int graph_degree;
-  double value_offset;
-  double value_scaling;
-  double tolerance;
-  // data file settings
-  int row_labels;
-  int column_labels;
-  // list of separators
-  vector<variants> separators;
+  int run_count{1};
+  vector<ConfigVariant> separator_configs;
 
-  static RunConfig FromFile(const string &path);
+  explicit RunConfig(string &run_config_file);
 };
 
 #endif // CLIQPART_SRC_RUN_CONFIG_H_

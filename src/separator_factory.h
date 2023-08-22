@@ -8,11 +8,11 @@
 #include <memory>
 #include "separators/abstract_separator.h"
 #include "run_config.h"
-#include "model_wrapper.h"
+#include "clique_part_model.h"
 
 class SeparatorFactory {
  public:
-  static vector<unique_ptr<AbstractSeparator>> BuildSeparator(RunConfig& config, ModelWrapper& data);
+  static vector<unique_ptr<IAbstractSeparator>> BuildSeparator(int degree, const RunConfig &config);
 };
 
 #endif //CLIQPART_SRC_SEPARATOR_FACTORY_H_

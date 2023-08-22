@@ -5,15 +5,28 @@
 #ifndef CLIQPART_SRC_SEPARATORS_ST_SEPARATOR_H_
 #define CLIQPART_SRC_SEPARATORS_ST_SEPARATOR_H_
 
-#include "triangle_separator.h"
-class ST_Separator : public AbstractSeparator {
- protected:
-  const int maxcut_;
- public:
-  explicit ST_Separator(ModelWrapper &model, double tolerance, const int maxcut)
-	: AbstractSeparator(model, tolerance), maxcut_(maxcut) {};
+#include "abstract_separator.h"
+#include "../clique_part_model.h"
 
-  int add_Cuts() override;
+enum class StSeparatorHeuristic {
+  GW1, GW2
+};
+
+class StSeparatorConfig : public AbstractSeparatorConfig {
+ public:
+  const int maxcut_{-1};
+  const StSeparatorHeuristic heuristic_{StSeparatorHeuristic::GW1};
+  StSeparatorConfig(double tolerance, const int maxcut, const StSeparatorHeuristic heuristic)
+	  : AbstractSeparatorConfig(tolerance), maxcut_(maxcut), heuristic_(heuristic) {};
+  StSeparatorConfig() = default;
+
+};
+
+#include "triangle_separator.h"
+class StSeparator : public AbstractSeparator<StSeparatorConfig> {
+ public:
+  explicit StSeparator(const int degree, const StSeparatorConfig &config) : AbstractSeparator(degree, config) {};
+  vector<GRBTempConstr> SeparateSolution(double *solution, GRBVar *vars) override;
 };
 
 #endif //CLIQPART_SRC_SEPARATORS_ST_SEPARATOR_H_

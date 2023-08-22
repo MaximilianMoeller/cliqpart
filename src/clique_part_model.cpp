@@ -5,13 +5,13 @@
 #include <iostream>
 #include "rapidcsv.h"
 
-#include "model_wrapper.h"
+#include "clique_part_model.h"
 
 using namespace std;
-ModelWrapper::ModelWrapper(GRBEnv &grb_env, RunConfig &config, const string &data_path) :
-  GRBModel(grb_env),
-  degree_(config.graph_degree),
-  vars_(make_unique<GRBVar[]>(EdgeCount())) {
+CliquePartModel::CliquePartModel(GRBEnv &grb_env, const string &data_path, DataConfig config, bool continuous) :
+	GRBModel(grb_env),
+	degree_(config.graph_degree),
+	vars_(make_unique<GRBVar[]>(EdgeCount())) {
   // TODO add error handling (file not found, wrong value types, too few lines/columns, empty lines/columns, ignore cells (i,i), …)
   // TODO add configuration support (row/column headers (i.e. labels), global objective offset)
   // TODO move opening the file to the main function -> constructor adjustment
@@ -23,27 +23,10 @@ ModelWrapper::ModelWrapper(GRBEnv &grb_env, RunConfig &config, const string &dat
 	  auto var = addVar(0.0,
 						1.0,
 						obj_coefficient,
-						GRB_CONTINUOUS,
+						continuous ? GRB_CONTINUOUS : GRB_BINARY,
 						"x_" + to_string(i) + "_" + to_string(j));
-	  vars_[GetIndex(i,j)] = var;
+	  vars_[i * (i - 1) / 2 + j] = var;
 	}
   }
 
-}
-int ModelWrapper::GetIndex(int v1, int v2) const {
-  if (v1 < 0 || v2 < 0 || v1 >= degree_ || v2 >= degree_) {
-	PLOGF << "Access to variable v_" << v1 << "_" << v2
-		  << " was requested, but graph only has vertices from index 0 to " << degree_ - 1 << endl;
-	exit(-1);
-  }
-  if (v1 == v2) {
-	PLOGF << "Access to variable v_" << v1 << "_" << v2
-		  << " was requested, but graph does not contain reflexive edges.";
-	exit(-1);
-  }
-
-  if (v1 < v2) {
-	return v2 * (v2 - 1) / 2 + v1;
-  }
-  return v1 * (v1 - 1) / 2 + v2;
 }

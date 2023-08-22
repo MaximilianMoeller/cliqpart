@@ -5,22 +5,22 @@
 #ifndef CLIQPART_SRC_SEPARATORS_TRIANGLE_SEPARATOR_H_
 #define CLIQPART_SRC_SEPARATORS_TRIANGLE_SEPARATOR_H_
 
-#include <gurobi_c++.h>
-#include "../model_wrapper.h"
 #include "abstract_separator.h"
+#include "../clique_part_model.h"
 
-using namespace std;
-
-class TriangleSeparator : public AbstractSeparator {
- private:
-  const int maxcut_;
+class TriangleSeparatorConfig : public AbstractSeparatorConfig {
  public:
-  explicit TriangleSeparator(ModelWrapper &model, double tolerance, const int maxcut)
-	: AbstractSeparator(model, tolerance), maxcut_(maxcut) {};
-  ~TriangleSeparator() override = default;
+  const int maxcut_{-1};
+  const bool variable_once_{false};
+  TriangleSeparatorConfig(double tolerance, const int maxcut, const bool variable_once)
+	  : AbstractSeparatorConfig(tolerance), maxcut_(maxcut), variable_once_(variable_once) {};
+  TriangleSeparatorConfig() = default;
+};
 
- protected:
-  int add_Cuts() override;
+class TriangleSeparator : public AbstractSeparator<TriangleSeparatorConfig> {
+ public:
+  TriangleSeparator(int degree, const TriangleSeparatorConfig &config) : AbstractSeparator(degree, config) {}
+  vector<GRBTempConstr> SeparateSolution(double *solution, GRBVar *vars) override;
 };
 
 #endif // CLIQPART_SRC_SEPARATORS_TRIANGLE_SEPARATOR_H_

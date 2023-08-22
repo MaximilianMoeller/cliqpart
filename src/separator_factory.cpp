@@ -5,22 +5,22 @@
 #include "separator_factory.h"
 
 #include <memory>
+#include <variant>
+#include "run_config.h"
 #include "separators/triangle_separator.h"
 #include "separators/st_separator.h"
 
-vector<unique_ptr<AbstractSeparator>> SeparatorFactory::BuildSeparator(RunConfig &config, ModelWrapper &data) {
+vector<unique_ptr<IAbstractSeparator>> SeparatorFactory::BuildSeparator(int degree, const RunConfig &config) {
 
-  vector<unique_ptr<AbstractSeparator>> res;
+  vector<unique_ptr<IAbstractSeparator>> res;
 
-  for (auto SepConfig: config.separators){
-	if (holds_alternative<TriangleSeparatorConfig>(SepConfig)) {
-	  int maxcut = get<TriangleSeparatorConfig>(SepConfig).MAXCUT;
-	  PLOGD << "Creating new Δ separator with MAXCUT parameter " << maxcut << " !" ;
-	  res.emplace_back(make_unique<TriangleSeparator>(data, config.tolerance, maxcut));
-	} else if (holds_alternative<ST_SeparatorConfig>(SepConfig)) {
-	  int maxcut = get<ST_SeparatorConfig>(SepConfig).MAXCUT;
-	  PLOGD << "Creating new [S:T] separator with MAXCUT parameter " << maxcut << " !" ;
-	  res.emplace_back(make_unique<ST_Separator>(data, config.tolerance, maxcut));
+  for (ConfigVariant sep_config : config.separator_configs) {
+	if (holds_alternative<TriangleSeparatorConfig>(sep_config)) {
+	  PLOGD << "Creating new Δ separator.";
+	  res.emplace_back(make_unique<TriangleSeparator>(degree, get<TriangleSeparatorConfig>(sep_config)));
+	} else if (holds_alternative<StSeparatorConfig>(sep_config)) {
+	  PLOGD << "Creating new [S:T] separator.";
+	  res.emplace_back(make_unique<StSeparator>(degree, get<StSeparatorConfig>(sep_config)));
 	}
 
   }

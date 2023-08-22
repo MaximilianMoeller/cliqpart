@@ -1,0 +1,8 @@
+name = "Δ"
+run_count = 1
+tolerance = 1e-6
+
+[[separators]]
+inequality = "Δ"
+maxcut = 400
+variable_once = false

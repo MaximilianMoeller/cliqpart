@@ -1,0 +1,13 @@
+name = "Δ_st"
+run_count = 1
+tolerance = 1e-6
+
+[[separators]]
+inequality = "Δ"
+variable_once = true
+maxcut = 400
+
+[[separators]]
+inequality = "ST"
+heuristic = 1
+maxcut = 400
