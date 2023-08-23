@@ -41,7 +41,7 @@ class IAbstractSeparator {
 
 class AbstractSeparatorConfig {
  public:
-  const double tolerance_{1e-6};
+  const double tolerance_{1e-9};
   explicit AbstractSeparatorConfig(const double tolerance) : tolerance_(tolerance) {};
   AbstractSeparatorConfig() = default;
   virtual ~AbstractSeparatorConfig() = default;

@@ -133,6 +133,9 @@ int main(int argc, char *argv[]) {
 
 		PLOGI << "Creating ILP model.";
 		CliquePartModel ilp_model{*env, data_dir_path / "data.csv", data_config, false};
+		// TOOD add field in data.toml to specify that this data should be maximized instead of minimized
+		// and move this setting of the optimization sense into the constructor
+		//ilp_model.set(GRB_IntAttr_ModelSense, -1);
 		ilp_model.set(GRB_IntParam_LazyConstraints, 1);
 
 		ILPCallback ilp_callback{ilp_model};
@@ -142,11 +145,8 @@ int main(int argc, char *argv[]) {
 
 		ilp_model.optimize();
 		ilp_model.write(data_dir_path / "optimal.sol");
-		StSeparator sep {data_config.graph_degree, StSeparatorConfig{StSeparatorHeuristic::GW1}};
-		sep.SeparateSolution(ilp_model.GetSolution(), ilp_model.GetVars());
-		exit(0);
-		//ilp_model.write(data_dir_path / "ilp_model.mps");
-		PLOGI << "Finished optimal solving";
+		PLOGI << "Finished optimal solving. Optimal objective value is: "
+			  + to_string(ilp_model.get(GRB_DoubleAttr_ObjVal));
 	  }
 
 	  // one base directory per data directory

@@ -6,7 +6,7 @@
 #include "separators/triangle_separator.h"
 #include "separators/st_separator.h"
 ILPCallback::ILPCallback(CliquePartModel &model) : model(model) {
-  triangle_separator_ = make_unique<TriangleSeparator>(model.NodeCount(), TriangleSeparatorConfig());
+  triangle_separator_ = make_unique<TriangleSeparator>(model.NodeCount(), TriangleSeparatorConfig(0.5, -1, false));
   //lp_separators_.emplace_back(make_unique<StSeparator>(model.NodeCount(), StSeparatorConfig()));
 }
 
