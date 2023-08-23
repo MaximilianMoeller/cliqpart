@@ -29,6 +29,9 @@ with open(args.file, 'r') as raw_data, open(output_csv_path, 'w') as output_csv,
 
     # a list of ids, if --id_row was specified, else just 1..OBJ
     ids = list(list(zip(*data[args.header_rows:]))[args.id_row]) if args.id_row else list(range(1, args.obj_count + 1))
+    # gurobi cannot print variables with a whitespace in their name
+    if args.id_row:
+        ids = list(map(lambda x: x.replace(" ", "_"), ids))
    
     # the relational part of the data extracted, i.e. a matrix with OBJ rows (first index) and REL columns (second index)
     relations = [row[args.header_columns:] for row in data[args.header_rows:]]

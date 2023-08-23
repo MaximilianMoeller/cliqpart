@@ -17,18 +17,19 @@ vector<GRBTempConstr> TriangleSeparator::SeparateSolution(double *solution, GRBV
   // iterate through whole graph to find a violated triangle inequalities
   // we only look at the inequality -x_ij + x_ik + x_jk <= 1 here
   // and deal with the other inequalities by iterating over all pairs {(i,j,k) \in \Z_{degree}^3}
-  for (int i = 2; i < degree_; ++i) {
+  for (int i = 0; i < degree_; ++i) {
 	// enumerate about 5 * maxcut violated inequalities
 	if (config_.maxcut_ > 0 && violated >= 5 * config_.maxcut_) break;
 
-	for (int j = 1; j < i; ++j) {
+	for (int j = 0; j < i; ++j) {
 
 	  auto v_ij = solution[EdgeIndex(i, j)];
 
 	  // if x_ij is already 1 or more (numerical inaccuracies) the inequality can no longer be violated -> continue
 	  if (v_ij >= 1.0 - config_.tolerance_) continue;
 
-	  for (int k = 0; k < j; ++k) {
+	  for (int k = 0; k < degree_; ++k) {
+		if (i == k || j == k) continue;
 
 		auto v_ik = solution[EdgeIndex(i, k)];
 		auto v_jk = solution[EdgeIndex(j, k)];

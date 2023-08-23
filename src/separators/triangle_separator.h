@@ -15,6 +15,8 @@ class TriangleSeparatorConfig : public AbstractSeparatorConfig {
   TriangleSeparatorConfig(double tolerance, const int maxcut, const bool variable_once)
 	  : AbstractSeparatorConfig(tolerance), maxcut_(maxcut), variable_once_(variable_once) {};
   TriangleSeparatorConfig() = default;
+  TriangleSeparatorConfig(const int maxcut, const bool variable_once)
+	  : maxcut_(maxcut), variable_once_(variable_once) {};
 };
 
 class TriangleSeparator : public AbstractSeparator<TriangleSeparatorConfig> {
