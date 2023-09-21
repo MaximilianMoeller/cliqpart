@@ -1,0 +1,8 @@
+graph_degree = 160
+
+maximizing = true
+
+row_labels = 1
+column_labels = 1
+
+value_offset = 0.5850
