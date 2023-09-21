@@ -16,26 +16,28 @@ RunConfig::RunConfig(string &run_config_file) {
 	tbl = toml::parse_file(run_config_file);
 
 	if (!tbl.contains("name") || !tbl["name"].is_string()) {
-	  PLOGW << "Please provide a string typed 'name' field in the config file " << run_config_file << "! ";
+	  PLOGW << "Please provide a string typed field called 'name' in the config file " << run_config_file << "! ";
 	}
-	auto backup_name = run_config_file;
+	auto backup_name = filesystem::path(run_config_file).filename().string();
 	std::string::iterator end_pos = std::remove(backup_name.begin(), backup_name.end(), '/');
 	backup_name.erase(end_pos, backup_name.end());
 	name = tbl["name"].value_or(backup_name);
-	PLOGD << "Result of parsing " << run_config_file << " will be named " << name << ".";
+	PLOGD << run_config_file << ": Parsing result will be named " << name << ".";
 
 	if (!tbl.contains("run_count") || !tbl["run_count"].is_integer()) {
-	  PLOGW << "No 'run_count' key was given in " << run_config_file << ". Assuming 1.";
+	  PLOGW << run_config_file << ": No 'run_count' key was given. Assuming 1. "
+			<< "If you wish re-running this config multiple times, set the 'run_count' parameter in "
+			<< run_config_file << ".";
 	}
 	run_count = tbl["run_count"].value_or(1);
-	PLOGD << "Run count of the configuration " << name << " set to " << run_count << ".";
+	PLOGD << name << " will be run " << run_count << " time(s).";
 
 	// tolerance to integrality
 	if (!tbl.contains("tolerance")) {
-	  PLOGW << run_config_file << ": no integrality tolerance was given, assuming 1e-6.";
+	  PLOGW << run_config_file << ": No integrality tolerance was given, assuming 1e-6.";
 	}
 	tolerance = tbl["tolerance"].value_or(1e-6);
-	PLOGD << "Solutions will be treated as integral with tolerance " << tolerance;
+	PLOGD << name << ": Solutions will be treated as integral with tolerance " << tolerance;
 
 	// separators
 	if (!tbl.contains("separators") || !tbl["separators"].is_array_of_tables()) {
@@ -67,8 +69,12 @@ RunConfig::RunConfig(string &run_config_file) {
 				<< "If set to 'true', for each variable there will be at most one Δ inequality containing that variable added per iteration. "
 				<< "Defaulting to 'false'.";
 		}
-		separator_configs.emplace_back(TriangleSeparatorConfig{tolerance, elem["maxcut"].value_or(-1),
-															   elem["variable_once"].value_or(false)});
+		auto maxcut = elem["maxcut"].value_or(-1);
+		auto var_once = elem["variable_once"].value_or(false);
+		separator_configs.emplace_back(TriangleSeparatorConfig{tolerance, maxcut, var_once});
+		PLOGD << name << ": Adding Δ-Separator with parameters: " <<
+			  "tolerance: " << tolerance << ", maxcut: " << maxcut << ", variable_once: "
+			  << (var_once ? "true" : "false") << ".";
 	  }
 		// ### [S:T] inequalities
 	  else if (ineq == "st" || ineq == "ST" || ineq == "s:t" || ineq == "S:T") {
@@ -88,10 +94,13 @@ RunConfig::RunConfig(string &run_config_file) {
 			break;
 		  default: heuristic = StSeparatorHeuristic::GW1;
 		}
-		separator_configs.emplace_back(StSeparatorConfig{tolerance, elem["maxcut"].value_or(-1), heuristic});
+		auto maxcut = elem["maxcut"].value_or(-1);
+		separator_configs.emplace_back(StSeparatorConfig{tolerance, maxcut, heuristic});
+		PLOGD << name << ": Adding st-Separator with parameters: " <<
+			  "tolerance: " << tolerance << ", maxcut: " << maxcut << ", heuristic: " << heuristic << ".";
 	  } else {
 		PLOGW << run_config_file
-			  << " contains a table in the 'separators' entry with the 'inequality' attribute specified to "
+			  << ": Contains a table in the 'separators' entry with the 'inequality' attribute specified to "
 			  << ineq.as_string() << " but this inequality is not supported (yet).";
 	  }
 

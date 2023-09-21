@@ -26,9 +26,9 @@ CliquePartModel::CliquePartModel(GRBEnv &grb_env, const string &data_path, DataC
 			  * config.value_scaling;
 
 	  string var_name{"x"};
+	  // naming the variables according to the labels in the data.csv can facilitate debugging.
 	  if (config.column_labels > 0 && config.row_labels > 0) {
-	  //if (false){
-	  var_name +=
+		var_name +=
 			"_" + doc.GetCell<string>(-1, row) + "_" + doc.GetCell<string>(column, -1);
 	  } else {
 		var_name += to_string(row) + "_" + to_string(column);
@@ -44,4 +44,6 @@ CliquePartModel::CliquePartModel(GRBEnv &grb_env, const string &data_path, DataC
 	}
   }
 
+  // model sense is determined by the data.toml
+  set(GRB_IntAttr_ModelSense, config.maximizing ? -1 : 1);
 }

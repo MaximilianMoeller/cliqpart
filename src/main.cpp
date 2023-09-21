@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
   if (!no_logs) {
 	cout << "Setting logfile to " << initial_log_file.c_str() << endl;
   }
-  static plog::RollingFileAppender<plog::TxtFormatter> file_appender(initial_log_file.c_str(), 16000000, 1000);
+  static plog::RollingFileAppender<plog::TxtFormatter> file_appender(initial_log_file.c_str(), 16000000, 1);
 
   if (no_logs) {
 	plog::init(log_level, &console_appender);
@@ -115,14 +115,24 @@ int main(int argc, char *argv[]) {
 
 	// everything else needs to be rebuilt for every base dir
 	for (auto &data_dir_path : data_dir_paths) {
+	  // one base directory per data directory
+	  auto basedir = results_dir / data_dir_path.parent_path().filename();
+	  filesystem::create_directories(basedir);
+	  if (!no_logs) {
+		auto const kLogFile = basedir / "log";
+		PLOGD << "Setting logfile to " << kLogFile << endl;
+		file_appender.setFileName(kLogFile.c_str());
+	  }
+
 	  // load data description file
 	  DataConfig data_config{data_dir_path / "data.toml"};
 
 	  // only solve to optimality if it has neither been disabled by the user
 	  // nor has been solved before
 	  if (!lp_only && !filesystem::exists(data_dir_path / "optimal.sol")) {
+		// todo: clear previous log file
 		if (!no_logs) {
-		  auto const kLogFile = data_dir_path / "log";
+		  auto const kLogFile = data_dir_path / "optimal.log";
 		  PLOGD << "Setting logfile to " << kLogFile << endl;
 		  file_appender.setFileName(kLogFile.c_str());
 
@@ -133,9 +143,6 @@ int main(int argc, char *argv[]) {
 
 		PLOGI << "Creating ILP model.";
 		CliquePartModel ilp_model{*env, data_dir_path / "data.csv", data_config, false};
-		// TOOD add field in data.toml to specify that this data should be maximized instead of minimized
-		// and move this setting of the optimization sense into the constructor
-		//ilp_model.set(GRB_IntAttr_ModelSense, -1);
 		ilp_model.set(GRB_IntParam_LazyConstraints, 1);
 
 		ILPCallback ilp_callback{ilp_model};
@@ -147,15 +154,6 @@ int main(int argc, char *argv[]) {
 		ilp_model.write(data_dir_path / "optimal.sol");
 		PLOGI << "Finished optimal solving. Optimal objective value is: "
 			  + to_string(ilp_model.get(GRB_DoubleAttr_ObjVal));
-	  }
-
-	  // one base directory per data directory
-	  auto basedir = results_dir / data_dir_path.parent_path().filename();
-	  filesystem::create_directories(basedir);
-	  if (!no_logs) {
-		auto const kLogFile = basedir / "log";
-		PLOGD << "Setting logfile to " << kLogFile << endl;
-		file_appender.setFileName(kLogFile.c_str());
 	  }
 
 	  for (const auto &kRunConfig : run_configs) {

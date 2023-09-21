@@ -23,6 +23,15 @@ DataConfig::DataConfig(const string &data_description_file) {
 	graph_degree = tbl["graph_degree"].value_or(-1);
 	PLOGD << "Graph degree set to " << graph_degree;
 
+	// optimization sense of the data
+	if (!tbl.contains("maximizing") || !tbl["maximizing"].is_boolean()) {
+	  PLOGW << data_description_file << ": No optimization sense was given, assuming minimizing! "
+			<< "If you'd like to maximize instead, please use the key 'maximizing' and set it to 'true' in "
+			<< data_description_file;
+	}
+	maximizing = tbl["maximizing"].value_or(false);
+	PLOGD << "Optimization sense set to " << (maximizing ? "maximizing" : "minimizing") << ".";
+
 	// row and column headers
 	if (!tbl.contains("row_labels") || !tbl.contains("column_labels") || !tbl["row_labels"].is_integer()
 		|| !tbl["column_labels"].is_integer()) {
@@ -38,7 +47,7 @@ DataConfig::DataConfig(const string &data_description_file) {
 
 	// offset for edge costs
 	if (!tbl.contains("value_offset")) {
-	  PLOGW << data_description_file << ": no value offset was given, assuming 0."
+	  PLOGW << data_description_file << ": No value offset was given, assuming 0! "
 			<< "If you’d like to subtract a constant offset from all values in the "
 			   "CSV table, please use the key 'value_offset' in " << data_description_file;
 	}
@@ -47,7 +56,7 @@ DataConfig::DataConfig(const string &data_description_file) {
 
 	// scaling for edge costs
 	if (!tbl.contains("value_scaling")) {
-	  PLOGW << data_description_file << ": no value scaling was given, assuming 1."
+	  PLOGW << data_description_file << ": No value scaling was given, assuming 1! "
 			<< "If you’d like to scale all objective values in the CSV table "
 			   "after offsetting them, please use the key 'value_scaling' in " << data_description_file;
 	}

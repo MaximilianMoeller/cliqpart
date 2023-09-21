@@ -37,10 +37,19 @@ struct DataDirValidator : public CLI::Validator {
 };
 
 struct DataConfig {
-  int graph_degree{-1};
+  // How many nodes of the CSV should be considered, i.e. enables only looking at a subgraph of the whole data.csv.
+  int graph_degree{0};
+
+  // Some data is meant for maximizing instead of minimizing.
+  bool maximizing{false};
+
+  // Some data might be labelled and those labels can be used in the naming ot the edge variables to facilitate debugging.
   int row_labels{0};
   int column_labels{0};
+
+  // Offsetting each graph weight by this constant allows for the graph weights to be, e.g. all positive.
   double value_offset{0.0};
+  // Fixing numerical inaccuracies can sometimes be accomplished by scaling all the weights by a constant factor.
   double value_scaling{1.0};
 
   explicit DataConfig(const string &data_description_file);
