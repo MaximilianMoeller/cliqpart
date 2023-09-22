@@ -33,7 +33,8 @@ CliquePartModel::CliquePartModel(GRBEnv &grb_env, const string &data_path, DataC
 	  } else {
 		var_name += to_string(row) + "_" + to_string(column);
 	  }
-	  PLOGV << var_name << ": " << to_string(column * (column - 1) / 2 + row);
+	  PLOGV << "Variable '" << var_name << "' is placed at index " << to_string(column * (column - 1) / 2 + row)
+			<< " in continuous memory.";
 
 	  auto var = addVar(0.0,
 						1.0,

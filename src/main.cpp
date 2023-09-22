@@ -20,15 +20,11 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
 
-  /* ###########################
-   * # Command line arguments #
-   * ##########################
-  */
-
+  // command line arguments
   CLI::App
 	  app("Comparison Implementation of different heuristics for solving the LP-relaxation of CLIQUE PARTITIONING.");
 
-  // Data dirs
+  // data dirs
   const static DataDirValidator kDataDirVal;
   vector<filesystem::path> data_dir_paths;
   app.add_option("DIRS",
@@ -36,90 +32,88 @@ int main(int argc, char *argv[]) {
 				 "Whitespace separated list of directories containing a data.csv and a data.toml file. (see README -> Usage).")->required(
 	  true)->check(kDataDirVal)->expected(1, -1);
 
-  // read in run_configs used for each run
+  // read in run_config paths
   vector<string> run_config_paths;
-  app.add_option("--config", run_config_paths, "Whitespace separated list of run_configs.")->expected(1, -1)->required(
-	  true);
+  app.add_option("-c,--config", run_config_paths, "Whitespace separated list of run_configs.")
+	  ->expected(1, -1)->required(true);
 
-  CLI::Option *v = app.add_flag("-v", "Level of verbosity; increases with each use.");
+  CLI::Option *v = app.add_flag("-v,--verbose", "Verbose; use twice for even more details.");
 
   bool no_logs{false};
-  app.add_flag("--no-logs", no_logs, "Disables logging to file, enabled by default.");
+  app.add_flag("-n,--no-logs", no_logs, "Disables logging to file, enabled by default.");
 
   bool gurobi_console_log{false};
-  app.add_flag("-g", gurobi_console_log, "Enables gurobi log in console, disabled by default.");
+  app.add_flag("-g,--gurobi-logs", gurobi_console_log, "Enables gurobi log in console, disabled by default.");
 
   bool lp_only{false};
-  app.add_flag("--lp-only", lp_only, "Scip solving the ILP to optimality and only solve the LP relaxation");
+  app.add_flag("-l,--lp-only", lp_only, "Scip solving the ILP to optimality and only solve the LP relaxation.");
+
+  app.usage("Usage: cliqpart DIRS --config CONFIGS [OPTIONS]");
 
   CLI11_PARSE(app, argc, argv)
 
   plog::Severity log_level;
   switch (v->count()) {
-	case 0:log_level = plog::Severity::fatal;
+	case 0:log_level = plog::Severity::info;
 	  break;
-	case 1:log_level = plog::Severity::error;
-	  break;
-	case 2:log_level = plog::Severity::warning;
-	  break;
-	case 3:log_level = plog::Severity::info;
-	  break;
-	case 4:log_level = plog::Severity::debug;
+	case 1:log_level = plog::Severity::debug;
 	  break;
 	default:log_level = plog::Severity::verbose;
 	  break;
   }
 
-  /* ################################
-   * # Setup of results and logging #
-   * ################################
-  */
-
+  // setup of results and logging
   filesystem::path results_dir{"results/"};
   filesystem::create_directories(results_dir);
+  filesystem::path main_log_file_path = results_dir / "log";
+  // clear previous log file
+  std::ofstream main_logfile{main_log_file_path, std::ios::out | std::ios::trunc};
+  main_logfile.close();
 
   // display colored console logging
   static plog::ColorConsoleAppender<plog::TxtFormatter> console_appender;
-  filesystem::path initial_log_file = results_dir / "log";
+  static plog::RollingFileAppender<plog::TxtFormatter> file_appender(main_log_file_path.c_str(), 16000000, 1);
   if (!no_logs) {
-	cout << "Setting logfile to " << initial_log_file.c_str() << endl;
-  }
-  static plog::RollingFileAppender<plog::TxtFormatter> file_appender(initial_log_file.c_str(), 16000000, 1);
-
-  if (no_logs) {
+	// initialize only the console logger
 	plog::init(log_level, &console_appender);
   } else {
-	// Initialize the logger
+	// initialize the console logger and the file logger
 	plog::init(log_level, &file_appender).addAppender(&console_appender);
   }
 
-  /* ##########################
-   * # Loading configurations #
-   * ##########################
-  */
-
+  // loading configurations
+  PLOGD << "Starting parsing of configuration file(s).";
   vector<RunConfig> run_configs{};
   for (auto &run_config_path : run_config_paths) {
 	RunConfig run_config{run_config_path};
 	run_configs.emplace_back(run_config);
   }
+  PLOGD << "Finished parsing of configuration file(s).";
 
   try {
 
 	// gurobi environment can be kept and parametrized, only models need to be built for each run
-	unique_ptr<GRBEnv> env = make_unique<GRBEnv>();
+	unique_ptr<GRBEnv> env = make_unique<GRBEnv>(true);
+	// disable gurobi output by default, especially the 'academic license […]' print
+	env->set(GRB_IntParam_OutputFlag, 0);
 	env->set(GRB_IntParam_LogToConsole, gurobi_console_log);
+	env->start();
 	if (no_logs) {
 	  env->set(GRB_StringParam_LogFile, "");
 	}
 
 	// everything else needs to be rebuilt for every base dir
 	for (auto &data_dir_path : data_dir_paths) {
+	  PLOGI << "Starting computations for data set '" << data_dir_path << "'.";
 	  // one base directory per data directory
 	  auto basedir = results_dir / data_dir_path.parent_path().filename();
 	  filesystem::create_directories(basedir);
 	  if (!no_logs) {
 		auto const kLogFile = basedir / "log";
+		// clear previous log file
+		std::ofstream logfile{kLogFile, std::ios::out | std::ios::trunc};
+		logfile.close();
+
 		PLOGD << "Setting logfile to " << kLogFile << endl;
 		file_appender.setFileName(kLogFile.c_str());
 	  }
@@ -129,10 +123,16 @@ int main(int argc, char *argv[]) {
 
 	  // only solve to optimality if it has neither been disabled by the user
 	  // nor has been solved before
-	  if (!lp_only && !filesystem::exists(data_dir_path / "optimal.sol")) {
-		// todo: clear previous log file
+	  if (!lp_only && (!filesystem::exists(data_dir_path / "optimal.sol")
+		  || !filesystem::exists(data_dir_path / "optimal.log"))) {
+		PLOGI << "No optimal solution was found for data set '" << data_dir_path
+			  << "'. Starting solving to optimality.";
 		if (!no_logs) {
 		  auto const kLogFile = data_dir_path / "optimal.log";
+		  // clear previous log file
+		  std::ofstream logfile{kLogFile, std::ios::out | std::ios::trunc};
+		  logfile.close();
+
 		  PLOGD << "Setting logfile to " << kLogFile << endl;
 		  file_appender.setFileName(kLogFile.c_str());
 
@@ -157,6 +157,7 @@ int main(int argc, char *argv[]) {
 	  }
 
 	  for (const auto &kRunConfig : run_configs) {
+		PLOGI << "Starting run config '" << kRunConfig.name << "' for data set '" << data_dir_path << "'.";
 
 		// ### BEGIN RUN SETUP ###
 		auto const kNow = std::chrono::system_clock::now();
@@ -174,6 +175,8 @@ int main(int argc, char *argv[]) {
 		}
 
 		for (int run_counter = 1; run_counter <= kRunConfig.run_count; run_counter++) {
+		  PLOGI << "Starting run " << run_counter << "/" << kRunConfig.run_count << " for run config '"
+				<< kRunConfig.name << "' and data set '" << data_dir_path << "'.";
 
 		  auto const kNumberedRunDir = kRunDir / to_string(run_counter);
 		  std::filesystem::create_directories(kNumberedRunDir);
@@ -222,13 +225,17 @@ int main(int argc, char *argv[]) {
 			for (const auto &constraint : violated_constraints) {
 			  model.addConstr(constraint);
 			}
-			PLOGI << "Added " << violated_constraints.size() << " constraints in iteration " << iteration;
+			PLOGD << "Added " << violated_constraints.size() << " constraints in iteration " << iteration;
 			// TODO: add CSV logging for easier analysis
 
 		  } while (!violated_constraints.empty());
 		  model.write(kNumberedRunDir / "0_last.sol");
+		  PLOGI << "Finished run " << run_counter << "/" << kRunConfig.run_count << " for run config '"
+				<< kRunConfig.name << "' and data set '" << data_dir_path << "'. Took " << iteration << " iterations.";
 		}
+		PLOGI << "Finished run config '" << kRunConfig.name << "' for data set '" << data_dir_path << "'.";
 	  }
+	  PLOGI << "Finished all computations for data set '" << data_dir_path << "'.";
 	}
   } catch (GRBException &e) {
 	PLOGE << "Gurobi Error number: " << e.getErrorCode() << endl;
