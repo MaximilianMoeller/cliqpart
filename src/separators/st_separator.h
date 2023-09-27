@@ -13,22 +13,25 @@ enum class StSeparatorHeuristic {
 };
 inline ostream &operator<<(ostream &out, StSeparatorHeuristic h) {
   switch (h) {
-	case StSeparatorHeuristic::GW1: out << "GW1";
-	  break;
-	case StSeparatorHeuristic::GW2: out << "GW2";
-	  break;
+    case StSeparatorHeuristic::GW1: out << "GW1";
+      break;
+    case StSeparatorHeuristic::GW2: out << "GW2";
+      break;
   }
   return out;
-};
+}
 
 class StSeparatorConfig : public AbstractSeparatorConfig {
  public:
   const int maxcut_{-1};
   const StSeparatorHeuristic heuristic_{StSeparatorHeuristic::GW1};
-  StSeparatorConfig(double tolerance, const int maxcut, const StSeparatorHeuristic heuristic) : AbstractSeparatorConfig(
-	  tolerance), maxcut_(maxcut), heuristic_(heuristic) {};
-  explicit StSeparatorConfig(const StSeparatorHeuristic heuristic) : heuristic_(heuristic) {};
+
   StSeparatorConfig() = default;
+
+  explicit StSeparatorConfig(const StSeparatorHeuristic heuristic) : heuristic_(heuristic) {};
+
+  StSeparatorConfig(double tolerance, const int maxcut, const StSeparatorHeuristic heuristic) : AbstractSeparatorConfig(
+      tolerance, maxcut), heuristic_(heuristic) {};
 
 };
 

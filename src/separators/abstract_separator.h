@@ -14,23 +14,23 @@ class IAbstractSeparator {
   const int degree_;
   [[nodiscard]] int EdgeCount() const { return (degree_ * (degree_ - 1)) / 2; };
   [[nodiscard]] int EdgeIndex(int v1, int v2) const {
-	if (v1 < 0 || v2 < 0 || v1 >= degree_ || v2 >= degree_) {
-	  PLOGF << "Access to variable v_" << v1 << "_" << v2
-			<< " was requested, but graph only has vertices from index 0 to " << degree_ - 1 << "!"
-			<< "This is most likely a mistake in the program logic of a separator.";
-	  exit(-1);
-	}
-	if (v1 == v2) {
-	  PLOGF << "Access to variable v_" << v1 << "_" << v2
-			<< " was requested, but graph does not contain reflexive edges."
-			<< "This is most likely a mistake in the program logic of a separator.";
-	  exit(-1);
-	}
+    if (v1 < 0 || v2 < 0 || v1 >= degree_ || v2 >= degree_) {
+      PLOGF << "Access to variable v_" << v1 << "_" << v2
+            << " was requested, but graph only has vertices from index 0 to " << degree_ - 1 << "!"
+            << "This is most likely a mistake in the program logic of a separator.";
+      exit(-1);
+    }
+    if (v1 == v2) {
+      PLOGF << "Access to variable v_" << v1 << "_" << v2
+            << " was requested, but graph does not contain reflexive edges."
+            << "This is most likely a mistake in the program logic of a separator.";
+      exit(-1);
+    }
 
-	if (v1 < v2) {
-	  return v2 * (v2 - 1) / 2 + v1;
-	}
-	return v1 * (v1 - 1) / 2 + v2;
+    if (v1 < v2) {
+      return v2 * (v2 - 1) / 2 + v1;
+    }
+    return v1 * (v1 - 1) / 2 + v2;
   };
 
  public:
@@ -42,7 +42,8 @@ class IAbstractSeparator {
 class AbstractSeparatorConfig {
  public:
   const double tolerance_{1e-9};
-  explicit AbstractSeparatorConfig(const double tolerance) : tolerance_(tolerance) {};
+  const int maxcut_{-1};
+  AbstractSeparatorConfig(const double tolerance, const int maxcut) : tolerance_(tolerance), maxcut_(maxcut) {};
   AbstractSeparatorConfig() = default;
   virtual ~AbstractSeparatorConfig() = default;
 };
@@ -53,7 +54,7 @@ class AbstractSeparator : public IAbstractSeparator {
   const SeparatorConfig config_;
  public:
   explicit AbstractSeparator(int degree, const SeparatorConfig &config)
-	  : IAbstractSeparator(degree), config_(config) {};
+      : IAbstractSeparator(degree), config_(config) {};
 };
 
 #endif // CLIQPART_SRC_SEPARATORS_ABSTRACT_SEPARATOR_H_

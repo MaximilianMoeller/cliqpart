@@ -10,13 +10,15 @@
 
 class TriangleSeparatorConfig : public AbstractSeparatorConfig {
  public:
-  const int maxcut_{-1};
   const bool variable_once_{false};
-  TriangleSeparatorConfig(double tolerance, const int maxcut, const bool variable_once)
-	  : AbstractSeparatorConfig(tolerance), maxcut_(maxcut), variable_once_(variable_once) {};
+
   TriangleSeparatorConfig() = default;
-  TriangleSeparatorConfig(const int maxcut, const bool variable_once)
-	  : maxcut_(maxcut), variable_once_(variable_once) {};
+
+  explicit TriangleSeparatorConfig(const bool variable_once) : variable_once_(variable_once) {};
+
+  TriangleSeparatorConfig(double tolerance, const int maxcut, const bool variable_once) : AbstractSeparatorConfig(
+      tolerance,
+      maxcut), variable_once_(variable_once) {};
 };
 
 class TriangleSeparator : public AbstractSeparator<TriangleSeparatorConfig> {
