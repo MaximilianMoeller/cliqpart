@@ -110,7 +110,7 @@ class H_Graph:
             cost = self.dist[s][t]
             print(f"{s} -> {t}: {cost}")
             if cost < 0.5 - threshold:
-                p = set([(n1, n2) for (_, _, n1, n2) in self.path(s,t)])
+                p = [(n1, n2) for (_, _, n1, n2) in self.path(s,t)][0:-1:2]
                 ps.append(p)
                 print(f"Violated! Path is :{p}, length {len(p)}")
         return ps
@@ -119,14 +119,26 @@ class weight_accesser:
     def __init__(self, random_weights):
         
         if not random_weights:
-            # define the solution vector x here
-            self.weights = [
-                [0, 0.5, 0, 0, 0.5],
-                [0.5, 0, 0.5, 0, 0],
-                [0, 0.5, 0, 0.5, 0],
-                [0, 0, 0.5, 0, 0.5],
-                [0.5, 0, 0, 0.5, 0]]
+            # a violated 2-chorded-odd-cycle inequality for a cycle of length 5
+            #self.weights = [
+            #    [0, 0.5, 0, 0, 0.5, 0, 0],
+            #    [0.5, 0, 0.5, 0, 0, 0, 0],
+            #    [0, 0.5, 0, 0.5, 0, 0, 0],
+            #    [0, 0, 0.5, 0, 0.5, 0, 0],
+            #    [0.5, 0, 0, 0.5, 0, 0, 0],
+            #    [0, 0, 0, 0, 0, 0, 0],
+            #    [0, 0, 0, 0, 0, 0, 0]]
             
+            # a violated 2-chorded-odd-cycle inequality for a cycle of length 7
+            self.weights = [
+                [0, 0.5, 0, 0, 0, 0, 0.5],
+                [0.5, 0, 0.5, 0, 0, 0, 0],
+                [0, 0.5, 0, 0.5, 0, 0, 0],
+                [0, 0, 0.5, 0, 0.5, 0, 0],
+                [0, 0, 0, 0.5, 0, 0.5, 0],
+                [0, 0, 0, 0, 0.5, 0, 0.5],
+                [0.5, 0, 0, 0, 0, 0.5, 0]]
+
             #self.weights = [
             #        [0/2, 1/2, 1/2, 1/2, 1/3, 1/2],
             #        [0/2, 0/2, 1/4, 1/4, 0/2, 1/3],
@@ -175,7 +187,7 @@ def contains_odd_cycle(paths):
 
 
 iteration, ws = 0, 0
-random_weights = True
+random_weights = False
 
 while True:
     ws += 1
