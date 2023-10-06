@@ -11,10 +11,11 @@
 #include <variant>
 #include "separators/triangle_separator.h"
 #include "separators/st_separator.h"
+#include "separators/oddSequences/CircleSeparator.h"
 
 using namespace std;
 
-typedef variant<TriangleSeparatorConfig, StSeparatorConfig> ConfigVariant;
+typedef variant<TriangleSeparatorConfig, StSeparatorConfig, CircleSeparatorConfig> ConfigVariant;
 
 struct RunConfig {
  private:

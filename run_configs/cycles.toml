@@ -1,0 +1,13 @@
+name = "cycles"
+run_count = 1
+tolerance = 1e-6
+
+[[separators]]
+inequality = "Δ"
+variable_once = false
+maxcut = 400
+
+[[separators]]
+inequality = "cycle"
+type = "2-chorded"
+maxcut = 400

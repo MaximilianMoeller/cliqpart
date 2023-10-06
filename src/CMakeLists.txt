@@ -13,6 +13,10 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
         separators/triangle_separator.cpp
         separators/st_separator.h
         separators/st_separator.cpp
+        separators/oddSequences/AuxGraph.h
+        separators/oddSequences/AuxGraph.cpp
+        separators/oddSequences/CircleSeparator.h
+        separators/oddSequences/CircleSeparator.cpp
         ilp_callback.cpp
         ilp_callback.h
         )

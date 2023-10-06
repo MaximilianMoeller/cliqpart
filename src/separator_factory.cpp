@@ -15,14 +15,17 @@ vector<unique_ptr<IAbstractSeparator>> SeparatorFactory::BuildSeparator(int degr
   vector<unique_ptr<IAbstractSeparator>> res;
 
   for (ConfigVariant sep_config : config.separator_configs) {
-	if (holds_alternative<TriangleSeparatorConfig>(sep_config)) {
-	  PLOGD << "Creating new Δ separator.";
-	  res.emplace_back(make_unique<TriangleSeparator>(degree, get<TriangleSeparatorConfig>(sep_config)));
-	} else if (holds_alternative<StSeparatorConfig>(sep_config)) {
-	  PLOGD << "Creating new [S:T] separator.";
-	  res.emplace_back(make_unique<StSeparator>(degree, get<StSeparatorConfig>(sep_config)));
-	}
-
+    if (holds_alternative<TriangleSeparatorConfig>(sep_config)) {
+      PLOGD << "Creating new Δ separator.";
+      res.emplace_back(make_unique<TriangleSeparator>(degree, get<TriangleSeparatorConfig>(sep_config)));
+    } else if (holds_alternative<StSeparatorConfig>(sep_config)) {
+      PLOGD << "Creating new [S:T] separator.";
+      res.emplace_back(make_unique<StSeparator>(degree, get<StSeparatorConfig>(sep_config)));
+    }
+    if (holds_alternative<CircleSeparatorConfig>(sep_config)) {
+      PLOGD << "Creating new circle separator.";
+      res.emplace_back(make_unique<CircleSeparator>(degree, get<CircleSeparatorConfig>(sep_config)));
+    }
   }
 
   return res;
