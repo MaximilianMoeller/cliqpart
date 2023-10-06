@@ -110,7 +110,11 @@ RunConfig::RunConfig(string &run_config_file) {
         CircleInequality inequality_type;
         if (elem["type"] == "half-chorded") {
           inequality_type = CircleInequality::HALF_CHORDED;
+        } else if (elem["type"] == "2-chorded") {
+          inequality_type = CircleInequality::TWO_CHORDED;
         } else {
+          PLOGW << "Unknown inequality type was given for a cycle-separator in " << run_config_file
+                << ". Assuming 2-chorded cycles instead.";
           inequality_type = CircleInequality::TWO_CHORDED;
         }
         auto maxcut = elem["maxcut"].value_or(-1);

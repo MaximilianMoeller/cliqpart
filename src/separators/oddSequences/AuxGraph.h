@@ -20,30 +20,18 @@ class AuxGraph {
   };
 
   explicit AuxGraph(int degree) : degree_(degree) {
-    Node max = {true, true, degree_, degree_ - 1};
+    Node max = {true, true, degree_ - 1, degree_ - 2};
     max_node_index_ = NodeToIndex(max);
-    arcs_ = std::vector<std::vector<double>>(max_node_index_,
-                                             std::vector<double>(max_node_index_, INFINITY));
   };
 
   void AddArc(Node start, Node target, double weight);
 
-
-  // call FloydWarshall first, then dist_ and prev_ will be populated
-  // from which the weights and paths can be derived
-  void FloydWarshall();
-  double getWeight(Node s, Node t);
-  std::vector<Node> Path(Node s, Node t);
-
   std::pair<double, std::vector<Node>> BellmanFord(Node s, Node t);
-
-
-
 
  private:
   int degree_;
   int max_node_index_;
-  std::vector<std::vector<double>> arcs_;
+  std::vector<std::tuple<int, int, double>> arcs_;
   std::vector<std::vector<double>> dist_;
   std::vector<std::vector<int>> prev_;
 

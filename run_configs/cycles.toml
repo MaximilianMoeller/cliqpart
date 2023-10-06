@@ -9,5 +9,5 @@ maxcut = 400
 
 [[separators]]
 inequality = "cycle"
-type = "2-chorded"
+type = "half-chorded"
 maxcut = 400

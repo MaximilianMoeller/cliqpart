@@ -7,6 +7,7 @@
 
 vector<GRBTempConstr> CircleSeparator::SeparateSolution(double *solution, GRBVar *vars) {
 
+  PLOGV << "Starting search for violated cycle-inequalities.";
   vector<GRBTempConstr> res;
   AuxGraph aux{degree_};
 
@@ -54,11 +55,14 @@ vector<GRBTempConstr> CircleSeparator::SeparateSolution(double *solution, GRBVar
         aux.AddArc(AuxGraph::Node{false, true, i, j},
                    AuxGraph::Node{true, false, j, k},
                    transitive_weight);
+        aux.AddArc(AuxGraph::Node{true, true, i, j},
+                   AuxGraph::Node{false, false, j, k},
+                   transitive_weight);
       }
     }
   }
 
-  aux.FloydWarshall();
+  //aux.FloydWarshall();
 
   double comparison;
   switch (config_.inequality_type_) {
@@ -72,16 +76,23 @@ vector<GRBTempConstr> CircleSeparator::SeparateSolution(double *solution, GRBVar
       break;
   }
 
-  for (int j = 0; j < degree_; ++j) {
-    for (int i = 0; i < j; ++i) {
-      // i is smaller than j
+  for (int i = 0; i < degree_; ++i) {
+
+    for (int j = 0; j < degree_; ++j) {
+      if (i == j) continue;
+
       AuxGraph::Node start{false, false, i, j};
       AuxGraph::Node target{true, false, i, j};
 
-      double cost = aux.getWeight(start, target);
+      auto [cost, path] = aux.BellmanFord(start, target);
+      string p{""};
+      for (auto n : path) {
+        p.append("(" + string(n.uv ? "v" : "u") + ", " + string(n.in_out ? "1" : "0") + ", " + to_string(n.i) + ", "
+                     + to_string(n.j) + ")");
+      }
+      PLOGV << p;
 
       if (cost < comparison) {
-        auto path = aux.Path(start, target);
         PLOGI << "Found violated inequality!!!";
         for (auto n : path) {
           PLOGV << "(" << n.uv << ", " << n.in_out << ", " << n.i << ", " << n.j << ")";
