@@ -22,8 +22,8 @@ def generate_from_random_graph(instance, random_params):
     
     for i in range(1,size):
         for j in range(0,i):
-               res = neg_gauss() if cluster[i] == cluster[j] else pos_gauss()
-               data[i][j] = data[j][i] = res
+            res = neg_gauss() if cluster[i] == cluster[j] else pos_gauss()
+            data[i][j] = data[j][i] = res
     
     basedir = f"random_graph_s{size}_c{num_clusters}_{pos_mean},{pos_stddev}_{neg_mean},{neg_stddev}"
     
