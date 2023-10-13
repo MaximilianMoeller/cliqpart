@@ -1,0 +1,5 @@
+graph_degree = 7
+row_labels = 1
+column_labels = 1
+
+maximizing = false

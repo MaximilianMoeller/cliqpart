@@ -6,28 +6,27 @@
 #include "AuxGraph.h"
 
 vector<GRBTempConstr> CircleSeparator::SeparateSolution(double *solution, GRBVar *vars) {
+  if (config_.inequality_type_ == CircleInequality::TWO_CHORDED) {
+    return SeparateTwoChords(solution, vars);
+  } else {
+    return SeparateHalfChords(solution, vars);
+  }
+}
 
-  PLOGV << "Starting search for violated cycle-inequalities.";
-  vector<GRBTempConstr> res;
-  AuxGraph aux{degree_};
+vector<GRBTempConstr> CircleSeparator::SeparateTwoChords(double *solution, GRBVar *vars) {
+  return {};
+}
+vector<GRBTempConstr> CircleSeparator::SeparateHalfChords(const double *solution, GRBVar *vars) {
+  PLOGD << "Starting search for violated half-chorded-cycle-inequalities.";
 
-  // construct auxiliary graph
+  auto aux = HalfChordedAuxGraph(degree_);
   for (int i = 0; i < degree_; ++i) {
     for (int j = 0; j < degree_; ++j) {
+
       if (i == j) continue;
 
-      // for every edge {i,j} in the original graph, add a gadget consisting of 4 nodes
-      double gadget_weight;
-      switch (config_.inequality_type_) {
-        case CircleInequality::TWO_CHORDED: {
-          gadget_weight = -solution[EdgeIndex(i, j)];
-        }
-          break;
-        case CircleInequality::HALF_CHORDED: {
-          gadget_weight = 1 - solution[EdgeIndex(i, j)];
-        }
-          break;
-      }
+      // add gadgets
+      double gadget_weight = solution[EdgeIndex(i, j)];
 
       aux.AddArc(AuxGraph::Node{false, false, i, j},
                  AuxGraph::Node{false, true, i, j},
@@ -36,72 +35,44 @@ vector<GRBTempConstr> CircleSeparator::SeparateSolution(double *solution, GRBVar
                  AuxGraph::Node{true, true, i, j},
                  gadget_weight);
 
+      // add weights for two adjacent edges (i,j) and (j,k)
       for (int k = 0; k < degree_; ++k) {
-
         if ((k == i) || (k == j)) continue;
 
-        double transitive_weight;
-        switch (config_.inequality_type_) {
-          case CircleInequality::TWO_CHORDED: {
-            transitive_weight = solution[EdgeIndex(i, k) + 1 / 2];
-          }
-            break;
-          case CircleInequality::HALF_CHORDED: {
-            transitive_weight = solution[EdgeIndex(i, k)];
-          }
-            break;
-        }
+        double triple_weight = 1 - solution[EdgeIndex(i, k)];
 
         aux.AddArc(AuxGraph::Node{false, true, i, j},
                    AuxGraph::Node{true, false, j, k},
-                   transitive_weight);
+                   triple_weight);
         aux.AddArc(AuxGraph::Node{true, true, i, j},
                    AuxGraph::Node{false, false, j, k},
-                   transitive_weight);
+                   triple_weight);
+
       }
     }
   }
 
-  //aux.FloydWarshall();
-
-  double comparison;
-  switch (config_.inequality_type_) {
-    case CircleInequality::TWO_CHORDED: {
-      comparison = 1 / 2;
-    }
-      break;
-    case CircleInequality::HALF_CHORDED: {
-      comparison = 3;
-    }
-      break;
-  }
-
+  // check for shortest paths
   for (int i = 0; i < degree_; ++i) {
-
     for (int j = 0; j < degree_; ++j) {
       if (i == j) continue;
 
       AuxGraph::Node start{false, false, i, j};
       AuxGraph::Node target{true, false, i, j};
 
-      auto [cost, path] = aux.BellmanFord(start, target);
-      string p{""};
-      for (auto n : path) {
-        p.append("(" + string(n.uv ? "v" : "u") + ", " + string(n.in_out ? "1" : "0") + ", " + to_string(n.i) + ", "
-                     + to_string(n.j) + ")");
-      }
-      PLOGV << p;
+      auto [cost, path] = aux.Dijkstra(start, target);
+      PLOGV << "(i, j, cost): (" << i << ", " << j << ", " << cost << ").";
 
-      if (cost < comparison) {
+      if (cost < 3) {
         PLOGI << "Found violated inequality!!!";
+        string p{""};
         for (auto n : path) {
-          PLOGV << "(" << n.uv << ", " << n.in_out << ", " << n.i << ", " << n.j << ")";
+          p.append("(" + string(n.uv ? "v" : "u") + ", " + string(n.in_out ? "1" : "0") + ", " + to_string(n.i) + ", "
+                       + to_string(n.j) + ")");
         }
-
+        PLOGI << p;
       }
-
     }
   }
-
-  return res;
+  return {};
 }

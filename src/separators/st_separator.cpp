@@ -11,7 +11,7 @@ vector<GRBTempConstr> StSeparator::SeparateSolution(double *solution, GRBVar *va
   int cuts_added{0};
   vector<GRBTempConstr> result;
 
-  PLOGV << "Starting enumeration of st-inequalities.";
+  PLOGD << "Starting enumeration of st-inequalities.";
 
   // "For every node v \in V_n, we do the following […]"
   for (int v = 0; v < degree_; ++v) {

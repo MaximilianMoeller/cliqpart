@@ -12,7 +12,7 @@ vector<GRBTempConstr> TriangleSeparator::SeparateSolution(double *solution, GRBV
   vector<TriangleTuple> triangles;
   // only add up to MAXCUT violated inequalities in one iteration
   int violated{0};
-  PLOGV << "Starting enumeration of Δ-inequalities.";
+  PLOGD << "Starting enumeration of Δ-inequalities.";
 
   // iterate through whole graph to find a violated triangle inequalities
   // we only look at the inequality -x_ij + x_ik + x_jk <= 1 here

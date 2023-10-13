@@ -39,6 +39,8 @@ class CircleSeparator : public AbstractSeparator<CircleSeparatorConfig> {
  public:
   CircleSeparator(int degree, const CircleSeparatorConfig &config) : AbstractSeparator(degree, config) {}
   vector<GRBTempConstr> SeparateSolution(double *solution, GRBVar *vars) override;
+  vector<GRBTempConstr> SeparateTwoChords(double *solution, GRBVar *vars);
+  vector<GRBTempConstr> SeparateHalfChords(const double *solution, GRBVar *vars);
 
 };
 
