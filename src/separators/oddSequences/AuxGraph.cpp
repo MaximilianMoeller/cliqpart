@@ -59,7 +59,7 @@ std::pair<double, std::vector<AuxGraph::Node>> HalfChordedAuxGraph::Dijkstra(Aux
     /// we will try to minimize the distance
     for (auto [edge_weight, edge_target] : weights_[current_node]) {
       /// minimizing distances
-      if (current_dist + edge_weight < dist[edge_target]) {
+      if (current_dist + edge_weight + 1e-9 < dist[edge_target]) {
         dist[edge_target] = current_dist + edge_weight;
         pred[edge_target] = current_node;
         queue.emplace(dist[edge_target], edge_target);

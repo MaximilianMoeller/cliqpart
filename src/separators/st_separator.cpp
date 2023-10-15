@@ -95,12 +95,12 @@ vector<GRBTempConstr> StSeparator::SeparateSolution(double *solution, GRBVar *va
 		  }
 		}
 
-		PLOGV << "Found violated constraint: " << constraint << "<= 1";
+		PLOGV << "Found violated [S:T]-inequality: " << constraint << "<= 1.";
 		result.emplace_back(constraint <= 1);
 		cuts_added++;
 	  }
 	}
   }
-  PLOGD << "Enumerated " << cuts_added << " violated [S:T]-inequalities";
+  PLOGD << "Enumerated " << cuts_added << " violated [S:T]-inequalities.";
   return result;
 };

@@ -231,7 +231,8 @@ int main(int argc, char *argv[]) {
           } while (!violated_constraints.empty());
           model.write(kNumberedRunDir / "0_last.sol");
           PLOGI << "Finished run " << run_counter << "/" << kRunConfig.run_count << " for run config '"
-                << kRunConfig.name << "' and data set '" << data_dir_path << "'. Took " << iteration << " iterations.";
+                << kRunConfig.name << "' and data set '" << data_dir_path << "'.";
+		  PLOGI << "Took " << iteration << " iterations and obtained objective value is " << to_string(model.get(GRB_DoubleAttr_ObjVal));
         }
         PLOGI << "Finished run config '" << kRunConfig.name << "' for data set '" << data_dir_path << "'.";
       }
