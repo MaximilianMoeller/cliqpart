@@ -5,9 +5,10 @@
 %  ┌────────┐
 %  │ Basics │
 %  └────────┘
-% westeuropäische Codierung (verbessert Trennung und copy/paste)
-\usepackage[T1]{fontenc}
+%
 \usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\setsansfont{Latin Modern Roman}
 % spezielle Sonderzeichen
 \usepackage{textcomp}
 % deutsches Sprachpaket
@@ -33,15 +34,15 @@
 % Text in mehreren Spalten
 \usepackage{multicol}
 % Mehr Farben
-\usepackage{xcolor}
+\usepackage[dvipsnames]{xcolor}
 % Lorem ipsum mit \blindtext
 \usepackage[]{blindtext}
 % Ersetzt etwas durch nichts (debugging)
 \newcommand\hide[1]{}
 % Zitate
 \usepackage{csquotes}
-\usepackage[style=alphabetic]{biblatex}
-\addbibresource{../../references.bib}
+\usepackage[style=chicago-authordate, backend=biber]{biblatex}
+\addbibresource{references.bib}
 
 % ┌────────────┐
 % │ Mathematik │
@@ -78,8 +79,8 @@
 \usepackage[]{proof}
 
 % SI-Einheiten
-\usepackage{siunitx}  
-\sisetup{locale = DE}
+%\usepackage{siunitx}  
+%\sisetup{locale = DE}
 
 % ┌──────────────┐
 % │ Environments │
@@ -141,12 +142,13 @@
 % └──────┘
 \usepackage{tikz}
 \usetikzlibrary{arrows, automata, positioning}
-\tikzset{
-	->, % directed edges
-	>=stealth, % bold arrow heads
-	node distance = 2cm,
-	default/.style={circle, thin, draw=black, fill=gray!25}
-}
+%\tikzset{
+%	->, % directed edges
+%	>=stealth, % bold arrow heads
+%	node distance = 2cm,
+%	default/.style={circle, thin, draw=black, fill=gray!25}
+%}
+\tikzstyle{vertex}=[circle, draw, fill=white, inner sep=0pt, minimum width=1ex]
 
 % ┌────────────┐
 % │ algorithms │
