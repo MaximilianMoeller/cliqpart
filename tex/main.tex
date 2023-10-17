@@ -1,5 +1,5 @@
 % !TEX TS-program = lualatex
-\documentclass[a4paper, cdfont=false]{tudscrartcl}
+\documentclass[a4paper, cdfont=false, cdsection=false, cdgeometry=off]{tudscrartcl}
 
 \input{preamble.tex}
 
@@ -17,11 +17,15 @@
 	% Colors from TUD corparate design
     unicode=true,
     colorlinks=true,
-    linkcolor=cdgreen,
-    citecolor=cdgreen,
-    filecolor=cdgreen,
-    urlcolor=cdgreen
+    linkcolor=cdblue,
+    citecolor=cdblue,
+    filecolor=cdblue,
+    urlcolor=cdblue
 }
+
+\setuptodonotes{color=cdgreen!30, tickmarkheight=0.2cm}
+
+\newcommand\CP[0]{\textmd{\textsc{Clique Partitioning}}\xspace}
 
 \begin{document}
 
@@ -35,25 +39,28 @@
 \faculty{Faculty of Computer Science}
 \institute{Institute for AI}
 \chair{Chair for Machine Learning for Computer Vision}
-\title{Evaluation of separation routines for some classes of inequalities of the \textmd{\textsc{Clique Partitioning}} polytope}
-\subtitle{Student Project “Großer Beleg“}
+% komische Bezeichnung für den großen Beleg, aber so festgelegt im TUDscript
+\thesis{evidence}
 \author{Maximilian Moeller} 
+\title{Evaluation of separation routines for some classes of inequalities of the \CP polytope}
+\supervisor{Jannik Irmai}
+\professor{Prof. Dr. Bjoern Andres}
 \date{\today}
-
-\selectlanguage{english}
 
 \maketitle[cdfont=off]
 
 \newpage
 \tableofcontents
-\blinddocument
+\listoftodos
 
-\section{Introduction}
-\subsection{Test}
-\blindtext
-Therefore \cite{grotschelFacetsCliquePartitioning1990a} will …
-\cite{andresPolyhedralStudyLifted2023a}
-\textsc{tiraneduiraen}
+\newpage
+\include{sections/Introduction.tex}
+\include{sections/CPP.tex}
+\include{sections/Related.tex}
+\include{sections/Separators.tex}
+\include{sections/Data.tex}
+\include{sections/Experiments.tex}
+
 
 \newpage
 \printbibliography

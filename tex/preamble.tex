@@ -6,6 +6,8 @@
 %  │ Basics │
 %  └────────┘
 %
+\usepackage[TU]{fontenc} %to enable bold small-caps letters
+
 \usepackage{fontspec}
 \setsansfont{Latin Modern Roman}
 % spezielle Sonderzeichen
@@ -21,6 +23,8 @@
 \usepackage{float}
 % verbesserter Schriftsatz (nicht sichtbare Abweichungen)
 \usepackage[]{microtype}
+% kann erkennen, ob ein space gebraucht wird oder nicht (praktisch für newcommands)
+\usepackage{xspace}
 % verbesserte Tabellen
 \usepackage{booktabs}
 % Kontrolle über enumerate, itemize und description
@@ -36,12 +40,19 @@
 \usepackage[dvipsnames]{xcolor}
 % Lorem ipsum mit \blindtext
 \usepackage[]{blindtext}
+% Todos
+\usepackage[colorinlistoftodos]{todonotes}
 % Ersetzt etwas durch nichts (debugging)
 \newcommand\hide[1]{}
 % Zitate
 \usepackage{csquotes}
-\usepackage[backend=biber, style=chicago-authordate]{biblatex}
+% Bibliography
+\usepackage[backend=biber, style=alphabetic]{biblatex}
 \addbibresource{references.bib}
+
+% e.g. and i.e.
+\newcommand\eg{\textit{e}.\textit{g}.\ }
+\newcommand\ie{\textit{i}.\textit{e}.\ }
 
 % ┌────────────┐
 % │ Mathematik │
@@ -159,3 +170,4 @@
 %  │ sonstiges │
 %  └───────────┘
 \usepackage{hyperref}
+\usepackage[capitalise]{cleveref}

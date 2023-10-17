@@ -1,0 +1,22 @@
+\section{Computational Experiments}\label{sec:comp}
+In this section we describe the experiments performed and present the results obtained from them.
+First we explain the setup and configurations for the separators explained in \cref{sec:sep}.
+Then we present the computational results along with some indications to their expressiveness.
+
+\subsection{Setup}\label{subsec:comp_setup}
+All tests were performed on the same machine running Ubuntu 23.04 as the operating system.
+The machine contains an Intel Core i9-12900KF processor running at ??\todo{Frequenz rausfinden (BIOS)} GHz and 64GB of DDR5 RAM. 
+
+The separation routines were implemented in \texttt{C++}.
+While some aspects of the code could be improved (\eg computations of shortest paths in parallel like in \cite{sorensenSeparationHeuristic2Partition2020}),
+performance was a big concern and we tried to implement the routines as efficiently as possible in the amount of time available for the project.
+
+\href{https://www.gurobi.com}{Gurobi} was used for both: computing the exact solution to the ILP problem and as the LP solver for the cutting plane algorithm.
+We chose Gurobi because of its performance compared to other solvers (see \cite{meindlAnalysisCommercialFree2012}) and the capability of solving ILPs and LPs within the same framework.
+The code infrastructure is designed flexible enough to use the separation routines either as callbacks to Gurobis ILP solver, or by passing a LP solution directly to them.
+Therefore, replacing the LP solver would be fairly easy, \eg for comparing performances of different solvers.
+However, this is beyond the scope of this project.
+
+\subsection{Separator Configurations}\label{subsec:run_configs}
+
+\subsection{Results}\label{subsec:comp_results}
