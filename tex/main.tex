@@ -23,7 +23,11 @@
     urlcolor=cdblue
 }
 
-\setuptodonotes{color=cdgreen!30, tickmarkheight=0.2cm}
+\mdfapptodefinestyle{theoremstyle}{
+	frametitlebackgroundcolor=cdblue!30
+}
+
+\setuptodonotes{color=cdgreen!30, tickmarkheight=0.2cm, noline}
 
 \newcommand\CP[0]{\textmd{\textsc{Clique Partitioning}}\xspace}
 
