@@ -1,1 +1,12 @@
 \section{The \CP polytope}\label{sec:cpp}
+
+\subsection{Two-chorded odd cycle inequalities}
+This class was found by \cite{grotschelFacetsCliquePartitioning1990} but a polynomial time separation routine was first described by \cite{mullerPartialOrderPolytope1996}.
+
+\begin{definition}[$2$-chorded odd cycle inequalities]\label{def:2-chords}
+	Let $5 \leq k \leq n$ with $k$ odd, and let $v\colon \Z_k \to \Z_n$ injective.
+	The $2$-chored odd cycle inequality with respect to $v$ is defined as:
+	\begin{equation}\label{eq:2-chords}
+		\sum_{i \in \Z_k} \left( x_{v_i v_{i+1}} - x_{v_i v_{i+2}} \right) \leq \left\lfloor \frac{1}{2} k \right\rfloor
+	\end{equation}
+\end{definition}
