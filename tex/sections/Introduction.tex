@@ -19,16 +19,28 @@ We denote the set of all clique partitionings of a graph $G$ by $\func{CP}(G)$.
 \begin{note}
 A clique partitioning $A$ consists precisely of the edges that connect vertices within the same block $W_i$ of the partition $\Gamma$.
 Thus, every clique partitioning $A$ induces an equivalence relation $\sim_A$ on $V$, and every equivalence relation on $V$ corresponds uniquely to a clique partitioning of $G$.
-Typically, one only considers complete graphs $G = K_n$, as this allows for any two objects to end up in the same block of the partition.
+Typically, one only considers complete graphs $K_n$, as this allows for any two objects to end up in the same cluster.
 In this case every block $W_i$ induces a clique, \ie a complete subgraph of $G$, hence the name \textit{clique} partitioning.
+We will restrict our attention to the case of complete graphs for the rest of the paper.
 \end{note}
 
 The \CP problem is then the following.
-Given a complete graph $K_n=(V_n,E_n)$ and edge weights $w_e \in \R^{E_n}$, find a clique partitioning of minimal weight.
-The problem is \textsc{NP}-hard in the strong sense \todo{add reference to wakabayashis phd thesis}.
+Given a complete graph $K_n=(V_n,E_n)$ and edge weights $w \in \R^{E_n}$, find a clique partitioning of minimal weight.
+The problem is known to be \textsc{NP}-hard in the strong sense \cite{wakabayashiAggregationBinaryRelations1986}.
 
-\todo{ILP-formulation beschreiben}
+Any valid clique partitioning of a (complete) graph $K_{n}=(V_{n}, E_{n})$ can be characterized by a vector $x \in \left\{ 0,1 \right\}^{E_{n}}$.
+Furthermore, \cite{grotschelFacetsCliquePartitioning1990} showed that a vector $x \in \left\{ 0,1 \right\}^{E_{n}}$ characterizes a clique partitioning iff it satisfies the \textit{triangle inequalities}:
+\[
+	 x_{ij} + x_{jk} - x_{ik} \leq 1
+\]
+for all pairwise distinct $i,j,k \in V_{n}$.
+Thus, we arrive at the following ILP formulation of the \CP problem:
 
+\begin{align*}
+	\min && &\sum_{e \in E_{n}} w_{e} x_{e} \\[1.5ex]
+	\text{subject to } && &x_{e} \in \left\{ 0,1 \right\} && \forall e \in E_{n} \\
+					   && &x_{uv} + x_{uw} - x_{uw} \leq 1 && \forall \left\{ u,v,w \right\} \in \binom{V_{n}}{3} \\
+\end{align*}
 
 Many variations of the problem are well studied, e.g. restricting the cardinality or the number (or both) of the obtained partitions.\todo{add references to original papers}
 Partitioning possibly incomplete graphs is also studied under the name “\textsc{Multicut} problem”.
