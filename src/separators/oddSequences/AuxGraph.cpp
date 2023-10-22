@@ -75,6 +75,7 @@ std::pair<double, std::vector<AuxGraph::Node>> HalfChordedAuxGraph::Dijkstra(Aux
     res.emplace_back(IndexToNode(current_node));
     current_node = pred[current_node];
   }
+  res.emplace_back(start);
   std::reverse(res.begin(), res.end());
   return std::make_pair(dist[target_index], res);
 }

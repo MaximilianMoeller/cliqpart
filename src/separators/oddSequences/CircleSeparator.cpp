@@ -67,9 +67,21 @@ vector<GRBTempConstr> CircleSeparator::SeparateHalfChords(const double *solution
 	  auto [cost, path] = aux.Dijkstra(start, target);
 
 	  if (cost < 3) {
-		// the loop below misses the “circle-connecting” edge, i.e. the edge from the last to the first element in the path
-		// since we always search for shortest paths inside a gadget, we already know that this edge must be positive
-		GRBLinExpr constraint_lhs = vars[EdgeIndex(path[0].i, path[0].j)];
+		// right-hand-side of the constraint is dependent on the length of the circle in the original graph, which is
+		// half the length of the shortest path found
+		// this is because the length of the circle is only the length of the “positive” part of the circle,
+		// whereas in the auxiliary graph the chords are also represented as edges
+		// the -1 is because the path variable contains actually all the nodes on the path (including the start)
+		// which are one more than the
+		// number of edges
+		int k = (path.size() - 1) / 2;
+
+		// circle diameter
+		int d = (k - 1) / 2;
+
+		GRBLinExpr constraint_lhs;
+
+		bool remapping{false};
 
 		// every edge in this shortest path corresponds to a variable in the constraint
 		for (int index = 1; index < path.size(); ++index) {
@@ -78,19 +90,19 @@ vector<GRBTempConstr> CircleSeparator::SeparateHalfChords(const double *solution
 
 		  // inside a gadget, i.e. a positive edge in the violated constraint
 		  if (node1.i == node2.i && node1.j == node2.j) {
-			constraint_lhs += vars[EdgeIndex(node1.i, node1.j)];
+			constraint_lhs +=
+				// TODO remapping here does not work, because it might be that (1.i*d) % k ==(1.j*d) % k even if i!=j
+				remapping ? vars[EdgeIndex((node1.i * d) % k, (node1.j * d) % k)] : vars[EdgeIndex(node1.i, node1.j)];
 		  }
 			// trans-gadget edge, i.e. a negative edge in the violated constraint
 			// because the auxiliary graph was build by adding (i,j) and (j,k),
 			// we now know that this corresponds to the edge (i,k) in the original graph
 		  else if (node1.j == node2.i) {
-			constraint_lhs -= vars[EdgeIndex(node1.i, node2.j)];
+			constraint_lhs -=
+				remapping ? vars[EdgeIndex((node1.i * d) % k, (node2.j * d) % k)] : vars[EdgeIndex(node1.i, node2.j)];
 		  }
 		}
 
-		// right-hand-side of the constraint is dependent on the length of the circle in the original graph, which is
-		// half the length of the shortest path found
-		int k = path.size() / 2;
 		auto constraint_rhs = k - 3;
 
 		violated_constraints.emplace_back(constraint_lhs <= constraint_rhs);
