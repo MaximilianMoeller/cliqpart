@@ -24,7 +24,28 @@ By subtracting $\frac{1}{2}k$ from both sides and after rearranging we obtain:
 	\sum_{i \in \Z_k} x_{v_i v_{i+1}} - \sum_{i \in \Z_k} \left(x_{v_i v_{i+2}} + \frac{1}{2} \right) \leq -\frac{1}{2}
 \end{equation*}
 
-\todo{where do i want to go with this? Somehow the edge weights of the auxiliary graph should fall out of this.}
-
 \subsection{Half-chorded odd cycle inequalities}
 
+\begin{definition}[Half-chorded odd cycle inequalities]\label{def:half-chorded}
+Let $5 \leq k \leq n$ with $k$ odd, let $d = \frac{k-1}{2}$, and let $v: \Z_{k} \to \Z_{n}$ be injective.
+The \textit{half-chorded odd cycle inequality} with respect to $v$ is defined as
+\begin{equation}\label{eq:half-chorded}
+	\sum_{i \in \Z_{k}}^{} (x_{v_{i} v_{i+1}} - x_{v_{i} v_{i+d} }) \leq k - 3
+\end{equation}
+\end{definition}
+\begin{note}
+	The half-chords $v_{i}v_{i+d}$ for $i \in \Z_{k}$ also form a cycle in $K_{n}$, and the edges $v_{i}v_{i+1}$ are the $2$-chords of that cycle.
+\end{note}
+We can therefore rewrite this equation as
+\begin{equation*}
+\sum_{i \in \Z_{k}}^{} (x_{w_{i}w_{i+2}} - x_{w_{i}w_{i+1}}) \leq k-3
+\end{equation*}
+where $w: \Z_{k} \to \Z_{n}, i \mapsto v_{i \cdot d}$.
+By subtracting $k$ from both sides and multiplying by $-1$ we obtain:
+\begin{equation*}
+	\sum_{i \in \Z_{k}}^{} \left( -x_{w_{i}w_{i+2}} + x_{w_{i}w_{i+1}} + 1 \right) \geq 3.
+\end{equation*}
+
+Now for every tuple $(i,j) \in V^{2}$ we set the weights of the arcs $(u_{1}^{i,j}, u_{2}^{i,j})$ and $(v_{1}^{i,j}, v_{2}^{i,j})$ to $x_{ij}$.
+And for every triple $(i,j,k) \in V^{3}$ we set the weight of the arcs $(u_{2}^{i,j}, v_{1}^{j,k})$ and $(v_{2}^{i,j}, u_{1}^{j,k})$ to $1-x_{ik}$.
+Then, $x$ violates a half-chorded odd cycle inequality iff for any $(i,j) \in V^{2}$ there exists a $u_{1}^{i,j}v_{1}^{i,j}$-walk in $H$ with weighted lenght stricly less than 3.
