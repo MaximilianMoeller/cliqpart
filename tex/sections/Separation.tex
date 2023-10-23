@@ -1,18 +1,16 @@
-\section{Separators}\label{sec:sep}
-This section is concerned with the separation routines (called \textit{separators} for short) for the classes of inequalities described in \cref{sec:cpp}.
+\section{Separation}\label{sec:separation}
+This section is concerned with the separation routines (called \textit{separators} for short) for the classes of inequalities described in \cref{sec:related}.
 
-\subsection{Triangle inequalities}\label{subsec:triangel_separator}
+\subsection{Triangle inequalities}\label{subsec:triangle_separator}
 
 \subsection{\texorpdfstring{\ST}{[S:T]} inequalities}\label{subsec:st_separator}
 
-\subsection{Two-chorded odd cycle inequalities}
+\subsection{Two-chorded odd cycle inequalities}\label{subsec:two_chorded_separator}
 The class of two-chorded odd cycle inequalities was shown to be seperable in polynomial time by \cite{mullerPartialOrderPolytope1996}.
 Their paper is mainly concerned with the partial order polytope of a \textit{directed} graph.
 However, the algorithm described there for separating \textit{odd closed walk} inequalities can be adapted to to separate a class of valid inequalities for the \CP polytope, that contains the class of two-chorded odd cycle inequalities.
 
 We are however only interested in the class of two-chorded inequalities (and not this broader class) and will therefore repeat the argument given, but slightly adapted for this narrower class.
-
-Since 2-chorded cycle inequalities are only facet defining for cycles of odd length, we can also rewrite \ref{eq:2-chords} as
 
 \begin{equation*}
 	\sum_{i \in \Z_k} \left( x_{v_i v_{i+1}} - x_{v_i v_{i+2}} \right) \leq \frac{1}{2} (k-1)
@@ -24,7 +22,7 @@ By subtracting $\frac{1}{2}k$ from both sides and after rearranging we obtain:
 	\sum_{i \in \Z_k} x_{v_i v_{i+1}} - \sum_{i \in \Z_k} \left(x_{v_i v_{i+2}} + \frac{1}{2} \right) \leq -\frac{1}{2}
 \end{equation*}
 
-\subsection{Half-chorded odd cycle inequalities}
+\subsection{Half-chorded odd cycle inequalities}\label{subsec:half_chorded_separator}
 
 \begin{definition}[Half-chorded odd cycle inequalities]\label{def:half-chorded}
 Let $5 \leq k \leq n$ with $k$ odd, let $d = \frac{k-1}{2}$, and let $v: \Z_{k} \to \Z_{n}$ be injective.

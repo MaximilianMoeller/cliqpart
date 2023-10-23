@@ -3,11 +3,7 @@
 
 \input{preamble.tex}
 
-%\usepackage{scrlayer-scrpage}
-%\lohead{Maximilian Moeller}
-%\rohead{}
-%\pagestyle{plain.scrheadings}
-
+\usetikzlibrary{graphs}
 
 \hypersetup{
     pdfauthor={Maximilian Moeller},
@@ -29,11 +25,15 @@
 
 \setuptodonotes{color=cdgreen!30, tickmarkheight=0.2cm, noline}
 
+
+\tikzstyle{vertex}=[circle, draw, fill=white, inner sep=0pt, minimum width=1ex]
+
 \newcommand\CP[0]{\textmd{\textsc{Clique Partitioning}}\xspace}
 \newcommand\ST[0]{$\left[S{:}T\right]$}
+
 \begin{document}
 
-
+% Makes all the section headings etc. use a serif font
 \addtokomafont{disposition}{\rmfamily}
 \addtokomafont{title}{\rmfamily}
 \addtokomafont{subtitle}{\rmfamily}
@@ -44,7 +44,6 @@
 \faculty{Faculty of Computer Science}
 \institute{Institute for Artificial Intelligence}
 \chair{Chair for Machine Learning for Computer Vision}
-% komische Bezeichnung für den großen Beleg, aber so festgelegt im TUDscript
 \thesis{Student Research Project “Großer Beleg”}
 \author{Maximilian Moeller} 
 \title{Evaluation of separation routines for some classes of inequalities of the \CP polytope}
@@ -56,15 +55,16 @@
 
 \newpage
 \tableofcontents
+\listoffigures
 \listoftodos
 
 \newpage
 \include{sections/Introduction.tex}
-\include{sections/CPP.tex}
 \include{sections/Related.tex}
-\include{sections/Separators.tex}
+\include{sections/Separation.tex}
 \include{sections/Data.tex}
 \include{sections/Experiments.tex}
+\include{sections/Discussion.tex}
 \newpage
 \printbibliography
 \end{document}

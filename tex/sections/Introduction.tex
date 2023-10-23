@@ -1,12 +1,31 @@
 \section{Introduction}
-The goal of this project was to gain some familiarity with the \CP problem in particular and combinatorial optimization techniques in general.
-Especially knowledge about classes of facet-defining inequalities is of vital interest for solving combinatorial optimization problems through branch-and-cut algorithms.
+\subsection{About this project}\label{subsec:about}
+The goal of this student research project was to gain some familiarity with the \CP problem in particular and combinatorial optimization techniques in general.
+Knowledge about classes of facet-defining inequalities is of vital interest for solving combinatorial optimization problems through branch-and-cut algorithms.
 Therefore, the task of the project was to review the available literature on such classes and implement separation routines for as many of them as possible.
-The relatively new class of $2$-chorded-half-cycle inequalities first described by \cite{andresPolyhedralStudyLifted2022} was of particular interest, because their practical use was unknown so far.
+The relatively new class of \textit{half-chorded odd cycle inequalities} first described by \cite{andresPolyhedralStudyLifted2022} was of particular interest, because their practical use was unknown so far.
 The separation routines should then be tested on data available from the literature as well as new instances.
 
-\subsection{The \CP problem}\label{subsec:cp}
-The \CP problem is a combinatorial optimization problem that was first investigated by \cite{grotschelFacetsCliquePartitioning1990}.
+The remainder of this section will give a brief overview of the \CP problem, but for an in-depth introduction we refer the reader to \cite{grotschelFacetsCliquePartitioning1990}.
+The structure of the rest of the document is as follows:
+\begin{table}[h]
+	\centering
+	\begin{tabular}{||c|c||}
+		\hline
+		Section & Topic \\ [0.5ex]
+		\hline\hline
+		\cref{sec:related}& Related and prior work \\
+		\cref{sec:separation}& Separation routines for some classes of inequalities \\
+		\cref{sec:data}& Instances used for our computational experiments \\
+		\cref{sec:experiments}& Setup, configuration and results of the experiments \\
+		\cref{sec:discussion}& Discussion of our results \\
+		\hline
+	\end{tabular}
+	\caption{Structure of this document}
+\end{table}
+
+\subsection{The \CP problem}\label{subsec:cp_problem}
+The \CP problem is a combinatorial optimization problem that was first investigated by \cite{grotschelFacetsCliquePartitioning1990} as a framework for aggregation of binary relations.
 The objective is to cluster a given set of objects with respect to their pairwise similarities into ‘maximally homogenous’ sets.
 
 \begin{definition}[\CP]\label{def:cp}
@@ -14,20 +33,72 @@ The objective is to cluster a given set of objects with respect to their pairwis
 	\[
 		A = \bigcup_{i=1}^k \left\{ (u,v) \in E \mid u,v \in W_i \right\}.
 	\]
-We denote the set of all clique partitionings of a graph $G$ by $\func{CP}(G)$.
 \end{definition}
 \begin{note}
 A clique partitioning $A$ consists precisely of the edges that connect vertices within the same block $W_i$ of the partition $\Gamma$.
 Thus, every clique partitioning $A$ induces an equivalence relation $\sim_A$ on $V$, and every equivalence relation on $V$ corresponds uniquely to a clique partitioning of $G$.
-Typically, one only considers complete graphs $K_n$, as this allows for any two objects to end up in the same cluster.
-In this case every block $W_i$ induces a clique, \ie a complete subgraph of $G$, hence the name \textit{clique} partitioning.
-We will restrict our attention to the case of complete graphs for the rest of the paper.
+\cref{fig:example_clique_partitioning} shows an example of a clique partitioning.
 \end{note}
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}
+        \def \n{8};
+        \def \radius{1.5cm};
+        \def \r{0.3cm};
+        \foreach \i in {0,...,\n}{
+			\node[vertex] (\i) at ({\i/(\n+1)*360+90}:\radius) {};
+			\node at ({\i/(\n+1)*360+90}:\radius+\r) {$v_{\i}$};
+        }
+        \foreach \i in {0,...,\n}{
+            \foreach \j in {\i,...,\n}{
+                \draw[dashed, gray] (\i) -- (\j);
+        	}
+        }
+        \foreach \i/\j in {1/8, 1/3, 1/5, 8/3, 8/5, 3/5} {
+			\draw[line width=0.3mm] (\i) -- (\j);
+        }
+        \foreach \i/\j in {4/6, 4/7, 6/7} {
+			\draw[line width=0.3mm] (\i) -- (\j);
+        }
+	\end{tikzpicture}
+	\caption[Example clique partitioning]{An example of a clique partitioning $A$ for $K_{9}$. 
+		Solid lines represent edges that are part of the clique partitioning and dashed lines represent edges $e \in E_{9} \setminus A$.
+	The induced partition is $\Gamma = \left\{ \left\{ v_{0} \right\}, \left\{ v_{2} \right\}, \left\{ v_{1}, v_{3}, v_{5}, v_{8} \right\}, \left\{ v_{4}, v_{6}, v_{7} \right\} \right\}$.}
+	\label{fig:example_clique_partitioning}
+\end{figure}
+
+Typically, one only considers complete graphs $K_n$, as this poses the least restrictions on the set of feasible solutions.
+Consider \eg the example given in \cref{fig:incomplete_graph}.
+The nodes $i$ and $k$ cannot end up in the same block of the partition except $j$ is also in this block.
+In many applications of \CP (\eg the instances given in \cite{grotschelCuttingPlaneAlgorithm1989}), every clique partitioning should be a feasible solution.
+We will therefore restrict our attention to the case of complete graphs for the rest of the paper.
+With this assumption every block $W_i$ induces a clique, \ie a complete subgraph of $G$, hence the name \textit{clique} partitioning.
+
+\begin{figure}[h]
+	\centering
+	\begin{tikzpicture}
+		\node[vertex, label=below:{$i$}] (i) at (0,0) {};
+		\node[vertex, label=below:{$j$}] (j) at (1,0) {};
+		\node[vertex, label=below:{$k$}] (k) at (2,0) {};
+
+		\draw (i) -- (j);
+		\draw (j) -- (k);
+	\end{tikzpicture}
+	\caption{An incomplete graph.}
+	\label{fig:incomplete_graph}
+\end{figure}
 
 The \CP problem is then the following.
 Given a complete graph $K_n=(V_n,E_n)$ and edge weights $w \in \R^{E_n}$, find a clique partitioning of minimal weight.
 The problem is known to be \textsc{NP}-hard in the strong sense \cite{wakabayashiAggregationBinaryRelations1986}.
+We will just briefly mention the trivial cases.
+If all entries in $w$ are non-negative, the empty clique partitioning is one optimal solution.
+Likewise, if all entries are non-positive, the maximal clique partitioning $A = E$ is an optimal solution.
+Furthermore, if the non-positive edges in $w$ induce cliques, then the optimal partition will consists exactly of these clique.
+More ‘interesting’ instances must therefore contain ‘conflicts’, \ie they must contain vertices with both positive and negative edges.
 
+\subsection{An ILP-formulation of \CP}\label{subsec:ilp_formulation}
 Any valid clique partitioning of a (complete) graph $K_{n}=(V_{n}, E_{n})$ can be characterized by a vector $x \in \left\{ 0,1 \right\}^{E_{n}}$.
 Furthermore, \cite{grotschelFacetsCliquePartitioning1990} showed that a vector $x \in \left\{ 0,1 \right\}^{E_{n}}$ characterizes a clique partitioning iff it satisfies the \textit{triangle inequalities}:
 \[
@@ -42,8 +113,3 @@ Thus, we arrive at the following ILP formulation of the \CP problem:
 					   && &x_{uv} + x_{uw} - x_{uw} \leq 1 && \forall \left\{ u,v,w \right\} \in \binom{V_{n}}{3} \\
 \end{align*}
 
-Many variations of the problem are well studied, e.g. restricting the cardinality or the number (or both) of the obtained partitions.\todo{add references to original papers}
-Partitioning possibly incomplete graphs is also studied under the name “\textsc{Multicut} problem”.
-Here, one typically thinks of the edges that are ‘cut’, \ie the edges between blocks of the partitiong instead of within a block.
-Hence the characteristic vectors and the inequalities for the \textsc{Multicut} problem are obtained by replacing a variable $x$ from the \CP problem with $(1-x)$.
-Therefore, these two problems are equivalent for complete graphs in the sense that an optimal solution to one of them also yields an optimal solution to the other.
