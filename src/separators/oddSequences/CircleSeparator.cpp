@@ -27,7 +27,7 @@ vector<GRBTempConstr> CircleSeparator::SeparateHalfChords(const double *solution
 	  if (i == j) continue;
 
 	  // add gadgets
-	  double gadget_weight = 1 - solution[EdgeIndex(i, j)];
+	  double gadget_weight = solution[EdgeIndex(i, j)];
 
 	  aux.AddArc(AuxGraph::Node{false, false, i, j},
 				 AuxGraph::Node{false, true, i, j},
@@ -40,7 +40,7 @@ vector<GRBTempConstr> CircleSeparator::SeparateHalfChords(const double *solution
 	  for (int k = 0; k < degree_; ++k) {
 		if ((k == i) || (k == j)) continue;
 
-		double triple_weight = solution[EdgeIndex(i, k)];
+		double triple_weight = 1 - solution[EdgeIndex(i, k)];
 
 		aux.AddArc(AuxGraph::Node{false, true, i, j},
 				   AuxGraph::Node{true, false, j, k},
@@ -69,19 +69,9 @@ vector<GRBTempConstr> CircleSeparator::SeparateHalfChords(const double *solution
 	  if (cost < 3) {
 		// right-hand-side of the constraint is dependent on the length of the circle in the original graph, which is
 		// half the length of the shortest path found
-		// this is because the length of the circle is only the length of the “positive” part of the circle,
-		// whereas in the auxiliary graph the chords are also represented as edges
-		// the -1 is because the path variable contains actually all the nodes on the path (including the start)
-		// which are one more than the
-		// number of edges
 		int k = (path.size() - 1) / 2;
 
-		// circle diameter
-		int d = (k - 1) / 2;
-
 		GRBLinExpr constraint_lhs;
-
-		bool remapping{false};
 
 		// every edge in this shortest path corresponds to a variable in the constraint
 		for (int index = 1; index < path.size(); ++index) {
@@ -90,16 +80,13 @@ vector<GRBTempConstr> CircleSeparator::SeparateHalfChords(const double *solution
 
 		  // inside a gadget, i.e. a positive edge in the violated constraint
 		  if (node1.i == node2.i && node1.j == node2.j) {
-			constraint_lhs +=
-				// TODO remapping here does not work, because it might be that (1.i*d) % k ==(1.j*d) % k even if i!=j
-				remapping ? vars[EdgeIndex((node1.i * d) % k, (node1.j * d) % k)] : vars[EdgeIndex(node1.i, node1.j)];
+			constraint_lhs -= vars[EdgeIndex(node1.i, node1.j)];
 		  }
 			// trans-gadget edge, i.e. a negative edge in the violated constraint
 			// because the auxiliary graph was build by adding (i,j) and (j,k),
 			// we now know that this corresponds to the edge (i,k) in the original graph
 		  else if (node1.j == node2.i) {
-			constraint_lhs -=
-				remapping ? vars[EdgeIndex((node1.i * d) % k, (node2.j * d) % k)] : vars[EdgeIndex(node1.i, node2.j)];
+			constraint_lhs += vars[EdgeIndex(node1.i, node2.j)];
 		  }
 		}
 
