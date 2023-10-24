@@ -14,7 +14,7 @@ The structure of the rest of the document is as follows:
 		\hline
 		Section & Topic \\ [0.5ex]
 		\hline\hline
-		\cref{sec:related}& Related and prior work \\
+		%\cref{sec:related}& Related and prior work \\
 		\cref{sec:separation}& Separation routines for some classes of inequalities \\
 		\cref{sec:data}& Instances used for our computational experiments \\
 		\cref{sec:experiments}& Setup, configuration and results of the experiments \\
@@ -52,18 +52,18 @@ Thus, every clique partitioning $A$ induces an equivalence relation $\sim_A$ on 
         }
         \foreach \i in {0,...,\n}{
             \foreach \j in {\i,...,\n}{
-                \draw[dashed, gray] (\i) -- (\j);
+                \draw[dotted, gray] (\i) -- (\j);
         	}
         }
         \foreach \i/\j in {1/8, 1/3, 1/5, 8/3, 8/5, 3/5} {
-			\draw[line width=0.3mm] (\i) -- (\j);
+			\draw[line width=0.2mm] (\i) -- (\j);
         }
         \foreach \i/\j in {4/6, 4/7, 6/7} {
-			\draw[line width=0.3mm] (\i) -- (\j);
+			\draw[line width=0.2mm] (\i) -- (\j);
         }
 	\end{tikzpicture}
 	\caption[Example clique partitioning]{An example of a clique partitioning $A$ for $K_{9}$. 
-		Solid lines represent edges that are part of the clique partitioning and dashed lines represent edges $e \in E_{9} \setminus A$.
+		Solid lines represent edges that are part of the clique partitioning and dotted lines represent edges $e \in E_{9} \setminus A$.
 	The induced partition is $\Gamma = \left\{ \left\{ v_{0} \right\}, \left\{ v_{2} \right\}, \left\{ v_{1}, v_{3}, v_{5}, v_{8} \right\}, \left\{ v_{4}, v_{6}, v_{7} \right\} \right\}$.}
 	\label{fig:example_clique_partitioning}
 \end{figure}
@@ -96,11 +96,17 @@ We will just briefly mention the trivial cases.
 If all entries in $w$ are non-negative, the empty clique partitioning is one optimal solution.
 Likewise, if all entries are non-positive, the maximal clique partitioning $A = E$ is an optimal solution.
 Furthermore, if the non-positive edges in $w$ induce cliques, then the optimal partition will consists exactly of these clique.
-More ‘interesting’ instances must therefore contain ‘conflicts’, \ie they must contain vertices with both positive and negative edges.
+More ‘interesting’ instances must therefore contain ‘conflicts’, \ie they must contain vertices adjacent to both positive and negative edges.
 
 \subsection{An ILP-formulation of \CP}\label{subsec:ilp_formulation}
 Any valid clique partitioning of a (complete) graph $K_{n}=(V_{n}, E_{n})$ can be characterized by a vector $x \in \left\{ 0,1 \right\}^{E_{n}}$.
-Furthermore, \cite{grotschelFacetsCliquePartitioning1990} showed that a vector $x \in \left\{ 0,1 \right\}^{E_{n}}$ characterizes a clique partitioning iff it satisfies the \textit{triangle inequalities}:
+For any edge $e \in E_{n}$ the value $x_{e} = 1$ means that $e \in A$, and $x_{e} = 0$ means that $e \notin A$.
+The \CP polytope $\mathscr{P}_{n}$ is then the convex hull of all characteristic vectors of clique partitionings of the complete graph $K_{n}$.
+A full description of this polytope by linear inequalities is unlikely, unless $\var{P} = \var{NP}$.
+However, many classes of valid and facet-defining inequalities have been found by the research community.
+Section 2 of \cite{andresPolyhedralStudyLifted2022} gives a comprehensive overview over know classes as well as over the history of the problem.
+
+\cite{grotschelFacetsCliquePartitioning1990} showed that a vector $x \in \left\{ 0,1 \right\}^{E_{n}}$ characterizes a clique partitioning iff it satisfies the \textit{triangle inequalities}:
 \[
 	 x_{ij} + x_{jk} - x_{ik} \leq 1
 \]
@@ -112,4 +118,3 @@ Thus, we arrive at the following ILP formulation of the \CP problem:
 	\text{subject to } && &x_{e} \in \left\{ 0,1 \right\} && \forall e \in E_{n} \\
 					   && &x_{uv} + x_{uw} - x_{uw} \leq 1 && \forall \left\{ u,v,w \right\} \in \binom{V_{n}}{3} \\
 \end{align*}
-
