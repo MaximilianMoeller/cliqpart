@@ -218,6 +218,20 @@ int main(int argc, char *argv[]) {
             violated_constraints = {};
             for (auto &separator : separators) {
               violated_constraints = separator->SeparateSolution(model.GetSolution(), model.GetVars());
+
+              // if the triangle separator found no violated constraints and the solution is integral
+              // there is no need to search for other violated inequalities -> abort early
+              if (separator->IsTriangleSeparator() && violated_constraints.empty() && model.IsIntegral()) {
+                PLOGI << "Found integral solution in iteration " << iteration << ".";
+                // very clear usage of goto, don't blame me
+                goto integral_solution;
+              }
+
+              // if a separator found violated constraints, we want to add those to the model and optimize again
+              // before calling other separators, because they might depend on the fact that a specific class
+              // of inequalities is satisfied.
+              // In fact, ALL other implemented separators use the assumption that the triangle inequalities are
+              // satisfied.
               if (!violated_constraints.empty()) break;
             }
 
@@ -229,10 +243,13 @@ int main(int argc, char *argv[]) {
             // TODO: add CSV logging for easier analysis
 
           } while (!violated_constraints.empty());
+          integral_solution: ;
+
           model.write(kNumberedRunDir / "0_last.sol");
           PLOGI << "Finished run " << run_counter << "/" << kRunConfig.run_count << " for run config '"
                 << kRunConfig.name << "' and data set '" << data_dir_path << "'.";
-		  PLOGI << "Took " << iteration << " iterations and obtained objective value is " << to_string(model.get(GRB_DoubleAttr_ObjVal));
+          PLOGI << "Took " << iteration << " iterations and obtained objective value is "
+                << to_string(model.get(GRB_DoubleAttr_ObjVal));
         }
         PLOGI << "Finished run config '" << kRunConfig.name << "' for data set '" << data_dir_path << "'.";
       }

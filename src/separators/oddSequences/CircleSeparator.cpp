@@ -79,7 +79,11 @@ vector<GRBTempConstr> CircleSeparator::SeparateSolution(double *solution, GRBVar
 
   progressbar bar(degree_);
   for (int i = 0; i < degree_; ++i) {
-    bar.update();
+
+    // only show progress bar in debugging mode (not in verbose because the PLOGV in the loop breaks the bar)
+    if (plog::get()->getMaxSeverity() == plog::Severity::debug) {
+      bar.update();
+    }
     for (int j = 0; j < degree_; ++j) {
       if (i == j) continue;
 

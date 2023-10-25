@@ -15,6 +15,7 @@ class CliquePartModel : public GRBModel {
  private:
   // the graph_degree of the complete graph, i.e. the number of nodes
   int degree_;
+  double integrality_tolerance;
 
   unique_ptr<GRBVar[]> vars_;
 
@@ -30,6 +31,9 @@ class CliquePartModel : public GRBModel {
 
   // returns the current solution (only valid after LP-optimization finished)
   double *GetSolution() { return get(GRB_DoubleAttr_X, vars_.get(), EdgeCount()); }
+
+  // whether the current solution is integral (only valid after LP-optimization finished)
+  bool IsIntegral();
 
   // returns the gurobi variable object of a given edge (indices of the adjacent nodes)
   GRBVar *GetVars() { return vars_.get(); };

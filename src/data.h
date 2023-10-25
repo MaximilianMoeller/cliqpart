@@ -52,6 +52,8 @@ struct DataConfig {
   // Fixing numerical inaccuracies can sometimes be accomplished by scaling all the weights by a constant factor.
   double value_scaling{1.0};
 
+  double integrality_tolerance{1e-6};
+
   explicit DataConfig(const string &data_description_file);
 
 };
