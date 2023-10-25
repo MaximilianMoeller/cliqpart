@@ -1,0 +1,13 @@
+graph_degree = 40
+maximizing = true
+
+row_labels = 1
+column_labels = 1
+
+# soft
+#value_offset = 0.5850
+# medium
+value_offset = 0.5550
+# hard
+#value_offset = 0.5000
+value_scaling = 1e3

@@ -2,8 +2,13 @@
 cliqpart
 cliqpart_r
 log*
+
+# instances
+random_*
 *.sol
-*.mps
+!optimal.sol
+
+# results of the computation
 results/
 
 # Prerequisites
