@@ -1,0 +1,18 @@
+name = "Δ_two"
+run_count = 1
+tolerance = 1e-6
+
+[[separators]]
+inequality = "Δ"
+variable_once = false
+maxcut = 400
+
+[[separators]]
+inequality = "cycle"
+type = "half-chorded"
+maxcut = 400
+
+[[separators]]
+inequality = "cycle"
+type = "two-chorded"
+maxcut = 400

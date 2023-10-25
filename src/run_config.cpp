@@ -108,9 +108,9 @@ RunConfig::RunConfig(string &run_config_file) {
                 << ". Assuming 2-chorded cycles.";
         }
         CircleInequality inequality_type;
-        if (elem["type"] == "half-chorded") {
+        if (elem["type"] == "half-chorded" || elem["type"] == "half" || elem["type"] == "1/2") {
           inequality_type = CircleInequality::HALF_CHORDED;
-        } else if (elem["type"] == "2-chorded") {
+        } else if (elem["type"] == "two-chorded" || elem["type"] == "2-chorded" || elem["type"] == "2") {
           inequality_type = CircleInequality::TWO_CHORDED;
         } else {
           PLOGW << "Unknown inequality type was given for a cycle-separator in " << run_config_file

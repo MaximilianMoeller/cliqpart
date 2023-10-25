@@ -4,5 +4,5 @@ tolerance = 1e-6
 
 [[separators]]
 inequality = "Δ"
-maxcut = 400
 variable_once = false
+maxcut = 400

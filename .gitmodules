@@ -10,3 +10,6 @@
 [submodule "extern/tomlplusplus"]
 	path = extern/tomlplusplus
 	url = https://github.com/marzer/tomlplusplus.git
+[submodule "extern/progressbar"]
+	path = extern/progressbar
+	url = https://github.com/gipert/progressbar.git

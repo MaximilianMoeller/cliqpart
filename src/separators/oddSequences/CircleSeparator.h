@@ -7,6 +7,7 @@
 
 #include "../abstract_separator.h"
 #include "../../clique_part_model.h"
+#include "AuxGraph.h"
 
 enum class CircleInequality {
   TWO_CHORDED, HALF_CHORDED
@@ -39,8 +40,6 @@ class CircleSeparator : public AbstractSeparator<CircleSeparatorConfig> {
  public:
   CircleSeparator(int degree, const CircleSeparatorConfig &config) : AbstractSeparator(degree, config) {}
   vector<GRBTempConstr> SeparateSolution(double *solution, GRBVar *vars) override;
-  vector<GRBTempConstr> SeparateTwoChords(double *solution, GRBVar *vars);
-  vector<GRBTempConstr> SeparateHalfChords(const double *solution, GRBVar *vars);
 
 };
 

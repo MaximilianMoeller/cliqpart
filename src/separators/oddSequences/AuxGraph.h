@@ -12,6 +12,9 @@
 #include "plog/Log.h"
 
 class AuxGraph {
+ protected:
+  int max_node_index_;
+
  public:
   int degree_;
 
@@ -22,7 +25,7 @@ class AuxGraph {
     int j;
   };
 
-  explicit AuxGraph(int degree) : degree_(degree) {};
+  explicit AuxGraph(int degree) : degree_(degree) { max_node_index_ = MaxNodeIndex(); };
 
   [[nodiscard]] int NodeToIndex(Node node) const {
     if (node.i == node.j) {
@@ -38,7 +41,7 @@ class AuxGraph {
     return NodeToIndex(max_node);
   }
 
-  Node IndexToNode(int index) {
+  [[nodiscard]] Node IndexToNode(int index) const {
     if (index < 0) {
       PLOGW << "Tried to convert index to auxiliary graph node, but index was " << index << ".";
       return Node{};
@@ -55,16 +58,9 @@ class AuxGraph {
   }
 
   virtual void AddArc(Node start, Node target, double weight) = 0;
+  virtual std::pair<double, std::vector<Node>> shortestPath(Node start, Node target) = 0;
+
   virtual ~AuxGraph() = default;
-};
-
-class TwoChordedAuxGraph : public AuxGraph {
-
- public:
-
-  explicit TwoChordedAuxGraph(int degree) : AuxGraph(degree) {};
-
-  void AddArc(Node start, Node target, double weight);
 };
 
 class HalfChordedAuxGraph : public AuxGraph {
@@ -75,11 +71,44 @@ class HalfChordedAuxGraph : public AuxGraph {
 
  public:
   explicit HalfChordedAuxGraph(int degree)
-      : AuxGraph(degree),
-        weights_(MaxNodeIndex() + 1, std::vector<std::pair<double, int>>()) {};
+      : AuxGraph(degree) {
+    weights_ = std::vector(max_node_index_ + 1, std::vector<std::pair<double, int>>());
+  };
+
   void AddArc(Node start, Node target, double weight) override;
 
-  std::pair<double, std::vector<Node>> Dijkstra(Node start, Node target);
+  // can use dijkstra because the graph only contains non-negative weights
+  std::pair<double, std::vector<Node>> shortestPath(Node start, Node target) override;
+};
+
+class TwoChordedAuxGraph : public AuxGraph {
+ private:
+  bool floyd_warshall_computed_{false};
+  std::vector<std::vector<double>> weights_;
+  std::vector<std::vector<double>> dist_;
+  std::vector<std::vector<int>> present_arcs_;
+  std::vector<std::vector<int>> pred_;
+
+ public:
+
+  explicit TwoChordedAuxGraph(int degree) :
+      AuxGraph(degree) {
+    weights_ = std::vector(max_node_index_ + 1,
+                           std::vector<double>(max_node_index_ + 1, std::numeric_limits<double>::infinity())),
+    dist_ = std::vector(max_node_index_ + 1,
+                        std::vector<double>(max_node_index_ + 1, std::numeric_limits<double>::infinity())),
+    pred_ = std::vector(max_node_index_ + 1, std::vector<int>(max_node_index_ + 1, -1));
+    present_arcs_ = std::vector(max_node_index_ + 1, std::vector<int>());
+  }
+
+  void AddArc(Node start, Node target, double weight)
+  override;
+
+  void FloydWarshall();
+  // floyd warshall is faster than doing belman-ford n^2 times
+  // cannot use dijkstra, because graph contains negative edges
+  std::pair<double, std::vector<Node>> shortestPath(Node start, Node target)
+  override;
 };
 
 #endif //CLIQPART_SRC_SEPARATORS_ODDSEQUENCES_AUXGRAPH_H_
