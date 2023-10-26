@@ -37,7 +37,7 @@ class IAbstractSeparator {
   explicit IAbstractSeparator(int degree) : degree_(degree) {};
   virtual ~IAbstractSeparator() = default;
   virtual vector<GRBTempConstr> SeparateSolution(double *solution, GRBVar *vars) = 0;
-  virtual bool IsTriangleSeparator() = 0;
+  virtual string Abbreviation() = 0;
 };
 
 class AbstractSeparatorConfig {
@@ -56,7 +56,6 @@ class AbstractSeparator : public IAbstractSeparator {
  public:
   explicit AbstractSeparator(int degree, const SeparatorConfig &config)
       : IAbstractSeparator(degree), config_(config) {};
-  bool IsTriangleSeparator() override {return false;};
 };
 
 #endif // CLIQPART_SRC_SEPARATORS_ABSTRACT_SEPARATOR_H_

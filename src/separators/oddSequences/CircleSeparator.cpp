@@ -146,7 +146,6 @@ vector<GRBTempConstr> CircleSeparator::SeparateSolution(double *solution, GRBVar
       }
     }
   }
-  std::cout << std::endl;
   PLOGD << "Found " << found << " violated " << config_.inequality_type_ << " odd cycle-inequalities.";
   return violated_constraints;
 }

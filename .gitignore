@@ -10,6 +10,7 @@ random_*
 
 # results of the computation
 results/
+measurements.csv
 
 # Prerequisites
 *.d

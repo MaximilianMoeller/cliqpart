@@ -40,7 +40,16 @@ class CircleSeparator : public AbstractSeparator<CircleSeparatorConfig> {
  public:
   CircleSeparator(int degree, const CircleSeparatorConfig &config) : AbstractSeparator(degree, config) {}
   vector<GRBTempConstr> SeparateSolution(double *solution, GRBVar *vars) override;
-
+  string Abbreviation() override {
+    string res;
+    switch (config_.inequality_type_) {
+      case CircleInequality::TWO_CHORDED:res = "2";
+        break;
+      case CircleInequality::HALF_CHORDED:res = "half";
+        break;
+    }
+    return res;
+  }
 };
 
 #endif //CLIQPART_SRC_SEPARATORS_CIRCLESEPARATOR_H_

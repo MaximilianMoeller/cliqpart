@@ -105,7 +105,9 @@ void TwoChordedAuxGraph::FloydWarshall() {
   progressbar bar(max_node_index_);
 
   for (int k = 0; k < max_node_index_; ++k) {
-    bar.update();
+    if (plog::get()->getMaxSeverity() == plog::Severity::debug) {
+      bar.update();
+    }
     for (int i = 0; i < max_node_index_; ++i) {
       for (int j = 0; j < max_node_index_; ++j) {
         auto new_weight = dist_[i][k] + dist_[k][j];
@@ -116,7 +118,6 @@ void TwoChordedAuxGraph::FloydWarshall() {
       }
     }
   }
-  std::cout << std::endl;
   floyd_warshall_computed_ = true;
   PLOGV << "Finished FloydWarshall algorithm on auxiliary graph.";
 }

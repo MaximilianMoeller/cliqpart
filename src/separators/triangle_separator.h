@@ -25,7 +25,7 @@ class TriangleSeparator : public AbstractSeparator<TriangleSeparatorConfig> {
  public:
   TriangleSeparator(int degree, const TriangleSeparatorConfig &config) : AbstractSeparator(degree, config) {}
   vector<GRBTempConstr> SeparateSolution(double *solution, GRBVar *vars) override;
-  bool IsTriangleSeparator() override { return true; };
+  string Abbreviation() override { return "Δ"; };
 };
 
 #endif // CLIQPART_SRC_SEPARATORS_TRIANGLE_SEPARATOR_H_

@@ -39,6 +39,7 @@ class StSeparator : public AbstractSeparator<StSeparatorConfig> {
  public:
   explicit StSeparator(const int degree, const StSeparatorConfig &config) : AbstractSeparator(degree, config) {};
   vector<GRBTempConstr> SeparateSolution(double *solution, GRBVar *vars) override;
+  string Abbreviation() override { return "[S:T]"; };
 };
 
 #endif //CLIQPART_SRC_SEPARATORS_ST_SEPARATOR_H_
