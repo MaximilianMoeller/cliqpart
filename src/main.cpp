@@ -139,7 +139,7 @@ int main(int argc, char *argv[]) {
       // only solve to optimality if it has neither been disabled by the user
       // nor has been solved before
       if (!lp_only && (!filesystem::exists(data_dir_path / "optimal.sol")
-          || !filesystem::exists(data_dir_path / "optimal.log"))) {
+          || !filesystem::exists(data_dir_path / "measurements.csv"))) {
         PLOGI << "No optimal solution was found for data set '" << data_dir_path
               << "'. Starting solving to optimality.";
         if (log_to_file) {
