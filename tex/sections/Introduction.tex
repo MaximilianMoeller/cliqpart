@@ -7,7 +7,7 @@ The relatively new class of \textit{half-chorded odd cycle inequalities} first d
 The separation routines should then be tested on data available from the literature as well as new instances.
 
 The remainder of this section will give a brief overview of the \CP problem, but for an in-depth introduction we refer the reader to \cite{grotschelFacetsCliquePartitioning1990}.
-The structure of the rest of the document is as follows:
+The structure of the document is as follows:
 \begin{table}[h]
 	\centering
 	\begin{tabular}{||c|c||}
@@ -111,10 +111,28 @@ Section 2 of \cite{andresPolyhedralStudyLifted2022} gives a comprehensive overvi
 	 x_{ij} + x_{jk} - x_{ik} \leq 1
 \]
 for all pairwise distinct $i,j,k \in V_{n}$.
-Thus, we arrive at the following ILP formulation of the \CP problem:
-
+This leads us to the following ILP formulation of \CP.
 \begin{align*}
 	\min && &\sum_{e \in E_{n}} w_{e} x_{e} \\[1.5ex]
 	\text{subject to } && &x_{e} \in \left\{ 0,1 \right\} && \forall e \in E_{n} \\
-					   && &x_{uv} + x_{uw} - x_{uw} \leq 1 && \forall \left\{ u,v,w \right\} \in \binom{V_{n}}{3} \\
+					   && &x_{uv} + x_{vw} - x_{uw} \leq 1 && \forall u,v,w \in V, \text{ pairwise distinct} \\
 \end{align*}
+
+The purpose of the triangle inequalities is to enforce transitivity of the induced equivalence relation.
+Notice that for each set $\left\{ i,j,k \right\} \subseteq V$ of pairwise distinct vertices there are actually three triangle inequalities:
+\begin{align*}
+	x_{ij} + x_{jk} - x_{ik} &\leq 1\\
+	x_{ij} - x_{jk} + x_{ik} &\leq 1\\
+	- x_{ij} + x_{jk} + x_{ik} &\leq 1\\
+\end{align*}
+We will however refer to these three as \textit{the} triangle inequality with respect to $\left\{ i,j,k \right\}$.
+
+In combination with an ILP solver (we used \href{www.gurobi.com}{gurobi}) the triangle inequalities already suffice to arrive at optimal solutions.
+However these computations might require great amounts of computational resources.
+We observed that for some – admittedly ‘difficult’ – instances the solver could not produce a single solution within half an hour on fairly modern hardware (see \cref{subsec:experiments_setup}).
+
+We will therefore follow \cite{grotschelFacetsCliquePartitioning1990} in using a cutting plane procedure, \ie solving LP relaxations of the problem and adding violated constraints iteratively to tighten the relaxation.
+This method is neither guaranteed to produce integral solutions nor can it give an approximation to the optimal objective value within any fixed factor.
+Nevertheless, one can imagine applications where a ‘good’ estimate on the optimal solution can already be of use.
+We will compare the results of this approach with optimal solutions obtained by the ILP solver when available.
+For bigger instances, comparing only the results obtained by different parametrizations of the cutting plane procedure might already give a ‘good’ estimate on the optimal objective value.
