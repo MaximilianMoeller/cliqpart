@@ -70,7 +70,7 @@ def generate_binary(size):
         descr.write("column_labels = 0\n")
 
 
-sizes = [35, 50, 100, 150, 200, 250, 300, 350]
+sizes = [25, 50, 75, 100, 150, 200]
 
 # thesis: the hardest ones will be the ones centered at 0 but no real difference with different standart deviations
 # the ones centered at 2 should be fairly easy though
@@ -79,7 +79,7 @@ normal_configs = [(0, 1), (0, 0.5), (0, 2), # comparison
                   (2,1), (2,0.5), (2,2)] # heavily positive sided
 
 # thesis: the hardest one will be (-1, 1), whereas symmetric versions with larger ranges will be slightly easier,
-uniform_configs= [(-1, 1), (-10, 10), (-10, 100)]
+uniform_configs= [(-1, 1), (-100, 100), (-10, 100)]
 
 for size in sizes:
     generate_binary(size)

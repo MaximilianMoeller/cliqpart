@@ -40,26 +40,17 @@ def generate_from_random_graph(instance, random_params):
         descr.write("row_labels = 0\n")
         descr.write("column_labels = 0\n")
 
-instances = [(35,2),(35,5),(35,10),
+instances = [(25,2),(25,5),(25,10),
              (50,2),(50,5),(50,10),
+             (75,2),(75,5),(75,10),
              (100,2),(100,5),(100,10),
              (150,2),(150,5),(150,10),
              (200,2),(200,5),(200,10),
-             (250,2),(250,5),(250,10),
-             (350,2),(350,5),(350,10)
              ]
 
 random_configs = [(1,1,-1,1), # comparison
                   (0.5,1,-0.5,1), # closer together
                   (2,1,-2,1), # further apart
-
-                  (1,0.5,-1,0.5), # less overlap
-                  (0.5,0.5,-0.5,0.5), # closer together
-                  (2,0.5,-2,0.5), # further apart
-
-                  (1,2,-1,2), # more overlap
-                  (0.5,2,-0.5,2), # closer together
-                  (2,2,-2,2), # further apart
                   ]
 
 num_instances = len(instances) * len(random_configs)
