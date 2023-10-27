@@ -53,6 +53,11 @@ int main(int argc, char *argv[]) {
   bool lp_only{false};
   app.add_flag("-l,--lp-only", lp_only, "Scip solving the ILP to optimality and only solve the LP relaxation.");
 
+  int optimality_time_limit{-1};
+  app.add_option("-t,--time-out",
+                 optimality_time_limit,
+                 "Time limit for the optimality solver in seconds. No time limit by default");
+
   app.usage("Usage: cliqpart DIRS --config CONFIGS [OPTIONS]");
 
   CLI11_PARSE(app, argc, argv)
@@ -163,16 +168,26 @@ int main(int argc, char *argv[]) {
         ILPCallback ilp_callback{ilp_model};
         ilp_model.setCallback(&ilp_callback);
 
+        if (optimality_time_limit > 0) {
+          ilp_model.set(GRB_DoubleParam_TimeLimit, (double) optimality_time_limit);
+        }
+
         PLOGI << "Starting optimal solving";
 
         measurements_file_appender.setFileName((data_dir_path / "measurements.csv").c_str());
         PLOGI_(CSVLog) << "Start optimal solve";
         ilp_model.optimize();
-        PLOGI_(CSVLog) << "End optimal solve";
+        auto optimization_result = ilp_model.get(GRB_IntAttr_Status);
+        if (optimization_result == GRB_OPTIMAL) {
+          PLOGI_(CSVLog) << "End optimal solve";
+          ilp_model.write(data_dir_path / "optimal.sol");
+          PLOGI << "Finished optimal solving. Optimal objective value is: "
+                + to_string(ilp_model.get(GRB_DoubleAttr_ObjVal));
+        } else if (optimization_result == GRB_TIME_LIMIT) {
+          PLOGI_(CSVLog) << "Time limit hit: " << optimality_time_limit << " seconds.";
+          PLOGI << "Solving to optimality hit time limit. Continuing with LP-relaxations.";
+        }
 
-        ilp_model.write(data_dir_path / "optimal.sol");
-        PLOGI << "Finished optimal solving. Optimal objective value is: "
-              + to_string(ilp_model.get(GRB_DoubleAttr_ObjVal));
       }
 
       for (const auto &kRunConfig : run_configs) {
