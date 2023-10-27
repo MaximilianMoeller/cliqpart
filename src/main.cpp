@@ -34,13 +34,14 @@ int main(int argc, char *argv[]) {
   vector<filesystem::path> data_dir_paths;
   app.add_option("DIRS",
                  data_dir_paths,
-                 "Whitespace separated list of directories containing a data.csv and a data.toml file. (see README -> Usage).")
-      ->required(true)->check(kDataDirVal)->expected(1, -1);
+                 "Whitespace separated list of directories containing a data.csv and a data.toml file. (see README -> Usage).")->required(
+      true)->check(kDataDirVal)->expected(1, -1);
 
   // read in run_config paths
   vector<string> run_config_paths;
-  app.add_option("-c,--config", run_config_paths, "Whitespace separated list of run_configs.")
-      ->expected(1, -1)->required(true);
+  app.add_option("-c,--config", run_config_paths, "Whitespace separated list of run_configs.")->expected(1,
+                                                                                                         -1)->required(
+      true);
 
   CLI::Option *v = app.add_flag("-v,--verbose", "Verbose; use twice for even more details.");
 
@@ -53,10 +54,11 @@ int main(int argc, char *argv[]) {
   bool lp_only{false};
   app.add_flag("-l,--lp-only", lp_only, "Scip solving the ILP to optimality and only solve the LP relaxation.");
 
-  int optimality_time_limit{-1};
+  int optimality_time_limit{1800};
   app.add_option("-t,--time-out",
                  optimality_time_limit,
-                 "Time limit for the optimality solver in seconds. No time limit by default");
+                 "Time limit for the optimality solver in seconds. 1800 (i.e. 30 minutes) by default. "
+                 "Turn off by supplying -1.");
 
   app.usage("Usage: cliqpart DIRS --config CONFIGS [OPTIONS]");
 
@@ -267,11 +269,11 @@ int main(int argc, char *argv[]) {
               // In fact, ALL other implemented separators use the assumption that the triangle inequalities are
               // satisfied.
               if (!violated_constraints.empty()) {
-                PLOGI_(CSVLog) << "{\"iteration\":" << iteration
-                               << ",\"obj_value\":" << model.get(GRB_DoubleAttr_ObjVal)
-                               << ",\"violated_found\":" << violated_constraints.size()
-                               << ",\"separator\":\"" << separator->Abbreviation() // NOLINT(*-raw-string-literal)
-                               << "\"}";
+                PLOGI_(CSVLog)
+                      << "{\"iteration\":" << iteration << ",\"obj_value\":" << model.get(GRB_DoubleAttr_ObjVal)
+                      << ",\"violated_found\":" << violated_constraints.size() << ",\"separator\":\""
+                      << separator->Abbreviation() // NOLINT(*-raw-string-literal)
+                      << "\"}";
                 break;
               }
             }
@@ -284,10 +286,8 @@ int main(int argc, char *argv[]) {
 
           } while (!violated_constraints.empty());
           integral_solution:;
-          PLOGI_(CSVLog) << "{\"iteration\":" << iteration
-                         << ",\"obj_value\":" << model.get(GRB_DoubleAttr_ObjVal)
-                         << ",\"violated_found\":" << 0
-                         << ",\"separator\":\"" << "none" // NOLINT(*-raw-string-literal)
+          PLOGI_(CSVLog) << "{\"iteration\":" << iteration << ",\"obj_value\":" << model.get(GRB_DoubleAttr_ObjVal)
+                         << ",\"violated_found\":" << 0 << ",\"separator\":\"" << "none" // NOLINT(*-raw-string-literal)
                          << "\"}";
 
           model.write(kNumberedRunDir / "0_last.sol");
