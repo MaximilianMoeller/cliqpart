@@ -4,4 +4,4 @@ run_count = 1
 [[separators]]
 inequality = "Δ"
 variable_once = false
-maxcut = 400
+maxcut = -1

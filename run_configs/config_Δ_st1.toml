@@ -1,5 +1,5 @@
-name = "Δ_half"
-run_count = 1
+name = "Δ_st"
+run_count = 3
 
 [[separators]]
 inequality = "Δ"
@@ -7,6 +7,6 @@ variable_once = false
 maxcut = 400
 
 [[separators]]
-inequality = "cycle"
-type = "half-chorded"
+inequality = "ST"
+heuristic = 1
 maxcut = 400
