@@ -79,6 +79,9 @@ vector<GRBTempConstr> CircleSeparator::SeparateSolution(double *solution, GRBVar
 
   progressbar bar(degree_);
   for (int i = 0; i < degree_; ++i) {
+    if (found >= config_.maxcut_) {
+      break;
+    }
 
     // only show progress bar in debugging mode (not in verbose because the PLOGV in the loop breaks the bar)
     if (plog::get()->getMaxSeverity() == plog::Severity::debug) {
@@ -86,6 +89,9 @@ vector<GRBTempConstr> CircleSeparator::SeparateSolution(double *solution, GRBVar
     }
     for (int j = 0; j < degree_; ++j) {
       if (i == j) continue;
+      if (found >= config_.maxcut_) {
+        break;
+      }
 
       AuxGraph::Node start{false, false, i, j};
       AuxGraph::Node target{true, false, i, j};
@@ -143,6 +149,7 @@ vector<GRBTempConstr> CircleSeparator::SeparateSolution(double *solution, GRBVar
 
         PLOGV << "Found violated " << config_.inequality_type_ << " odd cycle inequality: " << constraint_lhs << "<= "
               << rhs << ".";
+
       }
     }
   }
