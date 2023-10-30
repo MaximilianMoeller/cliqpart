@@ -67,7 +67,8 @@ v_{0} v_{2} v_{4} v_{6} v_{1} v_{3} v_{5} v_{0}
 
 
 and adding up the corresponding entry of the solution vector $x^{*}$ multiplied by $\pm 1$, respectively.
-This approach is independent of $k$ and suggests that we could try find some ‘shortest walk’ in an appropriate auxiliary graph.
+This approach is independent of $k$ as long as we only traverse odd cycles and their two-chords (and not even ones).
+This suggests that we could try find some ‘shortest walk’ in an appropriate auxiliary graph where the structure of the graph prohibits us from ever taking walks along even cycles.
 
 \begin{figure}[H]
 	\centering
