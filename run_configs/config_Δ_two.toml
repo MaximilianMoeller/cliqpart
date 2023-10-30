@@ -10,3 +10,4 @@ maxcut = 400
 inequality = "cycle"
 type = "two-chorded"
 maxcut = 400
+time_limit = 900

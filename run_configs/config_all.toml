@@ -1,9 +1,19 @@
-name = "Δ_circles"
-run_count = 1
+name = "all"
+run_count = 3
 
 [[separators]]
 inequality = "Δ"
 variable_once = false
+maxcut = 400
+
+[[separators]]
+inequality = "ST"
+heuristic = 1
+maxcut = 400
+
+[[separators]]
+inequality = "ST"
+heuristic = 2
 maxcut = 400
 
 [[separators]]
