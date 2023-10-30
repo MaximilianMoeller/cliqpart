@@ -18,9 +18,6 @@ vector<GRBTempConstr> CircleSeparator::SeparateSolution(double *solution, GRBVar
 
   // the minimum length of a path in the auxiliary graph such that the corresponding inequality is not violated
   double min_path_cost;
-  // what coefficients the variables corresponding to hops inside a gadget should get
-  // notice that between_gadget_coefficient = -1 * gadget_coefficient
-  int gadget_coefficient;
   // how the rhs of the constraint should be build depending on the circle length
   std::function<int(int)> constraint_rhs;
 
@@ -31,22 +28,21 @@ vector<GRBTempConstr> CircleSeparator::SeparateSolution(double *solution, GRBVar
     case CircleInequality::TWO_CHORDED: {
       aux = make_unique<TwoChordedAuxGraph>(degree_);
 
-      gadget_weight = [this, &solution](int a, int b) { return 0.5 - solution[EdgeIndex(a, b)]; };
-      triple_weight = [this, &solution](int a, int b) { return solution[EdgeIndex(a, b)]; };
+      gadget_weight =
+          [this, &solution](int a, int b) { return std::clamp(0.5 - solution[EdgeIndex(a, b)], -0.5, 0.5); };
+      triple_weight = [this, &solution](int a, int b) { return std::clamp(solution[EdgeIndex(a, b)], 0.0, 1.0); };
 
       min_path_cost = 0.5;
-      gadget_coefficient = 1;
       constraint_rhs = [](int k) { return (k - 1) / 2; };
     }
       break;
     case CircleInequality::HALF_CHORDED: {
       aux = make_unique<HalfChordedAuxGraph>(degree_);
 
-      gadget_weight = [this, &solution](int a, int b) { return solution[EdgeIndex(a, b)]; };
-      triple_weight = [this, &solution](int a, int b) { return 1 - solution[EdgeIndex(a, b)]; };
+      gadget_weight = [this, &solution](int a, int b) { return std::clamp(solution[EdgeIndex(a, b)], 0.0, 1.0); };
+      triple_weight = [this, &solution](int a, int b) { return std::clamp(1 - solution[EdgeIndex(a, b)], 0.0, 1.0); };
 
       min_path_cost = 3;
-      gadget_coefficient = -1;
       constraint_rhs = [](int k) { return k - 3; };
     }
       break;
@@ -99,6 +95,7 @@ vector<GRBTempConstr> CircleSeparator::SeparateSolution(double *solution, GRBVar
       auto [cost, path] = aux->shortestPath(start, target);
 
       if (cost < min_path_cost) {
+        double violation_degree{0};
         // right-hand-side of the constraint is dependent on the length of the circle in the original graph, which is
         // half the length of the shortest path found
         int k = (path.size() - 1) / 2;
@@ -116,10 +113,12 @@ vector<GRBTempConstr> CircleSeparator::SeparateSolution(double *solution, GRBVar
 
               case CircleInequality::TWO_CHORDED: {
                 constraint_lhs += vars[EdgeIndex(node1.i, node1.j)];
+                violation_degree += solution[EdgeIndex(node1.i, node1.j)];
               }
                 break;
               case CircleInequality::HALF_CHORDED: {
                 constraint_lhs -= vars[EdgeIndex(node1.i, node1.j)];
+                violation_degree -= solution[EdgeIndex(node1.i, node1.j)];
               }
                 break;
             }
@@ -132,10 +131,12 @@ vector<GRBTempConstr> CircleSeparator::SeparateSolution(double *solution, GRBVar
 
               case CircleInequality::TWO_CHORDED: {
                 constraint_lhs -= vars[EdgeIndex(node1.i, node2.j)];
+                violation_degree -= solution[EdgeIndex(node1.i, node2.j)];
               }
                 break;
               case CircleInequality::HALF_CHORDED: {
                 constraint_lhs += vars[EdgeIndex(node1.i, node2.j)];
+                violation_degree += solution[EdgeIndex(node1.i, node2.j)];
               }
                 break;
             }
@@ -143,13 +144,19 @@ vector<GRBTempConstr> CircleSeparator::SeparateSolution(double *solution, GRBVar
         }
 
         auto rhs = constraint_rhs(k);
+        violation_degree -= rhs;
 
-        violated_constraints.emplace_back(constraint_lhs <= rhs);
-        found++;
+        /* only add triangles if they violate the corresponding inequality by more than the tolerance
+        // prevents an issue where, due to floating point arithmetic, the same inequality would be added over and over again
+        */
+        if (violation_degree > config_.tolerance_) {
+          violated_constraints.emplace_back(constraint_lhs <= rhs);
+          found++;
 
-        PLOGV << "Found violated " << config_.inequality_type_ << " odd cycle inequality: " << constraint_lhs << "<= "
-              << rhs << ".";
+          PLOGV << "Found violated " << config_.inequality_type_ << " odd cycle inequality: " << constraint_lhs << "<= "
+                << rhs << ".";
 
+        }
       }
     }
   }
