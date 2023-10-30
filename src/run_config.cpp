@@ -100,15 +100,17 @@ RunConfig::RunConfig(string &run_config_file) {
               "tolerance: " << tolerance << ", maxcut: " << maxcut << ", heuristic: " << heuristic << ".";
       } else if (ineq == "odd" || ineq == "cycle" || ineq == "müller") {
         if (!elem.contains("maxcut") || !elem["maxcut"].is_integer()) {
-          PLOGW << "Consider setting the 'maxcut' parameter when using a separator for [S:T] inequalities! "
+          PLOGW << "Consider setting the 'maxcut' parameter when using a separator for odd cycle inequalities! "
                 << "Defaulting to -1, i.e. no limit on the number of inequalities added per iteration.";
         }
+        auto maxcut = elem["maxcut"].value_or(-1);
+
+        CircleInequality inequality_type;
         if (!elem.contains("type") || !elem["type"].is_string()) {
           PLOGW << "No inequality type was given for a cycle-separator in " << run_config_file
-                << ". Assuming 2-chorded cycles.";
-        }
-        CircleInequality inequality_type;
-        if (elem["type"] == "half-chorded" || elem["type"] == "half" || elem["type"] == "1/2") {
+                << ". Assuming half-chorded cycles.";
+          inequality_type = CircleInequality::HALF_CHORDED;
+        } else if (elem["type"] == "half-chorded" || elem["type"] == "half" || elem["type"] == "1/2") {
           inequality_type = CircleInequality::HALF_CHORDED;
         } else if (elem["type"] == "two-chorded" || elem["type"] == "2-chorded" || elem["type"] == "2") {
           inequality_type = CircleInequality::TWO_CHORDED;
@@ -117,11 +119,21 @@ RunConfig::RunConfig(string &run_config_file) {
                 << ". Assuming 2-chorded cycles instead.";
           inequality_type = CircleInequality::TWO_CHORDED;
         }
-        auto maxcut = elem["maxcut"].value_or(-1);
 
-        separator_configs.emplace_back(CircleSeparatorConfig{tolerance, maxcut, inequality_type});
+        if (!elem.contains("time_limit") || !elem["time_limit"].is_integer()) {
+          PLOGW << "Chorded odd cycle inequalities should be specified with a time limit. Assuming -1 (no time limit)."
+                   "If you want to limit the separation of the " << inequality_type <<
+                "odd cycle inequalities, set the 'time_limit' key in " << run_config_file << ".";
+
+        }
+        const int kTimeLimit = elem["time_limit"].value_or(-1);
+
+        separator_configs.emplace_back(CircleSeparatorConfig{tolerance, maxcut, inequality_type, kTimeLimit});
         PLOGD << name << ": Adding cycle-Separator with parameters: " <<
-              "tolerance: " << tolerance << ", maxcut: " << maxcut << ", inequality-type: " << inequality_type << ".";
+              "tolerance: " << tolerance <<
+              ", maxcut: " << maxcut <<
+              ", inequality-type: " << inequality_type <<
+              ", time limit: "<< kTimeLimit << " seconds.";
 
       } else {
         PLOGW << run_config_file

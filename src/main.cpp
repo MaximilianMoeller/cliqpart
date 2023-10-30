@@ -17,11 +17,9 @@
 #include "run_config.h"
 #include "ilp_callback.h"
 
-using namespace std;
+#define CSV_LOG 1
 
-enum {
-  CSVLog = 1
-};
+using namespace std;
 
 int main(int argc, char *argv[]) {
 
@@ -99,7 +97,7 @@ int main(int argc, char *argv[]) {
   measurements_file.close();
   static plog::RollingFileAppender<plog::CsvFormatter>
       measurements_file_appender(measurements_file_path.c_str(), 16000000, 1);
-  plog::init<CSVLog>(plog::info, &measurements_file_appender);
+  plog::init<CSV_LOG>(plog::info, &measurements_file_appender);
 
   // loading configurations
   PLOGD << "Starting parsing of configuration file(s).";
@@ -177,16 +175,16 @@ int main(int argc, char *argv[]) {
         PLOGI << "Starting optimal solving";
 
         measurements_file_appender.setFileName((data_dir_path / "measurements.csv").c_str());
-        PLOGI_(CSVLog) << "Start optimal solve";
+        PLOGI_(CSV_LOG) << "Start optimal solve";
         ilp_model.optimize();
         auto optimization_result = ilp_model.get(GRB_IntAttr_Status);
         if (optimization_result == GRB_OPTIMAL) {
-          PLOGI_(CSVLog) << "End optimal solve";
+          PLOGI_(CSV_LOG) << "End optimal solve";
           ilp_model.write(data_dir_path / "optimal.sol");
           PLOGI << "Finished optimal solving. Optimal objective value is: "
                 + to_string(ilp_model.get(GRB_DoubleAttr_ObjVal));
         } else if (optimization_result == GRB_TIME_LIMIT) {
-          PLOGI_(CSVLog) << "Time limit hit: " << optimality_time_limit << " seconds.";
+          PLOGI_(CSV_LOG) << "Time limit hit: " << optimality_time_limit << " seconds.";
           PLOGI << "Solving to optimality hit time limit. Continuing with LP-relaxations.";
         }
 
@@ -269,10 +267,10 @@ int main(int argc, char *argv[]) {
               // In fact, ALL other implemented separators use the assumption that the triangle inequalities are
               // satisfied.
               if (!violated_constraints.empty()) {
-                PLOGI_(CSVLog)
+                PLOGI_(CSV_LOG)
                       << "{\"iteration\":" << iteration << ",\"obj_value\":" << model.get(GRB_DoubleAttr_ObjVal)
-                      << ",\"violated_found\":" << violated_constraints.size() << ",\"separator\":\""
-                      << separator->Abbreviation() // NOLINT(*-raw-string-literal)
+                      << ",\"violated_found\":" << violated_constraints.size() << ",\"separator\":\"" // NOLINT(*-raw-string-literal)
+                      << separator->Abbreviation()
                       << "\"}";
                 break;
               }
@@ -286,8 +284,8 @@ int main(int argc, char *argv[]) {
 
           } while (!violated_constraints.empty());
           integral_solution:;
-          PLOGI_(CSVLog) << "{\"iteration\":" << iteration << ",\"obj_value\":" << model.get(GRB_DoubleAttr_ObjVal)
-                         << ",\"violated_found\":" << 0 << ",\"separator\":\"" << "none" // NOLINT(*-raw-string-literal)
+          PLOGI_(CSV_LOG) << "{\"iteration\":" << iteration << ",\"obj_value\":" << model.get(GRB_DoubleAttr_ObjVal)
+                          << ",\"violated_found\":" << 0 << ",\"separator\":\"" << "none" // NOLINT(*-raw-string-literal)
                          << "\"}";
 
           model.write(kNumberedRunDir / "0_last.sol");

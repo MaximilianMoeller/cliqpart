@@ -25,6 +25,14 @@ class AuxGraph {
     int j;
   };
 
+  // hacky, but easiest thing to do
+  class OutOfTimeException : public std::exception {
+   public:
+    const char *what() {
+      return "Run out of time.";
+    };
+  };
+
   explicit AuxGraph(int degree) : degree_(degree) { max_node_index_ = MaxNodeIndex(); };
 
   [[nodiscard]] int NodeToIndex(Node node) const {
@@ -83,6 +91,7 @@ class HalfChordedAuxGraph : public AuxGraph {
 
 class TwoChordedAuxGraph : public AuxGraph {
  private:
+  const int time_limit_{-1};
   bool floyd_warshall_computed_{false};
   std::vector<std::vector<double>> weights_;
   std::vector<std::vector<double>> dist_;
@@ -91,12 +100,12 @@ class TwoChordedAuxGraph : public AuxGraph {
 
  public:
 
-  explicit TwoChordedAuxGraph(int degree) :
-      AuxGraph(degree) {
+  explicit TwoChordedAuxGraph(int degree, int time_limit) :
+      AuxGraph(degree), time_limit_(time_limit) {
     weights_ = std::vector(max_node_index_ + 1,
-                           std::vector<double>(max_node_index_ + 1, std::numeric_limits<double>::infinity())),
+                           std::vector<double>(max_node_index_ + 1, std::numeric_limits<double>::infinity()));
     dist_ = std::vector(max_node_index_ + 1,
-                        std::vector<double>(max_node_index_ + 1, std::numeric_limits<double>::infinity())),
+                        std::vector<double>(max_node_index_ + 1, std::numeric_limits<double>::infinity()));
     pred_ = std::vector(max_node_index_ + 1, std::vector<int>(max_node_index_ + 1, -1));
     present_arcs_ = std::vector(max_node_index_ + 1, std::vector<int>());
   }

@@ -4,6 +4,7 @@
 
 #include <queue>
 #include <algorithm>
+#include <chrono>
 #include "AuxGraph.h"
 #include "progressbar.hpp"
 
@@ -104,7 +105,19 @@ void TwoChordedAuxGraph::FloydWarshall() {
 
   progressbar bar(max_node_index_);
 
+  auto start = std::chrono::steady_clock::now();
+
   for (int k = 0; k < max_node_index_; ++k) {
+
+    // terminate separation early if configured
+    if (time_limit_ > 0) {
+      auto now = std::chrono::steady_clock::now();
+      auto elapsed = (std::chrono::duration_cast<std::chrono::seconds>(now - start)).count();
+      if (elapsed > time_limit_) {
+        throw AuxGraph::OutOfTimeException();
+      }
+    }
+
     if (plog::get()->getMaxSeverity() == plog::Severity::debug) {
       bar.update();
     }
