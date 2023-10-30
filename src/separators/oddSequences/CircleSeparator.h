@@ -25,15 +25,18 @@ inline ostream &operator<<(ostream &out, CircleInequality c) {
 
 class CircleSeparatorConfig : public AbstractSeparatorConfig {
  public:
+  const int time_limit_{-1};
   const CircleInequality inequality_type_{CircleInequality::TWO_CHORDED};
 
   CircleSeparatorConfig() = default;
 
-  explicit CircleSeparatorConfig(const CircleInequality ineq_type) : inequality_type_(ineq_type) {};
+  explicit CircleSeparatorConfig(const CircleInequality ineq_type, const int time_limit)
+      : inequality_type_(ineq_type), time_limit_(time_limit) {};
 
-  CircleSeparatorConfig(double tolerance, const int maxcut, const CircleInequality ineq_type) : AbstractSeparatorConfig(
+  CircleSeparatorConfig(double tolerance, const int maxcut, const CircleInequality ineq_type, const int time_limit)
+      : AbstractSeparatorConfig(
       tolerance,
-      maxcut), inequality_type_(ineq_type) {};
+      maxcut), inequality_type_(ineq_type), time_limit_(time_limit) {};
 };
 
 class CircleSeparator : public AbstractSeparator<CircleSeparatorConfig> {
@@ -43,9 +46,9 @@ class CircleSeparator : public AbstractSeparator<CircleSeparatorConfig> {
   string Abbreviation() override {
     string res;
     switch (config_.inequality_type_) {
-      case CircleInequality::TWO_CHORDED:res = "2";
+      case CircleInequality::TWO_CHORDED:res = "two-chorded";
         break;
-      case CircleInequality::HALF_CHORDED:res = "half";
+      case CircleInequality::HALF_CHORDED:res = "half-chorded";
         break;
     }
     return res;

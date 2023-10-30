@@ -1,0 +1,69 @@
+% !TEX TS-program = lualatex
+\documentclass[a4paper, cdfont=false, cdsection=false, cdgeometry=off]{tudscrartcl}
+
+\input{preamble.tex}
+
+\usetikzlibrary{graphs}
+
+\hypersetup{
+    pdfauthor={Maximilian Moeller},
+	pdftitle={Separation Routines for Clique Partitioning},
+    pdfsubject={Großer Beleg},
+    pdfkeywords={Clique Partitioning} {Combinatorial Optimization},
+	% Colors from TUD corparate design
+    unicode=true,
+    colorlinks=true,
+    linkcolor=cdblue,
+    citecolor=cdblue,
+    filecolor=cdblue,
+    urlcolor=cdblue
+}
+
+\mdfapptodefinestyle{theoremstyle}{
+	frametitlebackgroundcolor=cdblue!30
+}
+
+\setuptodonotes{color=cdgreen!30, tickmarkheight=0.2cm, noline}
+
+
+\tikzstyle{vertex}=[circle, draw, fill=white, inner sep=0pt, minimum width=1ex]
+
+\newcommand\CP[0]{\textmd{\textsc{Clique Partitioning}}\xspace}
+\newcommand\ST[0]{$\left[S{:}T\right]$}
+
+\begin{document}
+
+% Makes all the section headings etc. use a serif font
+\addtokomafont{disposition}{\rmfamily}
+\addtokomafont{title}{\rmfamily}
+\addtokomafont{subtitle}{\rmfamily}
+\addtokomafont{author}{\rmfamily}
+\addtokomafont{date}{\rmfamily}
+\addtokomafont{subject}{\rmfamily}
+
+\faculty{Faculty of Computer Science}
+\institute{Institute for Artificial Intelligence}
+\chair{Chair for Machine Learning for Computer Vision}
+\thesis{Student Research Project “Großer Beleg”}
+\author{Maximilian Moeller} 
+\title{Evaluation of separation routines for some classes of inequalities of the \CP polytope}
+\supervisor{Jannik Irmai}
+\professor{Prof. Dr. Bjoern Andres}
+\date{\today}
+
+\maketitle[cdfont=off]
+
+\newpage
+\tableofcontents
+\listoffigures
+\listoftodos
+
+\newpage
+\include{sections/Introduction.tex}
+\include{sections/Separation.tex}
+\include{sections/Data.tex}
+\include{sections/Experiments.tex}
+\include{sections/Discussion.tex}
+\newpage
+\printbibliography
+\end{document}

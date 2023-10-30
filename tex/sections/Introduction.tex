@@ -1,0 +1,138 @@
+\section{Introduction}
+\subsection{About this project}\label{subsec:about}
+The goal of this student research project was to gain some familiarity with the \CP problem in particular and combinatorial optimization techniques in general.
+Knowledge about classes of facet-defining inequalities is of vital interest for solving combinatorial optimization problems through branch-and-cut algorithms.
+Therefore, the task of the project was to review the available literature on such classes and implement separation routines for as many of them as possible.
+The relatively new class of \textit{half-chorded odd cycle inequalities} first described by \cite{andresPolyhedralStudyLifted2022} was of particular interest, because their practical use was unknown so far.
+The separation routines should then be tested on data available from the literature as well as new instances.
+
+The remainder of this section will give a brief overview of the \CP problem, but for an in-depth introduction we refer the reader to \cite{grotschelFacetsCliquePartitioning1990}.
+The structure of the document is as follows:
+\begin{table}[h]
+	\centering
+	\begin{tabular}{||c|c||}
+		\hline
+		Section & Topic \\ [0.5ex]
+		\hline\hline
+		%\cref{sec:related}& Related and prior work \\
+		\cref{sec:separation}& Separation routines for some classes of inequalities \\
+		\cref{sec:data}& Instances used for our computational experiments \\
+		\cref{sec:experiments}& Setup, configuration and results of the experiments \\
+		\cref{sec:discussion}& Discussion of our results \\
+		\hline
+	\end{tabular}
+	\caption{Structure of this document}
+\end{table}
+
+\subsection{The \CP problem}\label{subsec:cp_problem}
+The \CP problem is a combinatorial optimization problem that was first investigated by \cite{grotschelFacetsCliquePartitioning1990} as a framework for aggregation of binary relations.
+The objective is to cluster a given set of objects with respect to their pairwise similarities into ‘maximally homogenous’ sets.
+
+\begin{definition}[\CP]\label{def:cp}
+	Given a graph $G=(V,E)$, a subset of edges $A \subseteq E$ is called a \textit{clique partitioning of $G$} if there exists a partition $\Gamma = \left\{ W_1, W_2, \ldots, W_k \right\}$ of $V$ such that
+	\[
+		A = \bigcup_{i=1}^k \left\{ (u,v) \in E \mid u,v \in W_i \right\}.
+	\]
+\end{definition}
+\begin{note}
+A clique partitioning $A$ consists precisely of the edges that connect vertices within the same block $W_i$ of the partition $\Gamma$.
+Thus, every clique partitioning $A$ induces an equivalence relation $\sim_A$ on $V$, and every equivalence relation on $V$ corresponds uniquely to a clique partitioning of $G$.
+\cref{fig:example_clique_partitioning} shows an example of a clique partitioning.
+\end{note}
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}
+        \def \n{8};
+        \def \radius{1.5cm};
+        \def \r{0.3cm};
+        \foreach \i in {0,...,\n}{
+			\node[vertex] (\i) at ({\i/(\n+1)*360+90}:\radius) {};
+			\node at ({\i/(\n+1)*360+90}:\radius+\r) {$v_{\i}$};
+        }
+        \foreach \i in {0,...,\n}{
+            \foreach \j in {\i,...,\n}{
+                \draw[dotted, gray] (\i) -- (\j);
+        	}
+        }
+        \foreach \i/\j in {1/8, 1/3, 1/5, 8/3, 8/5, 3/5} {
+			\draw[line width=0.2mm] (\i) -- (\j);
+        }
+        \foreach \i/\j in {4/6, 4/7, 6/7} {
+			\draw[line width=0.2mm] (\i) -- (\j);
+        }
+	\end{tikzpicture}
+	\caption[Example clique partitioning]{An example of a clique partitioning $A$ for $K_{9}$. 
+		Solid lines represent edges that are part of the clique partitioning and dotted lines represent edges $e \in E_{9} \setminus A$.
+	The induced partition is $\Gamma = \left\{ \left\{ v_{0} \right\}, \left\{ v_{2} \right\}, \left\{ v_{1}, v_{3}, v_{5}, v_{8} \right\}, \left\{ v_{4}, v_{6}, v_{7} \right\} \right\}$.}
+	\label{fig:example_clique_partitioning}
+\end{figure}
+
+Typically, one only considers complete graphs $K_n$, as this poses the least restrictions on the set of feasible solutions.
+Consider \eg the example given in \cref{fig:incomplete_graph}.
+The nodes $i$ and $k$ cannot end up in the same block of the partition except $j$ is also in this block.
+In many applications of \CP (\eg the instances given in \cite{grotschelCuttingPlaneAlgorithm1989}), every clique partitioning should be a feasible solution.
+We will therefore restrict our attention to the case of complete graphs for the rest of the paper.
+With this assumption every block $W_i$ induces a clique, \ie a complete subgraph of $G$, hence the name \textit{clique} partitioning.
+
+\begin{figure}[h]
+	\centering
+	\begin{tikzpicture}
+		\node[vertex, label=below:{$i$}] (i) at (0,0) {};
+		\node[vertex, label=below:{$j$}] (j) at (1,0) {};
+		\node[vertex, label=below:{$k$}] (k) at (2,0) {};
+
+		\draw (i) -- (j);
+		\draw (j) -- (k);
+	\end{tikzpicture}
+	\caption{An incomplete graph.}
+	\label{fig:incomplete_graph}
+\end{figure}
+
+The \CP problem is then the following.
+Given a complete graph $K_n=(V_n,E_n)$ and edge weights $w \in \R^{E_n}$, find a clique partitioning of minimal weight.
+The problem is known to be \textsc{NP}-hard in the strong sense \cite{wakabayashiAggregationBinaryRelations1986}.
+We will just briefly mention the trivial cases.
+If all entries in $w$ are non-negative, the empty clique partitioning is one optimal solution.
+Likewise, if all entries are non-positive, the maximal clique partitioning $A = E$ is an optimal solution.
+Furthermore, if the non-positive edges in $w$ induce cliques, then the optimal partition will consists exactly of these clique.
+More ‘interesting’ instances must therefore contain ‘conflicts’, \ie they must contain vertices adjacent to both positive and negative edges.
+
+\subsection{An ILP-formulation of \CP}\label{subsec:ilp_formulation}
+Any valid clique partitioning of a (complete) graph $K_{n}=(V_{n}, E_{n})$ can be characterized by a vector $x \in \left\{ 0,1 \right\}^{E_{n}}$.
+For any edge $e \in E_{n}$ the value $x_{e} = 1$ means that $e \in A$, and $x_{e} = 0$ means that $e \notin A$.
+The \CP polytope $\mathscr{P}_{n}$ is then the convex hull of all characteristic vectors of clique partitionings of the complete graph $K_{n}$.
+A full description of this polytope by linear inequalities is unlikely, unless $\var{P} = \var{NP}$.
+However, many classes of valid and facet-defining inequalities have been found by the research community.
+Section 2 of \cite{andresPolyhedralStudyLifted2022} gives a comprehensive overview over know classes as well as over the history of the problem.
+
+\cite{grotschelFacetsCliquePartitioning1990} showed that a vector $x \in \left\{ 0,1 \right\}^{E_{n}}$ characterizes a clique partitioning iff it satisfies the \textit{triangle inequalities}:
+\[
+	 x_{ij} + x_{jk} - x_{ik} \leq 1
+\]
+for all pairwise distinct $i,j,k \in V_{n}$.
+This leads us to the following ILP formulation of \CP.
+\begin{align*}
+	\min && &\sum_{e \in E_{n}} w_{e} x_{e} \\[1.5ex]
+	\text{subject to } && &x_{e} \in \left\{ 0,1 \right\} && \forall e \in E_{n} \\
+					   && &x_{uv} + x_{vw} - x_{uw} \leq 1 && \forall u,v,w \in V, \text{ pairwise distinct} \\
+\end{align*}
+
+The purpose of the triangle inequalities is to enforce transitivity of the induced equivalence relation.
+Notice that for each set $\left\{ i,j,k \right\} \subseteq V$ of pairwise distinct vertices there are actually three triangle inequalities:
+\begin{align*}
+	x_{ij} + x_{jk} - x_{ik} &\leq 1\\
+	x_{ij} - x_{jk} + x_{ik} &\leq 1\\
+	- x_{ij} + x_{jk} + x_{ik} &\leq 1\\
+\end{align*}
+We will however refer to these three as \textit{the} triangle inequality with respect to $\left\{ i,j,k \right\}$.
+
+In combination with an ILP solver (we used \href{www.gurobi.com}{gurobi}) the triangle inequalities already suffice to arrive at optimal solutions.
+However these computations might require great amounts of computational resources.
+We observed that for some – admittedly ‘difficult’ – instances the solver could not produce a single solution within half an hour on fairly modern hardware (see \cref{subsec:experiments_setup}).
+
+We will therefore follow \cite{grotschelFacetsCliquePartitioning1990} in using a cutting plane procedure, \ie solving LP relaxations of the problem and adding violated constraints iteratively to tighten the relaxation.
+This method is neither guaranteed to produce integral solutions nor can it give an approximation to the optimal objective value within any fixed factor.
+Nevertheless, one can imagine applications where a ‘good’ estimate on the optimal solution can already be of use.
+We will compare the results of this approach with optimal solutions obtained by the ILP solver when available.
+For bigger instances, comparing only the results obtained by different parametrizations of the cutting plane procedure might already give a ‘good’ estimate on the optimal objective value.

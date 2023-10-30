@@ -1,0 +1,172 @@
+% !TEX TS-program = lualatex
+
+% Preamble für Uni-Mitschriften
+% Stark inspiriert von https://github.com/gillescastel/university-setup/blob/master/preamble.tex
+%  ┌────────┐
+%  │ Basics │
+%  └────────┘
+%
+\usepackage[TU]{fontenc} %to enable bold small-caps letters
+
+\usepackage{fontspec}
+\setsansfont{Latin Modern Roman}
+% spezielle Sonderzeichen
+\usepackage{textcomp}
+% deutsches Sprachpaket
+\usepackage[ngerman, english]{babel}
+%\usepackage{url}
+% Einbindung von Bildern
+\usepackage{graphicx}
+% Bilder auf der Titelseite
+\usepackage{titlepic}
+% verbesserte floating-Objekte (z.B. figures/tables)
+\usepackage{float}
+% verbesserter Schriftsatz (nicht sichtbare Abweichungen)
+\usepackage[]{microtype}
+% kann erkennen, ob ein space gebraucht wird oder nicht (praktisch für newcommands)
+\usepackage{xspace}
+% verbesserte Tabellen
+\usepackage{booktabs}
+% Kontrolle über enumerate, itemize und description
+\usepackage{enumitem}
+% Platz zwischen Paragraphen
+\usepackage{parskip}
+% Keine Zeilennummern auf leeren Seiten
+\usepackage{emptypage}
+\usepackage{subcaption}
+% Text in mehreren Spalten
+\usepackage{multicol}
+% Mehr Farben
+\usepackage[dvipsnames]{xcolor}
+% Lorem ipsum mit \blindtext
+\usepackage[]{blindtext}
+% Todos
+\usepackage[colorinlistoftodos]{todonotes}
+% Ersetzt etwas durch nichts (debugging)
+\newcommand\hide[1]{}
+% Zitate
+\usepackage{csquotes}
+% Bibliography
+\usepackage[backend=biber, style=alphabetic]{biblatex}
+\addbibresource{references.bib}
+
+% e.g. and i.e.
+\newcommand\eg{\textit{e}.\textit{g}.\ }
+\newcommand\ie{\textit{i}.\textit{e}.\ }
+
+% ┌────────────┐
+% │ Mathematik │
+% └────────────┘
+% mathematische Pakete
+\usepackage{amsmath, amsfonts, mathtools, amsthm, amssymb, mathrsfs}
+% Terme streichen (optional mit Wert, z.B. Wert -> 0)
+\usepackage{cancel}
+% Bold math
+\usepackage{bm}
+% Shortcuts für Zahlenbereiche
+\newcommand\N{\ensuremath{\mathbb{N}}}
+\newcommand\Z{\ensuremath{\mathbb{Z}}}
+\newcommand\Q{\ensuremath{\mathbb{Q}}}
+\newcommand\R{\ensuremath{\mathbb{R}}}
+\newcommand\C{\ensuremath{\mathbb{C}}}
+% Funktionen und variablen aus mehreren Buchstaben
+\newcommand{\var}[1]{\mathit{\text{#1}}}
+\newcommand{\func}[1]{\operatorname{\text{#1}}}
+
+% Mehr Sonderzeichen (z.B. Blitz oder eckige Doppelklammern)
+\usepackage{stmaryrd}
+% Fixt komische Schriftartfehler für stmaryrd
+\SetSymbolFont{stmry}{bold}{U}{stmry}{m}{n}
+
+% Widerspruch als Blitz
+\newcommand\contra{\scalebox{1.5}{$\lightning$}}
+% = mit "def" darüber
+\newcommand\defeq{\stackrel{\text{def}}{=}}
+% :<=>
+\usepackage{colonequals}
+\newcommand\logeq{\ratio\Longleftrightarrow}
+% logical proof (inference rules)
+\usepackage[]{proof}
+
+% SI-Einheiten
+%\usepackage{siunitx}  
+%\sisetup{locale = DE}
+
+% ┌──────────────┐
+% │ Environments │
+% └──────────────┘
+% Kästen um Definitionen etc.
+\usepackage{mdframed}
+% Layout der Kästen
+\mdfsetup{skipabove=1em,skipbelow=0em}
+\theoremstyle{definition}
+\mdfdefinestyle{theoremstyle}{
+	linewidth=0.6pt,%
+	frametitlerule=true,%
+	frametitlerulewidth=0.4pt,%
+	nobreak=true,
+	}
+\mdtheorem[style=theoremstyle]{definition}{Definition}[section]
+\mdtheorem[style=theoremstyle]{theorem}[definition]{Theorem}
+\mdtheorem[style=theoremstyle]{prop}[definition]{Proposition}
+\mdtheorem[style=theoremstyle]{lemma}[definition]{Lemma}
+\mdtheorem[style=theoremstyle]{corollary}[definition]{Corollary}
+\mdtheorem[style=theoremstyle]{axiom}{Axiom}
+\newtheorem*{example}{Example}
+\surroundwithmdframed[innertopmargin=0, topline=false, bottomline=false, rightline=false, linewidth=4pt, linecolor=gray, backgroundcolor=lightgray]{example}
+\newtheorem*{notation}{Notation}
+\newtheorem*{terminology}{Terminology}
+\newtheorem*{note}{Note}
+\newtheorem*{problem}{Problem}
+
+% deutsche Titel
+\newmdenv[innertopmargin=0, topline=false, bottomline=false, rightline=false, linewidth=4pt, linecolor=gray, backgroundcolor=lightgray, frametitle={Beispiel:}]{beispiel}
+\newmdenv[innertopmargin=0, topline=false, bottomline=false, rightline=false, linewidth=2pt, linecolor=gray, frametitle={Merke:}]{merke}
+\mdtheorem[style=theoremstyle]{corollar}[definition]{Corollar}
+\newtheorem*{terminologie}{Terminologie}
+
+\newenvironment{subproof}[1][\proofname]{%
+  \renewcommand{\qedsymbol}{$\blacksquare$}%
+  \begin{proof}[#1]%
+}{%
+  \end{proof}%
+}
+
+\newenvironment{subsubproof}[1][\proofname]{%
+  \renewcommand{\qedsymbol}{$\blacklozenge$}%
+  \begin{proof}[#1]%
+}{%
+  \end{proof}%
+}
+
+% Fix some spacing
+% http://tex.stackexchange.com/questions/22119/how-can-i-change-the-spacing-before-theorems-with-amsthm
+\def\thm@space@setup{%
+  \thm@preskip=\parskip \thm@postskip=0pt
+}
+\makeatother
+
+% ┌──────┐
+% │ tikz │
+% └──────┘
+\usepackage{tikz}
+\usetikzlibrary{arrows, automata, positioning}
+%\tikzset{
+%	->, % directed edges
+%	>=stealth, % bold arrow heads
+%	node distance = 2cm,
+%	default/.style={circle, thin, draw=black, fill=gray!25}
+%}
+\tikzstyle{vertex}=[circle, draw, fill=white, inner sep=0pt, minimum width=1ex]
+
+% ┌────────────┐
+% │ algorithms │
+% └────────────┘
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+
+%  ┌───────────┐
+%  │ sonstiges │
+%  └───────────┘
+\usepackage{hyperref}
+\usepackage[capitalise]{cleveref}
