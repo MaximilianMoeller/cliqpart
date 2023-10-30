@@ -107,9 +107,9 @@ However, many classes of valid and facet-defining inequalities have been found b
 Section 2 of \cite{andresPolyhedralStudyLifted2022} gives a comprehensive overview over know classes as well as over the history of the problem.
 
 \cite{grotschelFacetsCliquePartitioning1990} showed that a vector $x \in \left\{ 0,1 \right\}^{E_{n}}$ characterizes a clique partitioning iff it satisfies the \textit{triangle inequalities}:
-\[
+\begin{equation}\label{eq:triangle_inequality}
 	 x_{ij} + x_{jk} - x_{ik} \leq 1
-\]
+\end{equation}
 for all pairwise distinct $i,j,k \in V_{n}$.
 This leads us to the following ILP formulation of \CP.
 \begin{align*}

@@ -1,16 +1,99 @@
 \section{Separation}\label{sec:separation}
-This section is concerned with the separation routines (called \textit{separators} for short) for the classes of inequalities.
+In this section we will describe the classes of inequalities that we separated as well as the algorithms used to do so.
+Most of the separation routines are configurable in one way or another.
+However, we will only explain the core algorithm in this section and leave the configuration parameters for \cref{subsec:run_configs}.
 
 \subsection{Triangle inequalities}\label{subsec:triangle_separator}
+In any complete graph $K_{n}$ there are only $3n(n-1)(n-2) = \mathcal{O}(n^{3})$ triangle inequalities.
+We found that complete enumeration runs in acceptable time even for the biggest instances we tested.
 
-\subsection{\texorpdfstring{\ST}{[S:T]} inequalities}\label{subsec:st_separator}
+\subsection{\texorpdfstring{$2$-partition}{2-partition} inequalities}\label{subsec:two_partition_separator}
+The $2$-partition inequalities first described by \cite{grotschelFacetsCliquePartitioning1990} are a generalization of triangle inequalities.
+\begin{definition}[$2$-partition inequalities, Section 4 of \cite{grotschelFacetsCliquePartitioning1990}]\label{def:2-partition_inequality}
+	Let $K_{n} = (V_{n}, E_{n})$ be a complete graph.
+	For every two disjoint nonempty subsets $S$ and $T$ of $V_{n}$, the inequality
+	\begin{equation}\label{eq:2-partition_inequality}
+		\sum_{s \in S}^{} \sum_{t \in T}^{} x_{st} - \sum_{\substack{s, s' \in S \\ s \neq s'}}^{} x_{ss'} - \sum_{\substack{t, t' \in T \\ t \neq t'}}^{} x_{tt'} \leq \func{min}( \lvert S \rvert, \lvert T \rvert )
+	\end{equation}
+	is called a $2$\textit{-partition inequality}.
+\end{definition}
+\begin{theorem}[Theorem 4.1 of \cite{grotschelFacetsCliquePartitioning1990}]
+	For every $n \geq 3$ and every two nonempty subsets $S, T$ of $V_{n}$, the corresponding $2$-partition inequality is valid for $\mathscr{P}_{n}$.
+	It defines a facet if and only if $\lvert  S \rvert \neq \lvert T \rvert$.
+\end{theorem}
+
+\cite{oostenCliquePartitioningProblem2001a} showed that separation for this class of inequalities is already \textsc{NP}-hard for any fixed $\lvert S \rvert$.
+We therefore resorted to the heuristic separation routines described in \cite{grotschelFacetsCliquePartitioning1990}.
 
 \subsection{Two-chorded odd cycle inequalities}\label{subsec:two_chorded_separator}
-The class of two-chorded odd cycle inequalities was shown to be seperable in polynomial time by \cite{mullerPartialOrderPolytope1996}.
-Their paper is mainly concerned with the partial order polytope of a \textit{directed} graph.
-However, the algorithm described there for separating \textit{odd closed walk} inequalities can be adapted to to separate a class of valid inequalities for the \CP polytope, that contains the class of two-chorded odd cycle inequalities.
+\begin{definition}[Two-chorded cycle inequalities, Section 5 of \cite{grotschelFacetsCliquePartitioning1990}]\label{def:2-chorded_cycle_inequality}
+	Let $K_{n} = (V_{n}, E_{n})$ be a complete graph, let $5 \leq k \leq n$, and let $v: \Z_{k} \to \Z_{n}$ be injective.
+	The \textit{two-chorded cycle inequality} with respect to $v$ is defined as
+	\begin{equation}\label{eq:two-chorded_cycle_inequality}
+		\sum_{i \in \Z_{k}}^{} x_{v_{i}v_{i+1}} - x_{v_{i}v_{i+2}} \leq \left\lfloor \frac{1}{2} k \right\rfloor
+	\end{equation}
+\end{definition}
+\begin{theorem}[Theorem 5.1 of \cite{grotschelFacetsCliquePartitioning1990}]
+	Let $K_{n}$ be a complete graph, let $5 \leq k \leq n$, and let $v: \Z_{k} \to \Z_{n}$ be injective.
+	Then the two-chorded cycle inequality with respect to $v$ is valid for $\mathscr{P}_{n}$.
+	It defines a facet if and only if $k$ is odd.
+\end{theorem}
 
-We are however only interested in the class of two-chorded inequalities (and not this broader class) and will therefore repeat the argument given, but slightly adapted for this narrower class.
+The naive attempt of separating the class of two-chorded odd cycle inequalities by enumeration quickly breaks down,
+as there are 
+\[
+	\sum_{k=5 \text{ odd}}^{n} \binom{n}{k} \frac{k!}{2k} = \sum_{k = 5 \text{ odd}}^{n} \frac{n!}{(n-k)!2k}
+\]
+distinct two-chorded odd cycle inequalities for $K_{n}$.
+\begin{proof}
+	Analogous to the Proof of Proposition 20 in \cite{andresPolyhedralStudyLifted2022}.
+\end{proof}
+
+However, the class was shown to be seperable in polynomial time by \cite{mullerPartialOrderPolytope1996}.
+Their paper is mainly concerned with the partial order polytope of a directed graph.
+The algorithm described for separating \textit{odd closed walk} inequalities can be adapted to to separate a class of valid inequalities for the \CP polytope, that contains the class of two-chorded odd cycle inequalities.
+
+In this paper, we are only interested in the class of two-chorded inequalities (and not this broader class) and will therefore repeat the argument given, but slightly adapted for this narrower class.
+
+The crucial step in understanding the proof is the following:
+Consider \cref{fig:support_graph_two-chorded_odd_cycle_inequality}.
+We can obtain the left hand side of the associated inequality by following the closed walk
+\[
+\mathrlap{\overbrace{\phantom{v_{0} v_{1} v_{2} v_{3} v_{4} v_{5} v_{6} v_{0}}}^{\text{cycle}}}
+v_{0} v_{1} v_{2} v_{3} v_{4} v_{5} v_{6}
+\mathrlap{\underbrace{\phantom{v_{0} v_{2} v_{4} v_{6} v_{1} v_{3} v_{5} v_{0}}}_{\text{two-chords}}}
+v_{0} v_{2} v_{4} v_{6} v_{1} v_{3} v_{5} v_{0}
+\]
+
+
+and adding up the corresponding entry of the solution vector $x^{*}$ multiplied by $\pm 1$, respectively.
+This approach is independent of $k$ and suggests that we could try find some ‘shortest walk’ in an appropriate auxiliary graph.
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}
+        \def \n{6};
+        \def \radius{1.5cm};
+        \def \r{0.3cm};
+        \foreach \i in {0,...,\n}{
+			\node[vertex] (\i) at ({\i/(\n+1)*360+90}:\radius) {};
+			\node at ({\i/(\n+1)*360+90}:\radius+\r) {$v_{\i}$};
+        }
+        \foreach \i/\j in {0/1, 1/2, 2/3, 3/4, 4/5, 5/6, 6/0} {
+			\draw[line width=0.2mm] (\i) -- (\j);
+        }
+        \foreach \i/\j in {0/2, 1/3, 2/4, 3/5, 4/6, 5/0, 6/1} {
+			\draw[line width=0.2mm, dashed] (\i) -- (\j);
+        }
+	\end{tikzpicture}
+	\caption[Support graph of a two-chorded odd cycle inequality]{Support graph of a two-chorded odd cycle inequality for $k$ = 7.
+	Solid/Dashed lines represent variables with coefficient $+ / - 1$, respectively.}
+	\label{fig:support_graph_two-chorded_odd_cycle_inequality}
+\end{figure}
+
+\todo{continue here}
+
+For the (facet-defining) case that $k$ is odd, the right hand side of \cref{eq:two-chorded_cycle_inequality} can be rewritten as $\frac{(k-1)}{2}$.
 
 \begin{equation*}
 	\sum_{i \in \Z_k} \left( x_{v_i v_{i+1}} - x_{v_i v_{i+2}} \right) \leq \frac{1}{2} (k-1)

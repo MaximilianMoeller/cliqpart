@@ -95,56 +95,13 @@
 % ┌──────────────┐
 % │ Environments │
 % └──────────────┘
-% Kästen um Definitionen etc.
-\usepackage{mdframed}
-% Layout der Kästen
-\mdfsetup{skipabove=1em,skipbelow=0em}
 \theoremstyle{definition}
-\mdfdefinestyle{theoremstyle}{
-	linewidth=0.6pt,%
-	frametitlerule=true,%
-	frametitlerulewidth=0.4pt,%
-	nobreak=true,
-	}
-\mdtheorem[style=theoremstyle]{definition}{Definition}[section]
-\mdtheorem[style=theoremstyle]{theorem}[definition]{Theorem}
-\mdtheorem[style=theoremstyle]{prop}[definition]{Proposition}
-\mdtheorem[style=theoremstyle]{lemma}[definition]{Lemma}
-\mdtheorem[style=theoremstyle]{corollary}[definition]{Corollary}
-\mdtheorem[style=theoremstyle]{axiom}{Axiom}
-\newtheorem*{example}{Example}
-\surroundwithmdframed[innertopmargin=0, topline=false, bottomline=false, rightline=false, linewidth=4pt, linecolor=gray, backgroundcolor=lightgray]{example}
-\newtheorem*{notation}{Notation}
-\newtheorem*{terminology}{Terminology}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}{Corollary}[theorem]
+
+\theoremstyle{remark}
 \newtheorem*{note}{Note}
-\newtheorem*{problem}{Problem}
-
-% deutsche Titel
-\newmdenv[innertopmargin=0, topline=false, bottomline=false, rightline=false, linewidth=4pt, linecolor=gray, backgroundcolor=lightgray, frametitle={Beispiel:}]{beispiel}
-\newmdenv[innertopmargin=0, topline=false, bottomline=false, rightline=false, linewidth=2pt, linecolor=gray, frametitle={Merke:}]{merke}
-\mdtheorem[style=theoremstyle]{corollar}[definition]{Corollar}
-\newtheorem*{terminologie}{Terminologie}
-
-\newenvironment{subproof}[1][\proofname]{%
-  \renewcommand{\qedsymbol}{$\blacksquare$}%
-  \begin{proof}[#1]%
-}{%
-  \end{proof}%
-}
-
-\newenvironment{subsubproof}[1][\proofname]{%
-  \renewcommand{\qedsymbol}{$\blacklozenge$}%
-  \begin{proof}[#1]%
-}{%
-  \end{proof}%
-}
-
-% Fix some spacing
-% http://tex.stackexchange.com/questions/22119/how-can-i-change-the-spacing-before-theorems-with-amsthm
-\def\thm@space@setup{%
-  \thm@preskip=\parskip \thm@postskip=0pt
-}
-\makeatother
 
 % ┌──────┐
 % │ tikz │
