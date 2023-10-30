@@ -167,7 +167,8 @@ vector<GRBTempConstr> CircleSeparator::SeparateSolution(double *solution, GRBVar
             violated_constraints.emplace_back(constraint_lhs <= rhs);
             found++;
 
-            PLOGV << "Found violated " << config_.inequality_type_ << " odd cycle inequality: " << constraint_lhs << "<= "
+            PLOGV << "Found violated " << config_.inequality_type_ << " odd cycle inequality: " << constraint_lhs
+                  << "<= "
                   << rhs << ".";
 
           }
@@ -178,6 +179,8 @@ vector<GRBTempConstr> CircleSeparator::SeparateSolution(double *solution, GRBVar
         PLOGI_(CSV_LOG) << "{\"exception\":\"Time limit hit separating "// NOLINT(*-raw-string-literal)
                         << config_.inequality_type_
                         << " odd cycle inequalities.\"";
+        PLOGD << "Time limit hit separating " << config_.inequality_type_ << " odd cycle inequalities."
+              << " Found " << violated_constraints.size() << " violated constraints in that time.";
         return violated_constraints;
       }
     }
