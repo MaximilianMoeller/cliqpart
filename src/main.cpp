@@ -43,14 +43,16 @@ int main(int argc, char *argv[]) {
 
   CLI::Option *v = app.add_flag("-v,--verbose", "Verbose; use twice for even more details.");
 
-  bool log_to_file{false};
-  app.add_flag("-f,--log-to-file", log_to_file, "Enable logging to file, disabled by default.");
+  // yes, this construction with log_to_file = !(disable_logging) is kinda dumb, but it's easier to write the rest of
+  // the code this way around…
+  bool disable_logging{false};
+  app.add_flag("--disable-logs", disable_logging, "Disables logging to file, enabled by default.");
 
   bool gurobi_console_log{false};
   app.add_flag("-g,--gurobi-logs", gurobi_console_log, "Enables gurobi log in console, disabled by default.");
 
   bool lp_only{false};
-  app.add_flag("-l,--lp-only", lp_only, "Scip solving the ILP to optimality and only solve the LP relaxation.");
+  app.add_flag("--lp-only", lp_only, "Scip solving the ILP to optimality and only solve the LP relaxation.");
 
   int optimality_time_limit{1800};
   app.add_option("-t,--time-out",
@@ -61,6 +63,7 @@ int main(int argc, char *argv[]) {
   app.usage("Usage: cliqpart DIRS --config CONFIGS [OPTIONS]");
 
   CLI11_PARSE(app, argc, argv)
+  bool log_to_file = !disable_logging;
 
   plog::Severity log_level;
   switch (v->count()) {
