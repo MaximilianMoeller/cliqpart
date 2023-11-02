@@ -77,6 +77,16 @@ vector<GRBTempConstr> CircleSeparator::SeparateSolution(double *solution, GRBVar
   int found{0};
   vector<GRBTempConstr> violated_constraints;
 
+  // when always searching for violated constraints in the same order,
+  // it is likely that the later parts of the graph never get investigated, while for the earlier parts
+  // the violated odd circle gets longer and longer.
+  // we therefore use a random shuffling of the nodes in each iteration
+  // note however that, given enough time (i.e., time limit big enough) the same constraints would be found!
+  vector<int> shuffling(degree_);
+  std::iota(shuffling.begin(), shuffling.end(), 0);
+  std::shuffle(shuffling.begin(), shuffling.end(), std::mt19937{std::random_device{}()});
+  PLOGW << shuffling;
+
   progressbar bar(degree_);
   // terminate separation early if enough constraints were found
   for (int i = 0; i < degree_; ++i) {
@@ -102,8 +112,8 @@ vector<GRBTempConstr> CircleSeparator::SeparateSolution(double *solution, GRBVar
         break;
       }
 
-      AuxGraph::Node start{false, false, i, j};
-      AuxGraph::Node target{true, false, i, j};
+      AuxGraph::Node start{false, false, shuffling[i], shuffling[j]};
+      AuxGraph::Node target{true, false, shuffling[i], shuffling[j]};
 
       auto [cost, path] = aux->ShortestPath(start, target);
 
