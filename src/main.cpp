@@ -261,21 +261,32 @@ int main(int argc, char *argv[]) {
               // since the optimal solution has been found
               if (separator->Abbreviation() == "Δ" && violated_constraints.empty() && model.IsIntegral()) {
                 PLOGI << "Found integral solution in iteration " << iteration << ".";
+
+                PLOGI_(CSV_LOG)
+                      << "{\"iteration\":" << iteration
+                      << ",\"obj_value\":" << model.get(GRB_DoubleAttr_ObjVal)
+                      << ",\"violated_found\": 0"
+                      << ",\"separator\":\"Δ\"" // NOLINT(*-raw-string-literal)
+                      << ",\"integral\": true"
+                      << "}";
                 // very clear usage of goto, don't blame me
                 goto no_violated_found;
               }
 
-              // if a separator found violated constraints, we want to add those to the model and optimize again
+              PLOGI_(CSV_LOG)
+                    << "{\"iteration\":" << iteration
+                    << ",\"obj_value\":" << model.get(GRB_DoubleAttr_ObjVal)
+                    << ",\"violated_found\":" << violated_constraints.size()
+                    << ",\"separator\":\"" << separator->Abbreviation() << "\""// NOLINT(*-raw-string-literal)
+                    << ",\"integral\": false"
+                    << "}";
+
+              // If a separator found violated constraints, we want to add those to the model and optimize again
               // before calling other separators, because they might depend on the fact that a specific class
               // of inequalities is satisfied.
               // In fact, ALL other implemented separators use the assumption that the triangle inequalities are
               // satisfied.
               if (!violated_constraints.empty()) {
-                PLOGI_(CSV_LOG)
-                      << "{\"iteration\":" << iteration << ",\"obj_value\":" << model.get(GRB_DoubleAttr_ObjVal)
-                      << ",\"violated_found\":" << violated_constraints.size() << ",\"separator\":\"" // NOLINT(*-raw-string-literal)
-                      << separator->Abbreviation()
-                      << "\"}";
                 break;
               }
             }

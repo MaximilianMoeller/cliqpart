@@ -6,8 +6,6 @@
 #include "AuxGraph.h"
 #include "progressbar.hpp"
 
-#define CSV_LOG 1
-
 vector<GRBTempConstr> CircleSeparator::SeparateSolution(double *solution, GRBVar *vars) {
   PLOGD << "Starting search for violated " << config_.inequality_type_ << " odd cycle inequalities.";
 
@@ -176,9 +174,6 @@ vector<GRBTempConstr> CircleSeparator::SeparateSolution(double *solution, GRBVar
         }
       }
       catch (AuxGraph::OutOfTimeException &_my_exception) {
-        PLOGI_(CSV_LOG) << "{\"exception\":\"Time limit hit separating "// NOLINT(*-raw-string-literal)
-                        << config_.inequality_type_
-                        << " odd cycle inequalities.\"";
         PLOGD << "Time limit hit separating " << config_.inequality_type_ << " odd cycle inequalities."
               << " Found " << violated_constraints.size() << " violated constraints in that time.";
         return violated_constraints;
