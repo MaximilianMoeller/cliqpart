@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
   measurements_file.close();
   static plog::RollingFileAppender<plog::CsvFormatter>
       measurements_file_appender(measurements_file_path.c_str(), 16000000, 1);
-  plog::init<CSV_LOG>(plog::info, &measurements_file_appender);
+  plog::init<CSV_LOG>(plog::verbose, &measurements_file_appender);
 
   // loading configurations
   PLOGD << "Starting parsing of configuration file(s).";
@@ -306,6 +306,14 @@ int main(int argc, char *argv[]) {
               auto removed = model.DeleteCuts();
 
               PLOGD << "Removed " << removed << " constraints in iteration " << iteration;
+              // debug verbosity level just to easily distinguish between this type of log and the one inside the
+              // separator loop
+              PLOGD_(CSV_LOG)
+                    << "{\"iteration\":" << iteration
+                    << ",\"obj_value\":" << model.get(GRB_DoubleAttr_ObjVal)
+                    << ",\"constraints_added\":" << violated_constraints.size()
+                    << ",\"constraints_removed\":" << removed
+                    << "}";
             }
 
           }
