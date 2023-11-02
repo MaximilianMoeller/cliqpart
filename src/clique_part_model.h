@@ -19,6 +19,11 @@ class CliquePartModel : public GRBModel {
 
   unique_ptr<GRBVar[]> vars_;
 
+  // for cut deletion
+  double worst_objective_;
+
+  bool ObjectiveDeclined(double current_objective);
+
  public:
   // needs information from the run config to generate edge weights,
   // a path to the CSV data_path,
@@ -37,6 +42,8 @@ class CliquePartModel : public GRBModel {
 
   // returns the gurobi variable object of a given edge (indices of the adjacent nodes)
   GRBVar *GetVars() { return vars_.get(); };
+
+  int DeleteCuts();
 };
 
 #endif //CLIQPART_SRC_CLIQUE_PART_MODEL_H_

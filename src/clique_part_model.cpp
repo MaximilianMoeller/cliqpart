@@ -48,6 +48,9 @@ CliquePartModel::CliquePartModel(GRBEnv &grb_env, const string &data_path, DataC
 
   // model sense is determined by the data.toml
   set(GRB_IntAttr_ModelSense, config.maximizing ? -1 : 1);
+  // assure that any objective found in the first iteration is worse than the current one
+  worst_objective_ =
+      config.maximizing ? std::numeric_limits<double>::infinity() : -std::numeric_limits<double>::infinity();
 }
 bool CliquePartModel::IsIntegral() {
   auto sol = GetSolution();
@@ -55,4 +58,48 @@ bool CliquePartModel::IsIntegral() {
   return std::all_of(vec_sol.begin(),
                      vec_sol.end(),
                      [this](double x) { return std::abs(x - std::floor(x + 0.5)) <= integrality_tolerance; });
+}
+
+bool CliquePartModel::ObjectiveDeclined(double current_objective) {
+  // maximizing = -1, minimizing = 1
+  int sense = get(GRB_IntAttr_ModelSense);
+
+  return (sense * worst_objective_ < sense * current_objective);
+}
+
+int CliquePartModel::DeleteCuts() {
+  int deleted{0};
+  double current_obj_value = get(GRB_DoubleAttr_ObjVal);
+
+  // The algorithm can get stuck in a hyperplane for some time, and removing cuts while still in this hyperplane
+  // would lead to an infinite loop.
+  // Therefore, only consider removing constraints when the objective value declined,
+  // i.e., the hyperplane got cut off entirely, and the LP relaxation now has a worse objective value than before.
+  if (ObjectiveDeclined(current_obj_value)) {
+    PLOGD << "Objective declined from " << worst_objective_ << " to " << current_obj_value << "! "
+          << "Searching for inactive constraints to remove.";
+    auto constraint_count = get(GRB_IntAttr_NumConstrs);
+    auto constraints = getConstrs();
+
+    for (int i = 0; i < constraint_count; ++i) {
+      GRBConstr constraint = constraints[i];
+      if (constraint.get(GRB_DoubleAttr_Slack) > 1e-3) {
+        PLOGV << "Removing " << getRow(constraint) << constraint.get(GRB_CharAttr_Sense) << "= "
+              << constraint.get(GRB_DoubleAttr_RHS) << ". Current LHS value was " << getRow(constraint).getValue()
+              << ".";
+        // Due to Gurobis lazy update approach, this change won't take effect until update, optimize or write is called
+        // on the model.
+        // Thus, this loop does not invalidate itself.
+        // Thanks, Gurobi.
+        remove(constraint);
+        deleted++;
+      }
+    }
+
+    worst_objective_ = current_obj_value;
+  } else {
+    PLOGD << "Objective did not decline, is still " << current_obj_value << "! Not deleting any cuts.";
+  }
+
+  return deleted;
 }

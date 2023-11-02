@@ -245,8 +245,8 @@ int main(int argc, char *argv[]) {
 
           // main LP loop, solving LP relaxation and adding violated constraints
           measurements_file_appender.setFileName((kNumberedRunDir / "measurements.csv").c_str());
-          do {
-            // solving LP and writing solution to file
+          while (true) {
+            // solving the LP and writing the solution to a file
             iteration++;
             model.optimize();
             model.write(kNumberedRunDir / (to_string(iteration) + ".sol"));
@@ -256,12 +256,13 @@ int main(int argc, char *argv[]) {
             for (auto &separator : separators) {
               violated_constraints = separator->SeparateSolution(model.GetSolution(), model.GetVars());
 
-              // if the triangle separator found no violated constraints and the solution is integral
-              // there is no need to search for other violated inequalities -> abort early
+              // if the triangle separator found no violated constraints and the solution is integral,
+              // there is no need to search for other violated inequalities,
+              // since the optimal solution has been found
               if (separator->Abbreviation() == "Δ" && violated_constraints.empty() && model.IsIntegral()) {
                 PLOGI << "Found integral solution in iteration " << iteration << ".";
                 // very clear usage of goto, don't blame me
-                goto integral_solution;
+                goto no_violated_found;
               }
 
               // if a separator found violated constraints, we want to add those to the model and optimize again
@@ -279,17 +280,25 @@ int main(int argc, char *argv[]) {
               }
             }
 
-            // adding violated constraints to model
-            for (const auto &constraint : violated_constraints) {
-              model.addConstr(constraint);
+            // If no violated constraint has been found by any separator, terminate the LP loop
+            if (violated_constraints.empty()) {
+              break;
             }
-            PLOGD << "Added " << violated_constraints.size() << " constraints in iteration " << iteration;
+              // otherwise, add violated constraints and remove inactive ones.
+            else {
+              // adding violated constraints to model
+              for (const auto &constraint : violated_constraints) {
+                model.addConstr(constraint);
+              }
+              PLOGD << "Added " << violated_constraints.size() << " constraints in iteration " << iteration;
 
-          } while (!violated_constraints.empty());
-          integral_solution:;
-          PLOGI_(CSV_LOG) << "{\"iteration\":" << iteration << ",\"obj_value\":" << model.get(GRB_DoubleAttr_ObjVal)
-                          << ",\"violated_found\":" << 0 << ",\"separator\":\"" << "none" // NOLINT(*-raw-string-literal)
-                         << "\"}";
+              auto removed = model.DeleteCuts();
+
+              PLOGD << "Removed " << removed << " constraints in iteration " << iteration;
+            }
+
+          }
+          no_violated_found:;
 
           model.write(kNumberedRunDir / "0_last.sol");
           PLOGI << "Finished run " << run_counter << "/" << kRunConfig.run_count << " for run config '"

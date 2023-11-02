@@ -6,6 +6,8 @@
 #include "separators/triangle_separator.h"
 #include "separators/st_separator.h"
 ILPCallback::ILPCallback(CliquePartModel &model) : model(model) {
+  // In the ILP Callback the triangle separator is only called when an integral vector has to be checked for feasibility
+  // hence the tolerance can be set to 0.5.
   triangle_separator_ = make_unique<TriangleSeparator>(model.NodeCount(), TriangleSeparatorConfig(0.5, -1, false));
   //lp_separators_.emplace_back(make_unique<StSeparator>(model.NodeCount(), StSeparatorConfig()));
 }
