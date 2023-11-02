@@ -85,7 +85,6 @@ vector<GRBTempConstr> CircleSeparator::SeparateSolution(double *solution, GRBVar
   vector<int> shuffling(degree_);
   std::iota(shuffling.begin(), shuffling.end(), 0);
   std::shuffle(shuffling.begin(), shuffling.end(), std::mt19937{std::random_device{}()});
-  PLOGW << shuffling;
 
   progressbar bar(degree_);
   // terminate separation early if enough constraints were found
