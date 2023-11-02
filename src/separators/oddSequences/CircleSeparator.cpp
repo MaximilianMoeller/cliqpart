@@ -2,6 +2,8 @@
 // Created by max on 26.09.23.
 //
 
+#include <numeric>
+#include <random>
 #include "CircleSeparator.h"
 #include "AuxGraph.h"
 #include "progressbar.hpp"
@@ -29,7 +31,7 @@ vector<GRBTempConstr> CircleSeparator::SeparateSolution(double *solution, GRBVar
   switch (config_.inequality_type_) {
 
     case CircleInequality::TWO_CHORDED: {
-      aux = make_unique<TwoChordedAuxGraph>(degree_, config_.time_limit_);
+      aux = make_unique<TwoChordedAuxGraph>(degree_);
 
       gadget_weight =
           [this, &solution](int a, int b) { return std::clamp(0.5 - solution[EdgeIndex(a, b)], -0.5, 0.5); };
@@ -76,15 +78,24 @@ vector<GRBTempConstr> CircleSeparator::SeparateSolution(double *solution, GRBVar
   vector<GRBTempConstr> violated_constraints;
 
   progressbar bar(degree_);
+  // terminate separation early if enough constraints were found
   for (int i = 0; i < degree_; ++i) {
     if (found >= config_.maxcut_) {
       break;
     }
-
+    // terminate separation early if allowed time limit was exceeded
+    if (config_.time_limit_ > 0) {
+      auto now = std::chrono::steady_clock::now();
+      auto elapsed = (std::chrono::duration_cast<std::chrono::seconds>(now - start_time)).count();
+      if (elapsed > config_.time_limit_) {
+        break;
+      }
+    }
     // only show progress bar in debugging mode (not in verbose because the PLOGV in the loop breaks the bar)
     if (plog::get()->getMaxSeverity() == plog::Severity::debug) {
       bar.update();
     }
+
     for (int j = 0; j < degree_; ++j) {
       if (i == j) continue;
       if (found >= config_.maxcut_) {
@@ -94,89 +105,73 @@ vector<GRBTempConstr> CircleSeparator::SeparateSolution(double *solution, GRBVar
       AuxGraph::Node start{false, false, i, j};
       AuxGraph::Node target{true, false, i, j};
 
-      try {
-        auto [cost, path] = aux->shortestPath(start, target);
+      auto [cost, path] = aux->ShortestPath(start, target);
 
-        // terminate separation early if configured
-        if (config_.time_limit_ > 0) {
-          auto now = std::chrono::steady_clock::now();
-          auto elapsed = (std::chrono::duration_cast<std::chrono::seconds>(now - start_time)).count();
-          if (elapsed > config_.time_limit_) {
-            throw AuxGraph::OutOfTimeException();
+      if (cost < min_path_cost) {
+        double violation_degree{0};
+        // right-hand-side of the constraint is dependent on the length of the circle in the original graph, which is
+        // half the length of the shortest path found
+        int k = (path.size() - 1) / 2;
+
+        GRBLinExpr constraint_lhs;
+
+        // every edge in this shortest path corresponds to a variable in the constraint
+        for (int index = 1; index < path.size(); ++index) {
+          auto node1 = path[index - 1];
+          auto node2 = path[index];
+
+          // inside a gadget, i.e. a positive edge in the violated constraint
+          if (node1.i == node2.i && node1.j == node2.j) {
+            switch (config_.inequality_type_) {
+
+              case CircleInequality::TWO_CHORDED: {
+                constraint_lhs += vars[EdgeIndex(node1.i, node1.j)];
+                violation_degree += solution[EdgeIndex(node1.i, node1.j)];
+              }
+                break;
+              case CircleInequality::HALF_CHORDED: {
+                constraint_lhs -= vars[EdgeIndex(node1.i, node1.j)];
+                violation_degree -= solution[EdgeIndex(node1.i, node1.j)];
+              }
+                break;
+            }
+          }
+            // trans-gadget edge, i.e. a negative edge in the violated constraint
+            // because the auxiliary graph was build by adding (i,j) and (j,k),
+            // we now know that this corresponds to the edge (i,k) in the original graph
+          else if (node1.j == node2.i) {
+            switch (config_.inequality_type_) {
+
+              case CircleInequality::TWO_CHORDED: {
+                constraint_lhs -= vars[EdgeIndex(node1.i, node2.j)];
+                violation_degree -= solution[EdgeIndex(node1.i, node2.j)];
+              }
+                break;
+              case CircleInequality::HALF_CHORDED: {
+                constraint_lhs += vars[EdgeIndex(node1.i, node2.j)];
+                violation_degree += solution[EdgeIndex(node1.i, node2.j)];
+              }
+                break;
+            }
           }
         }
 
-        if (cost < min_path_cost) {
-          double violation_degree{0};
-          // right-hand-side of the constraint is dependent on the length of the circle in the original graph, which is
-          // half the length of the shortest path found
-          int k = (path.size() - 1) / 2;
+        auto rhs = constraint_rhs(k);
+        violation_degree -= rhs;
 
-          GRBLinExpr constraint_lhs;
+        /* only add triangles if they violate the corresponding inequality by more than the tolerance
+        // prevents an issue where, due to floating point arithmetic, the same inequality would be added over and over again
+        */
+        if (violation_degree > config_.tolerance_) {
+          violated_constraints.emplace_back(constraint_lhs <= rhs);
+          found++;
 
-          // every edge in this shortest path corresponds to a variable in the constraint
-          for (int index = 1; index < path.size(); ++index) {
-            auto node1 = path[index - 1];
-            auto node2 = path[index];
-
-            // inside a gadget, i.e. a positive edge in the violated constraint
-            if (node1.i == node2.i && node1.j == node2.j) {
-              switch (config_.inequality_type_) {
-
-                case CircleInequality::TWO_CHORDED: {
-                  constraint_lhs += vars[EdgeIndex(node1.i, node1.j)];
-                  violation_degree += solution[EdgeIndex(node1.i, node1.j)];
-                }
-                  break;
-                case CircleInequality::HALF_CHORDED: {
-                  constraint_lhs -= vars[EdgeIndex(node1.i, node1.j)];
-                  violation_degree -= solution[EdgeIndex(node1.i, node1.j)];
-                }
-                  break;
-              }
-            }
-              // trans-gadget edge, i.e. a negative edge in the violated constraint
-              // because the auxiliary graph was build by adding (i,j) and (j,k),
-              // we now know that this corresponds to the edge (i,k) in the original graph
-            else if (node1.j == node2.i) {
-              switch (config_.inequality_type_) {
-
-                case CircleInequality::TWO_CHORDED: {
-                  constraint_lhs -= vars[EdgeIndex(node1.i, node2.j)];
-                  violation_degree -= solution[EdgeIndex(node1.i, node2.j)];
-                }
-                  break;
-                case CircleInequality::HALF_CHORDED: {
-                  constraint_lhs += vars[EdgeIndex(node1.i, node2.j)];
-                  violation_degree += solution[EdgeIndex(node1.i, node2.j)];
-                }
-                  break;
-              }
-            }
-          }
-
-          auto rhs = constraint_rhs(k);
-          violation_degree -= rhs;
-
-          /* only add triangles if they violate the corresponding inequality by more than the tolerance
-          // prevents an issue where, due to floating point arithmetic, the same inequality would be added over and over again
-          */
-          if (violation_degree > config_.tolerance_) {
-            violated_constraints.emplace_back(constraint_lhs <= rhs);
-            found++;
-
-            PLOGV << "Found violated " << config_.inequality_type_ << " odd cycle inequality: " << constraint_lhs
-                  << "<= "
-                  << rhs << ".";
-
-          }
+          PLOGV << "Found violated " << config_.inequality_type_ << " odd cycle inequality: " << constraint_lhs
+                << "<= "
+                << rhs << ".";
 
         }
-      }
-      catch (AuxGraph::OutOfTimeException &_my_exception) {
-        PLOGD << "Time limit hit separating " << config_.inequality_type_ << " odd cycle inequalities."
-              << " Found " << violated_constraints.size() << " violated constraints in that time.";
-        return violated_constraints;
+
       }
     }
   }

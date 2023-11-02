@@ -83,7 +83,7 @@ int CliquePartModel::DeleteCuts() {
 
     for (int i = 0; i < constraint_count; ++i) {
       GRBConstr constraint = constraints[i];
-      if (constraint.get(GRB_DoubleAttr_Slack) > 1e-3) {
+      if (constraint.get(GRB_DoubleAttr_Slack) > 1e-9) {
         PLOGV << "Removing " << getRow(constraint) << constraint.get(GRB_CharAttr_Sense) << "= "
               << constraint.get(GRB_DoubleAttr_RHS) << ". Current LHS value was " << getRow(constraint).getValue()
               << ".";

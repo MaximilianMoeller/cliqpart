@@ -8,7 +8,7 @@
 #include "AuxGraph.h"
 #include "progressbar.hpp"
 
-void HalfChordedAuxGraph::AddArc(Node start, Node target, double weight) {
+void AuxGraph::AddArc(AuxGraph::Node start, AuxGraph::Node target, double weight) {
   int start_index = NodeToIndex(start);
   int target_index = NodeToIndex(target);
 
@@ -20,7 +20,7 @@ void HalfChordedAuxGraph::AddArc(Node start, Node target, double weight) {
 }
 
 // Implementation adopted from https://github.com/TheAlgorithms/C-Plus-Plus/blob/master/graph/dijkstra.cpp
-std::pair<double, std::vector<AuxGraph::Node>> HalfChordedAuxGraph::shortestPath(Node start,
+std::pair<double, std::vector<AuxGraph::Node>> HalfChordedAuxGraph::ShortestPath(Node start,
                                                                                  Node target) {
   int start_index = NodeToIndex(start);
   int target_index = NodeToIndex(target);
@@ -81,86 +81,49 @@ std::pair<double, std::vector<AuxGraph::Node>> HalfChordedAuxGraph::shortestPath
   return std::make_pair(dist[target_index], path);
 }
 
-void TwoChordedAuxGraph::AddArc(AuxGraph::Node start, AuxGraph::Node target, double weight) {
+std::pair<double, std::vector<AuxGraph::Node>> TwoChordedAuxGraph::ShortestPath(Node start,
+                                                                                Node target) {
   int start_index = NodeToIndex(start);
   int target_index = NodeToIndex(target);
 
-  if (start_index > max_node_index_ || target_index > max_node_index_ || start_index == target_index) {
-    PLOGW << "Could not add [" << start_index << ", " << target_index << ", " << weight << "] to auxiliary graph.";
-    return;
-  }
-  weights_[start_index][target_index] = weight;
-  present_arcs_[start_index].emplace_back(target_index);
-}
-void TwoChordedAuxGraph::FloydWarshall() {
-  PLOGV << "Starting FloydWarshall algorithm on auxiliary graph.";
-  for (int i = 0; i < max_node_index_; ++i) {
-    dist_[i][i] = 0;
-    pred_[i][i] = -1;
-    for (auto edge_target : present_arcs_[i]) {
-      dist_[i][edge_target] = weights_[i][edge_target];
-      pred_[i][edge_target] = i;
-    }
-  }
-
-  progressbar bar(max_node_index_);
-
-  auto start = std::chrono::steady_clock::now();
-
-  for (int k = 0; k < max_node_index_; ++k) {
-
-    // terminate separation early if configured
-    if (time_limit_ > 0) {
-      auto now = std::chrono::steady_clock::now();
-      auto elapsed = (std::chrono::duration_cast<std::chrono::seconds>(now - start)).count();
-      if (elapsed > time_limit_) {
-        throw AuxGraph::OutOfTimeException();
-      }
-    }
-
-    if (plog::get()->getMaxSeverity() == plog::Severity::debug) {
-      bar.update();
-    }
-    for (int i = 0; i < max_node_index_; ++i) {
-      for (int j = 0; j < max_node_index_; ++j) {
-        auto new_weight = dist_[i][k] + dist_[k][j];
-        if (dist_[i][j] > new_weight + 1e-9) {
-          dist_[i][j] = new_weight;
-          pred_[i][j] = pred_[k][j];
-        }
-      }
-    }
-  }
-  floyd_warshall_computed_ = true;
-  PLOGV << "Finished FloydWarshall algorithm on auxiliary graph.";
-}
-std::pair<double, std::vector<AuxGraph::Node>> TwoChordedAuxGraph::shortestPath(AuxGraph::Node start,
-                                                                                AuxGraph::Node target) {
-
-  if (!floyd_warshall_computed_) {
-    FloydWarshall();
-  }
-
-  int start_index = NodeToIndex(start);
-  int target_index = NodeToIndex(target);
-
-  std::vector<Node> path{};
+  std::vector<Node> path;
 
   if (start_index == target_index) {
     return std::make_pair(0, path);
   }
-  if (pred_[start_index][target_index] == -1) {
+
+  auto dist = std::vector(max_node_index_ + 1, std::numeric_limits<double>::infinity());
+  dist[start_index] = 0;
+  auto pred = std::vector(max_node_index_ + 1, -1);
+  pred[start_index] = start_index;
+
+  bool progress{false};
+  // repeat outer loop |V| - 1 times
+  // |V| = max_node_index + 1 (because 0 is a valid index)
+  for (int i = 0; i < max_node_index_; ++i) {
+    // if nothing changes within a single loop, nothing will change in all subsequent iterations
+    progress = false;
+    for (int edge_source = 0; edge_source < max_node_index_ + 1; ++edge_source) {
+      for (auto [edge_weight, edge_target] : weights_[edge_source]) {
+        if (dist[edge_source] + edge_weight + 1e-9 < dist[edge_target]) {
+          dist[edge_target] = dist[edge_source] + edge_weight;
+          pred[edge_target] = edge_source;
+          progress = true;
+        }
+      }
+    }
+    if (!progress) break;
+  }
+  if (pred[target_index] == -1) {
     return std::make_pair(std::numeric_limits<double>::infinity(), path);
   }
-
-
   // reconstruct path
   auto current_node = target_index;
   while (current_node != start_index) {
     path.emplace_back(IndexToNode(current_node));
-    current_node = pred_[start_index][current_node];
+    current_node = pred[current_node];
   }
   path.emplace_back(start);
   std::reverse(path.begin(), path.end());
-  return std::make_pair(dist_[start_index][target_index], path);
+  return std::make_pair(dist[target_index], path);
 }
