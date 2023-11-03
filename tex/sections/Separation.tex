@@ -57,7 +57,7 @@ In this paper, we are only interested in the class of two-chorded inequalities (
 
 The crucial step in understanding the proof is the following:
 Consider \cref{fig:support_graph_two-chorded_odd_cycle_inequality}.
-We can obtain the left hand side of the associated inequality by following the closed walk
+We can obtain the left-hand side of the associated inequality by following the closed walk
 \[
 \mathrlap{\overbrace{\phantom{v_{0} v_{1} v_{2} v_{3} v_{4} v_{5} v_{6} v_{0}}}^{\text{cycle}}}
 v_{0} v_{1} v_{2} v_{3} v_{4} v_{5} v_{6}
@@ -66,9 +66,9 @@ v_{0} v_{2} v_{4} v_{6} v_{1} v_{3} v_{5} v_{0}
 \]
 
 
-and adding up the corresponding entry of the solution vector $x^{*}$ multiplied by $\pm 1$, respectively.
-This approach is independent of $k$ as long as we only traverse odd cycles and their two-chords (and not even ones).
-This suggests that we could try find some ‘shortest walk’ in an appropriate auxiliary graph where the structure of the graph prohibits us from ever taking walks along even cycles.
+and adding up the corresponding entries of the solution vector $x^{*}$ multiplied by $\pm 1$, respectively.
+As long as we only traverse odd cycles and their two-chords (and not even ones) this will always produce the left-hand side of a two-chorded odd cycle inequality and, crucially, we do not need to know the $k$ in advance.
+This suggests that we could try find some ‘special walk’ in an appropriate auxiliary graph $H$ where the structure of the graph prohibits us from ever taking walks along even cycles.
 
 \begin{figure}[H]
 	\centering
@@ -92,19 +92,99 @@ This suggests that we could try find some ‘shortest walk’ in an appropriate 
 	\label{fig:support_graph_two-chorded_odd_cycle_inequality}
 \end{figure}
 
-\todo{continue here}
-
-For the (facet-defining) case that $k$ is odd, the right hand side of \cref{eq:two-chorded_cycle_inequality} can be rewritten as $\frac{(k-1)}{2}$.
-
+We will construct this special graph later and assume for now, that we can do so.
+So restricting us to odd cycles, we can rewrite the right-hand side of \cref{eq:two-chorded_cycle_inequality}:
 \begin{equation*}
-	\sum_{i \in \Z_k} \left( x_{v_i v_{i+1}} - x_{v_i v_{i+2}} \right) \leq \frac{1}{2} (k-1)
+	\sum_{i \in \Z_k} x_{v_i v_{i+1}} - x_{v_i v_{i+2}} \leq \frac{1}{2} (k-1)
 \end{equation*}
-
 By subtracting $\frac{1}{2}k$ from both sides and after rearranging we obtain:
 
 \begin{equation*}
-	\sum_{i \in \Z_k} x_{v_i v_{i+1}} - \sum_{i \in \Z_k} \left(x_{v_i v_{i+2}} + \frac{1}{2} \right) \leq -\frac{1}{2}
+	\sum_{i \in \Z_k} \left( -x_{v_i v_{i+1}} + x_{v_i v_{i+2}} + \frac{1}{2} \right) \geq \frac{1}{2}
 \end{equation*}
+Now this inequality is independent of $k$ when we use the special graph $H$ described earlier to find the left-hand side.
+Furthermore, adding some ‘weights’ and checking whether they are samller than some constant strongly hints at the use of a shortest-path algorithm.
+
+We define the (weighted, directed, simple) axiliary graph $H = (V_{H}, E_{H})$ as follows:
+For every (directed) pair $(i,j) \in V_{n}^{2}$ with $i \neq j$, we add the four nodes $u_{1}^{i,j}, u_{2}^{i,j}, v_{1}^{i,j}$ and $v_{2}^{i,j}$ to $V_{H}$ 
+and the two arcs $(u_{1}^{i,j}, u_{2}^{i,j})$ and $(v_{1}^{i,j}, v_{2}^{i,j})$ to $E_{H}$.
+We will call four such nodes a \textit{gadget} and the two edges inside a gadget \textit{inner-gadget edges}.
+Furthermore for every (directed) triple $(i,j,k) \in V_{n}^{3}$ with $i,j,k$ pairwise distinct, we add the two arcs $(u_{2}^{i,j}, v_{1}^{j,k})$ and $(v_{2}^{i,j}, u_{i}^{j,k})$ to $E_{H}$, called \textit{inter-gadget edges}.
+\cref{fig:aux_graph_K3} shows an example of the auxiliary graph for $K_{3}$.
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}
+		\foreach \i/\j [count=\gc from 0] in {0/1, 1/2, 2/0, 0/2, 2/1, 1/0}
+			\foreach \io in {1,2}
+				\foreach \uv [count=\uvc from 0] in {u,v}{
+					\node[vertex]
+					(\uv\io\i\j) 
+					at ({ifthenelse(\gc < 3, 0, 1)*3.5+ \uvc*1.5}, -{Mod(\gc,3)*3.5 + ifthenelse(\io == 2, 0, 1.5)})
+					{$\uv_{\io}^{\i, \j}$};
+			}
+		\foreach \i/\j in {0/1, 0/2, 1/0, 1/2, 2/0, 2/1}{
+			\draw[-latex] (u1\i\j) edge[line width=0.75pt] (u2\i\j);
+			\draw[-latex] (v1\i\j) edge[line width=0.75pt] (v2\i\j);
+		}
+		\foreach \i/\j/\k [count=\cc from 1] in {0/1/2, 1/2/0, 2/0/1, 0/2/1, 2/1/0, 1/0/2}{
+			\pgfmathsetmacro{\outdiruv}{ifthenelse(Mod(\cc,3) == 0, "north east", "south"}
+			\pgfmathsetmacro{\outdirvu}{ifthenelse(Mod(\cc,3) == 0, "north west", "south"}
+			\pgfmathsetmacro{\indiruv}{ifthenelse(Mod(\cc,3) == 0, "south west", "north"}
+			\pgfmathsetmacro{\indirvu}{ifthenelse(Mod(\cc,3) == 0, "south east", "north"}
+			\pgfmathsetmacro{\looseness}{ifthenelse(Mod(\cc,3) == 0, 0.2, 1}
+			\draw[-latex] (u2\i\j) edge[line width=0.75pt, dashed, out=\outdiruv, in=\indiruv, looseness=\looseness] (v1\j\k);
+			\draw[-latex] (v2\i\j) edge[line width=0.75pt, dashed, out=\outdirvu, in=\indirvu, looseness=\looseness] (u1\j\k);
+		}
+	\end{tikzpicture}
+	\caption[Auxiliary graph $H$ for $K_3$]{The auxiliary graph for the complete graph $K_{3}$.
+	Inner-gadget edges are shown as solid lines and inter-gadget edges are shown as dashed lines.}
+	\label{fig:aux_graph_K3}
+\end{figure}
+
+Note that $H$ connected for any $K_{n}$ with $n \geq 4$, but showing such a graph in full detail is rather confusing.
+
+\begin{figure}[H]
+	\centering
+	\resizebox{\textwidth}{!}{
+			\begin{tikzpicture}
+        \def \n{6};
+		\foreach \i in {0, ..., \n}
+			\foreach \j in {0, ..., \n}{
+
+			\ifthenelse{\i = \j}{}{
+
+			\foreach \io in {1,2}
+				\foreach \uv [count=\uvc from 0] in {u,v}{
+					\node[vertex]
+					(\uv\io\i\j) 
+					at ({\i*3 + \uvc*1.25}, -{\j*3 + ifthenelse(\io == 2, 0, 1.25)}) %{};
+					{$\uv_{\io}^{\i, \j}$};
+				}
+			\draw[-latex] (u1\i\j) -- (u2\i\j);
+			\draw[-latex] (v1\i\j) -- (v2\i\j);
+			}
+
+			}
+		\foreach \i/\j/\k [count=\counter from 0] in {0/1/2, 1/2/3, 2/3/4, 3/4/5, 4/5/6, 5/6/0, 6/0/1}{
+			\pgfmathsetmacro{\startnode}{ifthenelse(Mod(\counter,2) == 0, "u", "v")}
+			\pgfmathsetmacro{\endnode}{ifthenelse(Mod(\counter,2) == 0, "v", "u")}
+			\pgfmathsetmacro{\indir}{ifthenelse(\j == 6, "west", "north")}
+			\pgfmathsetmacro{\outdir}{ifthenelse(\j == 6, "east", "south")}
+			\pgfmathsetmacro{\looseness}{ifthenelse(\j == 0, 0.25, ifthenelse(\j == 6, 0.25, 0.5))}
+			\draw[-latex] (\startnode2\i\j) edge[color=cdblue, out=\outdir, in=\indir, looseness=\looseness] (\endnode1\j\k);
+		}
+		\foreach \i/\j [count=\counter from 0] in {0/1, 1/2, 2/3, 3/4, 4/5, 5/6, 6/0}{
+			\pgfmathsetmacro{\uv}{ifthenelse(Mod(\counter,2) == 0, "u", "v")}
+			\draw[-latex] (\uv1\i\j) edge[color=cdblue] (\uv2\i\j);
+
+		}
+	\end{tikzpicture}}
+	\caption[Walk in $H$]{The auxiliary graph $H$ for $K_{7}$.
+	The $u_{1}^{0,1}v_{1}^{0,1}$-walk corrsponding to the inequality in \cref{fig:support_graph_two-chorded_odd_cycle_inequality} is shown in blue.
+	All other inter-gadget weights are left out for clarity.}
+	\label{fig:walk_in_auxiliary_graph}
+\end{figure}
 
 \subsection{Half-chorded odd cycle inequalities}\label{subsec:half_chorded_separator}
 

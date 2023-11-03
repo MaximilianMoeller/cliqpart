@@ -17,6 +17,10 @@ The code infrastructure is designed flexible enough to use the separation routin
 Therefore, replacing the LP solver would be fairly easy, \eg for comparing performances of different solvers for this specific problem.
 However, this is beyond the scope of the project.
 
+\subsection{Cut Deletion}\label{subsec:cut_deletion}
+See \cite{sorensenSeparationHeuristic2Partition2020} \rightarrow delete cuts after they are inactive for 5 consecutive rounds (hard to implement, rather do if they are inactive in the current round) and objective value has strictly declined.
+Solves the LP much faster.
+
 \subsection{Separator Configurations}\label{subsec:run_configs}
 
 \subsection{Results}\label{subsec:experiments_results}
