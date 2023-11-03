@@ -42,5 +42,5 @@ for raw_file_name in os.listdir(raw_data_dir):
         output_toml.write("graph_degree = " + str(max_index + 1)+"\n")
         output_toml.write("maximizing = true\n\n")
         output_toml.write("row_labels = 0\n")
-        output_toml.write("column_labels = 0\n")
-
+        output_toml.write("column_labels = 0\n\n")
+        output_toml.write("value_scaling = 1e3\n")

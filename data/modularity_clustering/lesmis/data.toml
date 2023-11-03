@@ -3,3 +3,5 @@ maximizing = true
 
 row_labels = 0
 column_labels = 0
+
+value_scaling = 1e3
