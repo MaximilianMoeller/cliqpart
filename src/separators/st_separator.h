@@ -23,7 +23,6 @@ inline ostream &operator<<(ostream &out, StSeparatorHeuristic h) {
 
 class StSeparatorConfig : public AbstractSeparatorConfig {
  public:
-  const int maxcut_{-1};
   const StSeparatorHeuristic heuristic_{StSeparatorHeuristic::GW1};
 
   StSeparatorConfig() = default;

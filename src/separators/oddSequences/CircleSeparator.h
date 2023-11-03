@@ -43,6 +43,7 @@ class CircleSeparator : public AbstractSeparator<CircleSeparatorConfig> {
  public:
   CircleSeparator(int degree, const CircleSeparatorConfig &config) : AbstractSeparator(degree, config) {}
   vector<GRBTempConstr> SeparateSolution(double *solution, GRBVar *vars) override;
+
   string Abbreviation() override {
     string res;
     switch (config_.inequality_type_) {

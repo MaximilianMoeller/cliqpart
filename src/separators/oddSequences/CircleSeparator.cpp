@@ -77,11 +77,14 @@ vector<GRBTempConstr> CircleSeparator::SeparateSolution(double *solution, GRBVar
   int found{0};
   vector<GRBTempConstr> violated_constraints;
 
-  // when always searching for violated constraints in the same order,
+  // When always searching for violated constraints in the same order,
   // it is likely that the later parts of the graph never get investigated, while for the earlier parts
   // the violated odd circle gets longer and longer.
-  // we therefore use a random shuffling of the nodes in each iteration
-  // note however that, given enough time (i.e., time limit big enough) the same constraints would be found!
+  // This is due to the time limit and the maxcut parameter.
+  // The computations for the first n calls to the shortest-path-subroutine don't run any faster just because they
+  // were already computed in a previous iteration.
+  // We therefore use a random shuffling of the nodes in each iteration
+  //  Note that, given enough time, the same constraints would be found!
   vector<int> shuffling(degree_);
   std::iota(shuffling.begin(), shuffling.end(), 0);
   std::shuffle(shuffling.begin(), shuffling.end(), std::mt19937{std::random_device{}()});
@@ -89,7 +92,7 @@ vector<GRBTempConstr> CircleSeparator::SeparateSolution(double *solution, GRBVar
   progressbar bar(degree_);
   // terminate separation early if enough constraints were found
   for (int i = 0; i < degree_; ++i) {
-    if (found >= config_.maxcut_) {
+    if (config_.maxcut_ > 0 && found >= config_.maxcut_) {
       break;
     }
     // terminate separation early if allowed time limit was exceeded
@@ -107,7 +110,7 @@ vector<GRBTempConstr> CircleSeparator::SeparateSolution(double *solution, GRBVar
 
     for (int j = 0; j < degree_; ++j) {
       if (i == j) continue;
-      if (found >= config_.maxcut_) {
+      if (config_.maxcut_ > 0 && found >= config_.maxcut_) {
         break;
       }
 
