@@ -263,10 +263,10 @@ int main(int argc, char *argv[]) {
                 PLOGI << "Found integral solution in iteration " << iteration << ".";
 
                 PLOGI_(CSV_LOG)
-                      << "{\"iteration\":" << iteration
-                      << ",\"obj_value\":" << model.get(GRB_DoubleAttr_ObjVal)
+                      << "{\"iteration\": " << iteration
+                      << ",\"obj_value\": " << model.get(GRB_DoubleAttr_ObjVal)
                       << ",\"violated_found\": 0"
-                      << ",\"separator\":\"Δ\"" // NOLINT(*-raw-string-literal)
+                      << ",\"separator\": \"Δ\"" // NOLINT(*-raw-string-literal)
                       << ",\"integral\": true"
                       << "}";
                 // very clear usage of goto, don't blame me
@@ -274,10 +274,10 @@ int main(int argc, char *argv[]) {
               }
 
               PLOGI_(CSV_LOG)
-                    << "{\"iteration\":" << iteration
-                    << ",\"obj_value\":" << model.get(GRB_DoubleAttr_ObjVal)
-                    << ",\"violated_found\":" << violated_constraints.size()
-                    << ",\"separator\":\"" << separator->Abbreviation() << "\""// NOLINT(*-raw-string-literal)
+                    << "{\"iteration\": " << iteration
+                    << ",\"obj_value\": " << model.get(GRB_DoubleAttr_ObjVal)
+                    << ",\"violated_found\": " << violated_constraints.size()
+                    << ",\"separator\": \"" << separator->Abbreviation() << "\""// NOLINT(*-raw-string-literal)
                     << ",\"integral\": false"
                     << "}";
 
@@ -309,10 +309,10 @@ int main(int argc, char *argv[]) {
               // debug verbosity level just to easily distinguish between this type of log and the one inside the
               // separator loop
               PLOGD_(CSV_LOG)
-                    << "{\"iteration\":" << iteration
-                    << ",\"obj_value\":" << model.get(GRB_DoubleAttr_ObjVal)
-                    << ",\"constraints_added\":" << violated_constraints.size()
-                    << ",\"constraints_removed\":" << removed
+                    << "{\"iteration\": " << iteration
+                    << ",\"obj_value\": " << model.get(GRB_DoubleAttr_ObjVal)
+                    << ",\"constraints_added\": " << violated_constraints.size()
+                    << ",\"constraints_removed\": " << removed
                     << "}";
             }
 
