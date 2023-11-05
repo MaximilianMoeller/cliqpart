@@ -13,7 +13,7 @@
 % spezielle Sonderzeichen
 \usepackage{textcomp}
 % deutsches Sprachpaket
-\usepackage[ngerman, english]{babel}
+\usepackage[english]{babel}
 %\usepackage{url}
 % Einbindung von Bildern
 \usepackage{graphicx}
@@ -49,6 +49,8 @@
 % Bibliography
 \usepackage[backend=biber, style=alphabetic]{biblatex}
 \addbibresource{references.bib}
+% ifthenelse command
+\usepackage{ifthen}
 
 % e.g. and i.e.
 \newcommand\eg{\textit{e}.\textit{g}.\ }
@@ -107,7 +109,7 @@
 % │ tikz │
 % └──────┘
 \usepackage{tikz}
-\usetikzlibrary{arrows, automata, positioning}
+\usetikzlibrary{arrows, automata, graphs, positioning}
 %\tikzset{
 %	->, % directed edges
 %	>=stealth, % bold arrow heads
