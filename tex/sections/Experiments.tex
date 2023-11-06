@@ -17,9 +17,25 @@ The code infrastructure is designed flexible enough to use the separation routin
 Therefore, replacing the LP solver would be fairly easy, \eg for comparing performances of different solvers for this specific problem.
 However, this is beyond the scope of the project.
 
+\subsection{Cut Generation}\label{subsec:cut_generation}
+The overall procedure of the algorithm is as follows.
+We create the LP from the instance data and create some separators according to a provided configuration.
+In every iteration we start by solving the current LP relaxation to obtain the solution $x^{*}$.
+If $x^{*}$ satsfies all triangle inequalities and is integral, we have found an optimal solution and terminate.
+Otherwise we call the separators each after another (starting with the triangle separator) to separate $x^{*}$.
+If violated constraints are found, we add them to the LP and start with the next iteration without calling any further separators.
+It may thus happen, that a particular separator is never called even it was created according to the configuration,
+\eg because an integral solution was found by just calling the separators before it, or because we terminated computation early for some other reason.
+
 \subsection{Cut Deletion}\label{subsec:cut_deletion}
-See \cite{sorensenSeparationHeuristic2Partition2020} \rightarrow delete cuts after they are inactive for 5 consecutive rounds (hard to implement, rather do if they are inactive in the current round) and objective value has strictly declined.
-Solves the LP much faster.
+In order to keep the LP at a reasonable size we decided to delete some cutting planes after adding new ones and before optimizing the model again.
+Due to implementation details we decided to just remove all non-binding constraints in the current solution.
+As \cite{sorensenSeparationHeuristic2Partition2020} pointed out we can only delete cuts if the objective value has strictly declined.
+Otherwise the algorithm might get stuck adding constraints we have previously removed, cycling through the vertices of a hyperplane of the polytope.
+
+\subsection{Iteration Limit}\label{subsec:iteration_limit}
+For some instances there is a tendency of the algorithm to add cuts that improve the objective value only marginally.
+There is a plethora of possible heuristics to avoid this, but we just decided to terminate the cutting plane procedure after 100\,000 iterations.
 
 \subsection{Separator Configurations}\label{subsec:run_configs}
 

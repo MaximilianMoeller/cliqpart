@@ -1,7 +1,56 @@
 \section{Data}\label{sec:data}
+In this section we will describe the data we used to test the separation routines.
+First we will present the instances available from the literature and then random instances we created.
+Every instance will get an abbreviation for later reference that we will denote by “Instance name (\texttt{Abbreviation})”.
+Furthermore, some of the instances can be parametrized in some way, \eg, the size of the instance, orthe parameters of a random distribution.
+We will include such parametrization parameters in the abbreviation.
+
+\subsection{Real-world data}
+\subsubsection{Cetacea (\texttt{Cet})}\label{subsubsec:data_cetacea}
+We copied this instance from \cite{grotschelCuttingPlaneAlgorithm1989}, in order to sanity-check our implementation.
+It is one of the easiest instances we tested, because an integral solution is already found after 2 iterations by just separating triangle inequalities.
+
+\subsubsection{Organoid Clustering (\texttt{organoid\_[size]\_[difficulty]})}
+In his master thesis, Jannik Presberger studied correlation clustering of organoids in light microscopy, where \CP showed up naturally as a the problem of clustering these organoids based on pairwise similarities.
+The findings of this work are yet to be published, but we obtained one instance after private communication.
+It consists of pairwise similarities of 160 organoids measured in an interval $(0,1)$, where a value of $1$ means that two organoids are identical and a value of $0$ means they are dissimilar.
+A challenge in modelling the similarity between different organoids was mapping one organoids components to those of another organoid.
+Their solution resulted in an asymmetric cost matrix, \ie for two organoids $i, j$ the similarity value $s(i,j)$ would not necessarily equal $s(j,i)$.
+For creating a \CP instance from this cost matrix we followed them in choosing the smaller of the two possibilities for $w_{ij}$.
+Note that these are maximization problems instead of the usual minimization.
+
+Since these are all positive values, the resulting \CP instance would be trivial.
+We therefore offset the values by subtracting a constant value $b$ from every one.
+Jannik Presberger informed us that $b \in \left\{ 0.500, 0.550, 0.585 \right\}$ were adequate values for such an offset and provided us with the optimal values for each of the corresponding instances.
+The running time of the ILP solver increases drastically as the offset approaches $b = 0.500$, which is to be expected, as this creates the most ‘conflicts’.
+However, we have also been informed that the obtained clusterings tend to be more meaningful for $b$’s in the vicinity of $0.500$.
+We have decided to call these instance \texttt{hard} ($b= 0.500$), \texttt{medium} ($b = 0.50$) and \texttt{soft} ($b = 0.585$), respectively.
+Furtermore, we have created subsets of these instances by just considering the first \texttt{size} organoids in the cost matrix.
+
+
+
+\subsubsection{Modularity Clustering}
 Janniks data is from \cite{kappesComparativeStudyModern2015a}, but that is not the original source...
-The other Janniks organoid data is “do be published”
-\subsection{Data format and configuration}\label{subsec:data_format}
-\subsection{Cetacea}\label{subsec:cetacea}
-Copied from \cite{grotschelCuttingPlaneAlgorithm1989}, but originally from \todo{insert original source}
+\todo{Write this section and add original source}
+
+
 \subsection{Random Data}\label{subsec:random_data}
+We also created \CP instances randomly and for different sizes.
+We will abbreviate all random instances starting with an \texttt{r\_} followed by the name and size of the instance,
+\eg, \texttt{r\_normal\_200\_[further parameters]} is an instance of $K_{200}$ with normally distributed edge weights according to further parameters.
+
+\subsubsection{Binary data (\texttt{r\_binary\_[size])}}\label{subsubsec:data_random_binary}
+The edge weights of the input graph are sampled from the set $\left\{ -1, 1 \right\}$ with equal probability.
+We created these instances with the intetion of being computationally ‘hard’.
+That is because choosing between rewarding and penalizing edges randomly with the same numeric incentive creates many ‘conflicts’.
+
+\subsubsection{Uniform distribution (\texttt{r\_uniform\_[size]\_[lb]\_[ub]})}\label{subsubsec:data_random_uniform}
+In this instance type the edge weights are sampled from a continuous uniform distribution with interval boundaries \texttt{lb} below and \texttt{ub} above and with $\text{\texttt{lb}} < \text{\texttt{ub}}$.
+We suspected these instances to be easier to solve than the binary data, especially when using asymetric boundaries, \eg \texttt{r\_uniform\_[size]\_-10\_+100}, because in an instance like this, ‘conflicts’ are often already solved by the numeric value of the ‘conflicting’ edges.
+
+\subsubsection{Normal distribution (\texttt{r\_normal\_[size]\_[mu]\_[sigma]})}\label{subsubsec:data_random_normal}
+Real-world data can often be described with normal distributions, which raises the question how applicable the separation routines are in practise.
+The edge weights of these instances are sampled from a normal distribution with mean \texttt{mu} and standard deviation \texttt{sigma}.
+We expected that a non-zero mean result in ‘easier’ instances, as many of the edges could be resolved trivially.
+Conversely, we expected little to no influence of the standard deviation to the ‘hardness’ of the instance.
+We have created instances for $(\text{\texttt{mu}}, \text{\texttt{sigma}}) \in \left\{ 0, 0.5, 2 \right\} \times \left\{ 0.5, 1, 2 \right\}$.

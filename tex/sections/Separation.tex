@@ -259,4 +259,5 @@ The construction of $H$ is as above with the only difference being the value of 
 For every $(i,j) \in V^{2}$ with $i \neq j$ we set the weight of the two arcs $(u_{1}^{i,j},u_{2}^{i,j})$ and $(\hat{u}_{1}^{i,j},\hat{u}_{2}^{i,j})$ to be $x_{ij}$.
 For every $(i,j,k) \in V^{3}$ with $i,j,k$ pairwise distinct, we set the weight of the inter-gadget edges $(u_{2}^{i,j},\hat{u}_{1}^{j,k})$ and $(\hat{u}_{2}^{i,j}, u_{1}^{j,k})$ to be $1 - x_{i,k}$.
 Note that the weights in $H$ are all non-negative now, and hence we can use Dijkstra’s algorithm to check whether any $u_{1}^{i,j}\hat{u}_{1}^{i,j}$-walk has weight strictly smaller than $3$.
-As a further improvement, we can skip expanding vertices in the routine, whenever their current distance to the start vertex is already bigger than $3$.
+This reduces running time to $\mathcal{O}(\lvert E \rvert + \lvert V \rvert \func{log} \lvert V \rvert) = \mathcal{O}(n^{3})$.
+As a further improvement, we can skip expanding vertices in the routine, whenever their current distance to the start vertex is already bigger than $3$, resulting in even faster average time.
