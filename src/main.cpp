@@ -18,6 +18,7 @@
 #include "ilp_callback.h"
 
 #define CSV_LOG 1
+#define ITERATION_LIMIT 100'000
 
 using namespace std;
 
@@ -291,8 +292,9 @@ int main(int argc, char *argv[]) {
               }
             }
 
-            // If no violated constraint has been found by any separator, terminate the LP loop
-            if (violated_constraints.empty()) {
+            // If no separator found any violated constraints, or the iteration limit is exceeded,
+            // terminate the LP loop
+            if (violated_constraints.empty() || iteration >= ITERATION_LIMIT) {
               break;
             }
               // otherwise, add violated constraints and remove inactive ones.
