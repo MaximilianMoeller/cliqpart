@@ -19,6 +19,7 @@
 
 #define CSV_LOG 1
 #define ITERATION_LIMIT 100'000
+#define TIME_LIMIT_SECONDS (60*60)
 
 using namespace std;
 
@@ -198,8 +199,8 @@ int main(int argc, char *argv[]) {
         PLOGI << "Starting run config '" << kRunConfig.name << "' for data set '" << data_dir_path << "'.";
 
         // ### BEGIN RUN SETUP ###
-        auto const kNow = std::chrono::system_clock::now();
-        auto const kInTimeT = std::chrono::system_clock::to_time_t(kNow);
+        auto const kRunStartTime = std::chrono::system_clock::now();
+        auto const kInTimeT = std::chrono::system_clock::to_time_t(kRunStartTime);
         std::stringstream run_start_time;
         run_start_time << std::put_time(std::localtime(&kInTimeT), "%Y-%m-%d-%X");
 
@@ -213,6 +214,7 @@ int main(int argc, char *argv[]) {
         }
 
         for (int run_counter = 1; run_counter <= kRunConfig.run_count; run_counter++) {
+          auto const kNumberedRunStartTime = std::chrono::steady_clock::now();
           PLOGI << "Starting run " << run_counter << "/" << kRunConfig.run_count << " for run config '"
                 << kRunConfig.name << "' and data set '" << data_dir_path << "'.";
 
@@ -243,6 +245,8 @@ int main(int argc, char *argv[]) {
 
           int iteration{0};
           vector<GRBTempConstr> violated_constraints;
+
+          bool time_limit_exceeded {false};
 
           // main LP loop, solving LP relaxation and adding violated constraints
           measurements_file_appender.setFileName((kNumberedRunDir / "measurements.csv").c_str());
@@ -292,9 +296,19 @@ int main(int argc, char *argv[]) {
               }
             }
 
+            // terminate separation early if allowed time limit was exceeded, check only every 10 iterations to
+            //  reduce the number of syscalls
+            if (iteration % 10 == 0) {
+              auto now = std::chrono::steady_clock::now();
+              auto elapsed = (std::chrono::duration_cast<std::chrono::seconds>(now - kNumberedRunStartTime)).count();
+              if (elapsed > TIME_LIMIT_SECONDS) {
+                time_limit_exceeded = true;
+              }
+            }
+
             // If no separator found any violated constraints, or the iteration limit is exceeded,
             // terminate the LP loop
-            if (violated_constraints.empty() || iteration >= ITERATION_LIMIT) {
+            if (violated_constraints.empty() || iteration >= ITERATION_LIMIT || time_limit_exceeded) {
               break;
             }
               // otherwise, add violated constraints and remove inactive ones.
