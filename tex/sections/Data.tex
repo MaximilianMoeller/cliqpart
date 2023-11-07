@@ -2,7 +2,7 @@
 In this section we will describe the data we used to test the separation routines.
 First we will present the instances available from the literature and then random instances we created.
 Every instance will get an abbreviation for later reference that we will denote by “Instance name (\texttt{Abbreviation})”.
-Furthermore, some of the instances can be parametrized in some way, \eg, the size of the instance, orthe parameters of a random distribution.
+Furthermore, some of the instances can be parametrized in some way, \eg, the size of the instance, or the parameters of a random distribution.
 We will include such parametrization parameters in the abbreviation.
 
 \subsection{Real-world data}
@@ -30,7 +30,7 @@ Furtermore, we have created subsets of these instances by just considering the f
 
 
 \subsubsection{Modularity Clustering}
-Janniks data is from \cite{kappesComparativeStudyModern2015a}, but that is not the original source...
+Janniks data is from \cite{kappesComparativeStudyModern2015}, but that is not the original source...
 \todo{Write this section and add original source}
 
 
@@ -51,6 +51,6 @@ We suspected these instances to be easier to solve than the binary data, especia
 \subsubsection{Normal distribution (\texttt{r\_normal\_[size]\_[mu]\_[sigma]})}\label{subsubsec:data_random_normal}
 Real-world data can often be described with normal distributions, which raises the question how applicable the separation routines are in practise.
 The edge weights of these instances are sampled from a normal distribution with mean \texttt{mu} and standard deviation \texttt{sigma}.
-We expected that a non-zero mean result in ‘easier’ instances, as many of the edges could be resolved trivially.
+We expected that a non-zero mean results in ‘easier’ instances, as many of the edges could be resolved trivially.
 Conversely, we expected little to no influence of the standard deviation to the ‘hardness’ of the instance.
 We have created instances for $(\text{\texttt{mu}}, \text{\texttt{sigma}}) \in \left\{ 0, 0.5, 2 \right\} \times \left\{ 0.5, 1, 2 \right\}$.

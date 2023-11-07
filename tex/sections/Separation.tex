@@ -21,20 +21,22 @@ The $2$-partition inequalities first described by \cite{grotschelFacetsCliquePar
 	For every $n \geq 3$ and every two nonempty subsets $S, T$ of $V_{n}$, the corresponding $2$-partition inequality is valid for $\mathscr{P}_{n}$.
 	It defines a facet if and only if $\lvert  S \rvert \neq \lvert T \rvert$.
 \end{theorem}
-
-\cite{oostenCliquePartitioningProblem2001a} showed that separation for this class of inequalities is already \textsc{NP}-hard for any fixed $\lvert S \rvert$.
+\cite{oostenCliquePartitioningProblem2001a} showed that separation of 2-partition inequalities is already \textsc{NP}-hard for any fixed $\lvert S \rvert$.
 We therefore resorted to the heuristic separation routines described in \cite{grotschelFacetsCliquePartitioning1990}.
+
+The 2-partition inequalities are even further generalized by the \textit{clique-web inequalities} presented in \cite{dezaCliqueWebFacetsMulticut1992}.
+This broader class does also contain other polynomial-time-seperable subclasses that we could not consider in the time available for the project.
 
 \subsection{Two-chorded odd cycle inequalities}\label{subsec:two_chorded_separator}
 \begin{definition}[Two-chorded cycle inequalities, Section 5 of \cite{grotschelFacetsCliquePartitioning1990}]\label{def:2-chorded_cycle_inequality}
-	Let $K_{n} = (V_{n}, E_{n})$ be a complete graph, let $5 \leq k \leq n$, and let $v: \Z_{k} \to \Z_{n}$ be injective.
+	Let $K_{n} = (V_{n}, E_{n})$ be a complete graph, let $5 \leq k \leq n$, and let $v: \Z_{k} \to V_{n}$ be injective.
 	The \textit{two-chorded cycle inequality} with respect to $v$ is defined as
 	\begin{equation}\label{eq:two-chorded_cycle_inequality}
 		\sum_{i \in \Z_{k}}^{} x_{v_{i}v_{i+1}} - x_{v_{i}v_{i+2}} \leq \left\lfloor \frac{1}{2} k \right\rfloor
 	\end{equation}
 \end{definition}
 \begin{theorem}[Theorem 5.1 of \cite{grotschelFacetsCliquePartitioning1990}]
-	Let $K_{n}$ be a complete graph, let $5 \leq k \leq n$, and let $v: \Z_{k} \to \Z_{n}$ be injective.
+	Let $K_{n}$ be a complete graph, let $5 \leq k \leq n$, and let $v: \Z_{k} \to V_{n}$ be injective.
 	Then the two-chorded cycle inequality with respect to $v$ is valid for $\mathscr{P}_{n}$.
 	It defines a facet if and only if $k$ is odd.
 \end{theorem}
@@ -49,13 +51,13 @@ distinct two-chorded odd cycle inequalities for $K_{n}$.
 	Analogous to the Proof of Proposition 20 in \cite{andresPolyhedralStudyLifted2022}.
 \end{proof}
 
-However, the class was shown to be seperable in polynomial time by \cite{mullerPartialOrderPolytope1996}.
+Independently, the class was shown to be seperable in polynomial time by \cite{mullerPartialOrderPolytope1996} and \cite{capraraChvatalGomoryCuts1996}.
+We will focus on the technique used by \cite{mullerPartialOrderPolytope1996}.
 Their paper is mainly concerned with the partial order polytope of a directed graph.
 The algorithm described for separating \textit{odd closed walk} inequalities can be adapted to to separate a class of valid inequalities for the \CP polytope, that contains the class of two-chorded odd cycle inequalities.
 
 In this paper, we are only interested in the class of two-chorded inequalities (and not this broader class) and will therefore repeat the argument given, but slightly adapted for this narrower class.
 
-The crucial step in understanding the proof is the following:
 Consider \cref{fig:support_graph_two-chorded_odd_cycle_inequality}.
 We can obtain the left-hand side of the associated inequality by following the closed walk
 \[
@@ -68,7 +70,7 @@ and adding up the corresponding entries of the solution vector $x^{*}$ multiplie
 As long as we only traverse odd cycles and their two-chords (and not even ones) this will always produce the left-hand side of a two-chorded odd cycle inequality and, crucially, we do not need to know the $k$ in advance.
 This suggests that we could try find some ‘special walk’ in an appropriate auxiliary graph $H$ where the structure of the graph prohibits us from ever taking walks along even cycles.
 
-\begin{figure}[H]
+\begin{figure}
 	\centering
 	\begin{tikzpicture}
         \def \n{6};
@@ -116,17 +118,20 @@ All edge weights are derived from \cref{eq:two-chorded_graph_weights}:
 %Note that $H$ connected for any $K_{n}$ with $n \geq 4$, but showing such a graph in full detail is rather confusing.
 
 We use the special node types $u$ and $\hat{u}$ to distinguish between even and odd cycles.
-Every odd cycle $v_{1}v_{2} \ldots v_{k}v_{1}$ in $K_{n}$ with $k$ odd induces a walk
+In fact, $H$ can be thought of a special kind of bipartide graph divided into ${U = \big\{ u_{1}^{i,j}, u_{2}^{i,j} \mid 0 \leq i,j \leq n, i \neq j \big\}}$ and $\hat{U} = \big\{ \hat{u}_{1}^{i,j}, \hat{u}_{2}^{i,j} \mid 0 \leq i,j \leq n, i \neq j \big\}$.
+This is obviously not a bipartition in the standart sense, because of the inner-gadget edges $(u_{1}^{i,j}, u_{2}^{i,j})$ and $(\hat{u}_{1}^{i,j}, \hat{u}_{2}^{i,j})$, but they are really only there to precisely obtain the left-hand side of the inequality.
+The essential part is that we mark a special pair of nodes ($u_{1}^{i,j}$ and $\hat{u}_{1}^{i,j}$) in the two different parts of the bipartide graph which allows us to easily distinguish between odd and even cycles:
+Every odd cycle $v_{0}v_{1} \ldots v_{k-1}v_{0}$ in $K_{n}$ where $k$ is odd induces a walk
 \[
-	u_{1}^{v_{1}, v_{2}}u_{2}^{v_{1}, v_{2}}\hat{u}_{1}^{v_{2}, v_{3}}\hat{u}_{2}^{v_{2}, v_{3}}
+	u_{1}^{v_{0}, v_{1}}u_{2}^{v_{0}, v_{1}}\hat{u}_{1}^{v_{1}, v_{2}}\hat{u}_{2}^{v_{1}, v_{2}}
 	\ldots
-	\hat{u}_{1}^{v_{k-1}, v_{k}}\hat{u}_{2}^{v_{k-1}, v_{k}}u_{1}^{v_{k}, v_{1}}u_{2}^{v_{k}, v_{1}}\hat{u}_{1}^{v_{1}, v_{2}}
+	\hat{u}_{1}^{v_{k-2}, v_{k-1}}\hat{u}_{2}^{v_{k-2}, v_{k-1}}u_{1}^{v_{k-1}, v_{0}}u_{2}^{v_{k-1}, v_{0}}\hat{u}_{1}^{v_{0}, v_{1}}
 \]
-in $H$, while every even cycle $v_{1}v_{2} \ldots v_{k}v_{1}$ with $k$ even induces a walk
+in $H$, while every even cycle $v_{0}v_{1} \ldots v_{k-1}v_{0}$ with $k$ even induces a walk
 \[
-	u_{1}^{v_{1}, v_{2}}u_{2}^{v_{1}, v_{2}}\hat{u}_{1}^{v_{2}, v_{3}}\hat{u}_{2}^{v_{2}, v_{3}}
+	u_{1}^{v_{0}, v_{1}}u_{2}^{v_{0}, v_{1}}\hat{u}_{1}^{v_{1}, v_{2}}\hat{u}_{2}^{v_{1}, v_{2}}
 	\ldots
-	u_{1}^{v_{k-1}, v_{k}}u_{2}^{v_{k-1}, v_{k}}\hat{u}_{1}^{v_{k}, v_{1}}\hat{u}_{2}^{v_{k}, v_{1}}u_{1}^{v_{1}, v_{2}}
+	u_{1}^{v_{k-2}, v_{k-1}}u_{2}^{v_{k-2}, v_{k-1}}\hat{u}_{1}^{v_{k-1}, v_{0}}\hat{u}_{2}^{v_{k-1}, v_{0}}u_{1}^{v_{0}, v_{1}}
 .\]
 
 Conversely, every $u_{1}^{i,j}\hat{u}_{1}^{i,j}$-walk in $H$ corresponds to an odd cycle in $K_{n}$ and the weight of this walk is precisely the left-hand side of \cref{eq:two-chorded_graph_weights}.
@@ -218,7 +223,7 @@ For $n \in \N$ the auxiliary graph $H$ for $K_{n}$ has the following dimensions:
 	\lvert V_{H} \rvert &= 4 \left( n(n-1) \right) = 4n^{2} - 4n \\
 	\lvert E_{H} \rvert &= \underbrace{2 \left( n(n-1) \right)}_{\text{inner-gadget edges}} + \underbrace{2 \left( n(n-1)(n-2) \right)}_{\text{inter-gadget edges}} = 2n^{3} - 4n^{2} + 2n \\
 \end{align*}
-Since the graph can contains edges with negative costs, Dijkstra’s Algorithm won’t suffice.
+Since the graph can contains edges with negative costs, Dijkstra’s Algorithm is not applicable.
 We implemented a Belman-Ford algorithm, \ie, a single-source-single-target shortest path algorithm that runs in time $\mathcal{O}(\lvert V_{H} \rvert \cdot \lvert E_{H} \rvert) = \mathcal{O}(n^{5})$.
 We need to run the algorithm for every $u_{1}^{i,j}\hat{u}_{1}^{i,j}$-pair in the auxiliary graph, \ie, $\mathcal{O}(n^{2})$ many times resulting in an overall run-time of $\mathcal{O}(n^{7})$.
 While a Floyd-Warshall algorithm would take only $\mathcal{O}(\lvert V \rvert^3) = \mathcal{O}(n^{6})$ many steps in total, there are some disadvantages that discouraged us from using it.
@@ -232,14 +237,14 @@ This is simply not possible for the Floyd-Warshall algorithm, which needs to be 
 \subsection{Half-chorded odd cycle inequalities}\label{subsec:half_chorded_separator}
 
 \begin{definition}[Half-chorded odd cycle inequalities, Definition 10 of \cite{andresPolyhedralStudyLifted2022}]\label{def:half-chorded}
-	Let $5 \leq k \leq n$ with $k$ odd, let $d = \frac{k-1}{2}$, and let $v: \Z_{k} \to \Z_{n}$ be injective.
+	Let $5 \leq k \leq n$ with $k$ odd, let $d = \frac{k-1}{2}$, and let $v: \Z_{k} \to V_{n}$ be injective.
 	The \textit{half-chorded odd cycle inequality} with respect to $v$ is defined as
 	\begin{equation}\label{eq:half-chorded}
 		\sum_{i \in \Z_{k}}^{} (x_{v_{i} v_{i+1}} - x_{v_{i} v_{i+d} }) \leq k - 3
 	\end{equation}
 \end{definition}
 \begin{theorem}[Proposition 22 of \cite{andresPolyhedralStudyLifted2022}]
-	Let $K_{n}$ be a complete graph, let $5 \leq k \leq n$, and let $v: \Z_{k} \to \Z_{n}$ be injective.
+	Let $K_{n}$ be a complete graph, let $5 \leq k \leq n$, and let $v: \Z_{k} \to V_{n}$ be injective.
 	Then the half-chorded cycle inequality with respect to $v$ is valid for $\mathscr{P}_{n}$.
 	It defines a facet if and only if $k$ is odd.
 \end{theorem}
@@ -249,7 +254,7 @@ We can therefore rewrite this equation as
 \begin{equation*}
 \sum_{i \in \Z_{k}}^{} (x_{w_{i}w_{i+2}} - x_{w_{i}w_{i+1}}) \leq k-3
 \end{equation*}
-where $w: \Z_{k} \to \Z_{n}, i \mapsto v_{i \cdot d}$.
+where $w: \Z_{k} \to V_{n}, i \mapsto v_{i \cdot d}$.
 By subtracting $k$ from both sides and multiplying by $-1$ we obtain:
 \begin{equation*}
 	\sum_{i \in \Z_{k}}^{} \Bigl( \underbrace{x_{w_{i}w_{i+1}}}_{\text{inner-gadget weight}} + \underbrace{1 -x_{w_{i}w_{i+2}}}_{\text{inter-gadged weight}} \Bigr) \geq 3.

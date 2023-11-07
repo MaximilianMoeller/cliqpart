@@ -35,7 +35,7 @@ The objective is to cluster a given set of objects with respect to their pairwis
 	\]
 \end{definition}
 A clique partitioning $A$ consists precisely of the edges that connect vertices within the same block $W_i$ of the partition $\Gamma$.
-Thus, every clique partitioning $A$ induces an equivalence relation $\sim_A$ on $V$, and every equivalence relation on $V$ corresponds uniquely to a clique partitioning of $G$.
+Thus, every clique partitioning $A$ induces an equivalence relation $\sim_A$ on $V$.
 \cref{fig:example_clique_partitioning} shows an example of a clique partitioning.
 
 \begin{figure}[H]
@@ -66,10 +66,11 @@ Thus, every clique partitioning $A$ induces an equivalence relation $\sim_A$ on 
 	\label{fig:example_clique_partitioning}
 \end{figure}
 
-Typically, one only considers complete graphs $K_n$, as this poses the least restrictions on the set of feasible solutions.
-Consider the example given in \cref{fig:incomplete_graph}.
-The nodes $i$ and $k$ cannot end up in the same block of the partition except $j$ is also in this block.
-In many applications of \CP (\eg the instances given in \cite{grotschelCuttingPlaneAlgorithm1989}), every clique partitioning should be a feasible solution.
+Typically, one only considers complete graphs $K_n$, because then a clique partitioning indicates for every pair of nodes whether they are in the same block or not.
+That is because for a complete graph $K_{n} = (V_{n}, \binom{V_{n}}{2})$, every equivalence relation on $V_{n}$ corresponds uniquely to a clique partitioning of $G$.
+Consider on the other hand \cref{fig:incomplete_graph}.
+We could not distinguish the partionings $\Gamma_{1} = \left\{ \left\{ i \right\}, \left\{ j \right\}, \left\{ k \right\} \right\}$ and $\Gamma_{2} = \left\{ \left\{ i, k \right\}, \left\{ j \right\} \right\}$, because they both correspond to the empty clique partitioning $A = \emptyset$.
+However, in many applications of \CP (\eg the instances given in \cite{grotschelCuttingPlaneAlgorithm1989}), every partitioning should be a feasible solution.
 We will therefore restrict our attention to the case of complete graphs for the rest of the paper.
 With this assumption every block $W_i$ induces a clique, \ie a complete subgraph of $G$, hence the name \textit{clique} partitioning.
 
@@ -125,7 +126,7 @@ Notice that for each set $\left\{ i,j,k \right\} \subseteq V$ of pairwise distin
 \end{align*}
 We will however refer to these three as \textit{the} triangle inequality with respect to $\left\{ i,j,k \right\}$.
 
-In combination with an ILP solver (we used \href{www.gurobi.com}{gurobi}) the triangle inequalities already suffice to arrive at optimal solutions.
+In combination with an ILP solver (we used Gurobi \cite{gurobioptimizationllcGurobiOptimizerReference2023}) the triangle inequalities already suffice to arrive at optimal solutions.
 However these computations might require great amounts of computational resources.
 We observed that for some – admittedly ‘difficult’ – instances the solver could not produce a single solution within half an hour on fairly modern hardware (see \cref{subsec:experiments_setup}).
 

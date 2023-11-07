@@ -1,6 +1,6 @@
 \section{Computational Experiments}\label{sec:experiments}
 In this section we describe the experiments performed and present the results obtained from them.
-First we explain the setup and configurations for the separators mentioned in \cref{sec:separation}.
+First we explain the setup and configurations for the separation routines (\textit{separators} for short) mentioned in \cref{sec:separation}.
 Then we present the computational results along with some indications to their expressiveness.
 
 \subsection{Setup}\label{subsec:experiments_setup}
@@ -30,12 +30,13 @@ It may thus happen, that a particular separator is never called even it was crea
 \subsection{Cut Deletion}\label{subsec:cut_deletion}
 In order to keep the LP at a reasonable size we decided to delete some cutting planes after adding new ones and before optimizing the model again.
 Due to implementation details we decided to just remove all non-binding constraints in the current solution.
-As \cite{sorensenSeparationHeuristic2Partition2020} pointed out we can only delete cuts if the objective value has strictly declined.
+As \cite{sorensenSeparationHeuristic2Partition2020} pointed out we can only delete cuts if the objective value has strictly worsened.
 Otherwise the algorithm might get stuck adding constraints we have previously removed, cycling through the vertices of a hyperplane of the polytope.
 
-\subsection{Iteration Limit}\label{subsec:iteration_limit}
-For some instances there is a tendency of the algorithm to add cuts that improve the objective value only marginally.
-There is a plethora of possible heuristics to avoid this, but we just decided to terminate the cutting plane procedure after 100\,000 iterations.
+\subsection{Limiting Computation}\label{subsec:limiting_computation}
+For some instances there is a tendency of the algorithm to add cuts that improve the objective value only marginally for a large number of iterations in a row.
+This results in extremely time-consuming computations, for which it was even difficult to give an estimate about how long they might continue.
+There is a plethora of possible heuristics to avoid this, but we just decided to terminate the cutting plane procedure after 100\,000 iterations or after an hour of computation time, whichever happens first.
 
 \subsection{Separator Configurations}\label{subsec:run_configs}
 
