@@ -11,8 +11,8 @@ We copied this instance from \cite{grotschelCuttingPlaneAlgorithm1989}, in order
 It is one of the easiest instances we tested, because an integral solution is already found after 2 iterations by just separating triangle inequalities.
 
 \subsubsection{Organoid Clustering (\texttt{organoid\_[size]\_[difficulty]})}
-In his master thesis, Jannik Presberger studied correlation clustering of organoids in light microscopy, where \CP showed up naturally as a the problem of clustering these organoids based on pairwise similarities.
-The findings of this work are yet to be published, but we obtained one instance after private communication.
+In \cite{presbergerSegmentationClusteringOrganoids2023} the author studied clustering of organoids in light microscopy images, where \CP showed up naturally.
+The findings of this work are yet to be published in a separate paper, but we obtained one instance after private communication.
 It consists of pairwise similarities of 160 organoids measured in an interval $(0,1)$, where a value of $1$ means that two organoids are identical and a value of $0$ means they are dissimilar.
 A challenge in modelling the similarity between different organoids was mapping one organoids components to those of another organoid.
 Their solution resulted in an asymmetric cost matrix, \ie for two organoids $i, j$ the similarity value $s(i,j)$ would not necessarily equal $s(j,i)$.
@@ -21,13 +21,11 @@ Note that these are maximization problems instead of the usual minimization.
 
 Since these are all positive values, the resulting \CP instance would be trivial.
 We therefore offset the values by subtracting a constant value $b$ from every one.
-Jannik Presberger informed us that $b \in \left\{ 0.500, 0.550, 0.585 \right\}$ were adequate values for such an offset and provided us with the optimal values for each of the corresponding instances.
+J. Presberger informed us that $b \in \left\{ 0.500, 0.550, 0.585 \right\}$ were adequate values for such an offset and provided us with the optimal values for each of the corresponding instances.
 The running time of the ILP solver increases drastically as the offset approaches $b = 0.500$, which is to be expected, as this creates the most ‘conflicts’.
 However, we have also been informed that the obtained clusterings tend to be more meaningful for $b$’s in the vicinity of $0.500$.
-We have decided to call these instance \texttt{hard} ($b= 0.500$), \texttt{medium} ($b = 0.50$) and \texttt{soft} ($b = 0.585$), respectively.
+We decided to call these instance \texttt{hard} ($b= 0.500$), \texttt{medium} ($b = 0.50$) and \texttt{soft} ($b = 0.585$), respectively.
 Furtermore, we have created subsets of these instances by just considering the first \texttt{size} organoids in the cost matrix.
-
-
 
 \subsubsection{Modularity Clustering}
 Janniks data is from \cite{kappesComparativeStudyModern2015}, but that is not the original source...
