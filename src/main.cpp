@@ -258,8 +258,13 @@ int main(int argc, char *argv[]) {
 
             // enumerating violated constraints
             violated_constraints = {};
+
             for (auto &separator : separators) {
-              violated_constraints = separator->SeparateSolution(model.GetSolution(), model.GetVars());
+              double* solution = model.GetSolution();
+
+              violated_constraints = separator->SeparateSolution(solution, model.GetVars());
+
+              delete[](solution);
 
               // if the triangle separator found no violated constraints and the solution is integral,
               // there is no need to search for other violated inequalities,

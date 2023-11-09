@@ -55,9 +55,11 @@ CliquePartModel::CliquePartModel(GRBEnv &grb_env, const string &data_path, DataC
 bool CliquePartModel::IsIntegral() {
   auto sol = GetSolution();
   std::vector<double> vec_sol(sol, sol + EdgeCount());
-  return std::all_of(vec_sol.begin(),
-                     vec_sol.end(),
-                     [this](double x) { return std::abs(x - std::floor(x + 0.5)) <= integrality_tolerance; });
+  bool result = std::all_of(vec_sol.begin(),
+                            vec_sol.end(),
+                            [this](double x) { return std::abs(x - std::floor(x + 0.5)) <= integrality_tolerance; });
+  delete[](sol);
+  return result;
 }
 
 bool CliquePartModel::ObjectiveDeclined(double current_objective) {
@@ -79,7 +81,7 @@ int CliquePartModel::DeleteCuts() {
     PLOGD << "Objective declined from " << worst_objective_ << " to " << current_obj_value << "! "
           << "Searching for inactive constraints to remove.";
     auto constraint_count = get(GRB_IntAttr_NumConstrs);
-    auto constraints = getConstrs();
+    GRBConstr* constraints = getConstrs();
 
     for (int i = 0; i < constraint_count; ++i) {
       GRBConstr constraint = constraints[i];
@@ -97,6 +99,7 @@ int CliquePartModel::DeleteCuts() {
     }
 
     worst_objective_ = current_obj_value;
+    delete[](constraints);
   } else {
     PLOGD << "Objective did not decline, is still " << current_obj_value << "! Not deleting any cuts.";
   }
