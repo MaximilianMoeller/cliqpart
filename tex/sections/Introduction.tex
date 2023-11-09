@@ -101,6 +101,7 @@ More ‘interesting’ instances must therefore contain ‘conflicts’, \ie the
 Any valid clique partitioning of a (complete) graph $K_{n}=(V_{n}, E_{n})$ can be characterized by a vector $x \in \left\{ 0,1 \right\}^{E_{n}}$.
 For any edge $e \in E_{n}$ the value $x_{e} = 1$ means that $e \in A$, and $x_{e} = 0$ means that $e \notin A$.
 The \CP polytope $\mathscr{P}_{n}$ is then the convex hull of all characteristic vectors of clique partitionings of the complete graph $K_{n}$.
+
 A full description of this polytope by linear inequalities is unlikely, unless $\var{P} = \var{NP}$.
 However, many classes of valid and facet-defining inequalities have been found by the research community.
 Section 2 of \cite{andresPolyhedralStudyLifted2022} gives a comprehensive overview over know classes as well as over the history of the problem.
@@ -135,3 +136,16 @@ This method is neither guaranteed to produce integral solutions nor can it give 
 Nevertheless, one can imagine applications where a ‘good’ estimate on the optimal solution can already be of use.
 We will compare the results of this approach with optimal solutions obtained by the ILP solver when available.
 For bigger instances, comparing only the results obtained by different parametrizations of the cutting plane procedure might already give a ‘good’ estimate on the optimal objective value.
+
+\subsection{The Multicut Problem}
+We briefly mention that the \CP problem is equivalent to the multicut problem (see \eg \cite{chopraPartitionProblem1993}, \cite{dezaCliqueWebFacetsMulticut1992}).
+The main difference is that for a clique partitioning $A$ of $K_{n}$, a multicut consist precisely of the edges $E_{n} \setminus A$.
+For any edge $e \in E_{n}$ the value $x_{e} = 1$ for the multicut variable means that $e$ is part of the multicut, \ie not part of the correpsonding \CP, and vice versa.
+We therefore get the following relation between the \CP polytope $\mathscr{P}_{n}$ and the multicut polytope $\mathscr{M}_{n}$:
+\[
+	\mathscr{M}_{n} = \left\{ \mathbbm{1}^{E_{n}} - x \mid x \in \mathscr{P}_{n} \right\}
+\]
+where $\mathbbm{1}^{E_{n}}$ denotes the vector of dimension $\lvert E_{n} \rvert$ with all entries equal to $1$.
+
+Furthermore, the multicut problem is seldom restricted to the case of complete graphs.
+However, any results obtained for the multicut problem of the complete graph can be easily transferred to the \CP problem and vice versa.

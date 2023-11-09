@@ -6,17 +6,18 @@ Furthermore, some of the instances can be parametrized in some way, \eg, the siz
 We will include such parametrization parameters in the abbreviation.
 
 \subsection{Real-world data}
-\subsubsection{Cetacea (\texttt{Cet})}\label{subsubsec:data_cetacea}
-We copied this instance from \cite{grotschelCuttingPlaneAlgorithm1989}, in order to sanity-check our implementation.
-It is one of the easiest instances we tested, because an integral solution is already found after 2 iterations by just separating triangle inequalities.
+\subsubsection{Cetacea (\texttt{cetacea}) and Wild Cats (\texttt{cats})}\label{subsubsec:data_cetacea}
+These instances arose from the classification of cetacea (whales, porpoises, and dolphins) and wild cats, respectively.
+We copied them from \cite{grotschelCuttingPlaneAlgorithm1989}, in order to sanity-check our implementation,
+and consider them as the easiest among our test data, because integral solution were already found after 2 (resp. 3) iterations by just separating triangle inequalities.
 
 \subsubsection{Organoid Clustering (\texttt{organoid\_[size]\_[difficulty]})}
 In \cite{presbergerSegmentationClusteringOrganoids2023} the author studied clustering of organoids in light microscopy images, where \CP showed up naturally.
 The findings of this work are yet to be published in a separate paper, but we obtained one instance after private communication.
 It consists of pairwise similarities of 160 organoids measured in an interval $(0,1)$, where a value of $1$ means that two organoids are identical and a value of $0$ means they are dissimilar.
 A challenge in modelling the similarity between different organoids was mapping one organoids components to those of another organoid.
-Their solution resulted in an asymmetric cost matrix, \ie for two organoids $i, j$ the similarity value $s(i,j)$ would not necessarily equal $s(j,i)$.
-For creating a \CP instance from this cost matrix we followed them in choosing the smaller of the two possibilities for $w_{ij}$.
+Their solution resulted in an asymmetric cost matrix $C$, \ie for two organoids $i, j$ the similarity value $C_{i,j}$ would not necessarily equal $C_{j,i}$.
+For creating a \CP instance from this cost matrix we chose $w_{ij} = \func{min}(C_{i,j}, C_{j,i})$.
 Note that these are maximization problems instead of the usual minimization.
 
 Since these are all positive values, the resulting \CP instance would be trivial.
@@ -24,22 +25,32 @@ We therefore offset the values by subtracting a constant value $b$ from every on
 J. Presberger informed us that $b \in \left\{ 0.500, 0.550, 0.585 \right\}$ were adequate values for such an offset and provided us with the optimal values for each of the corresponding instances.
 The running time of the ILP solver increases drastically as the offset approaches $b = 0.500$, which is to be expected, as this creates the most ‘conflicts’.
 However, we have also been informed that the obtained clusterings tend to be more meaningful for $b$’s in the vicinity of $0.500$.
-We decided to call these instance \texttt{hard} ($b= 0.500$), \texttt{medium} ($b = 0.50$) and \texttt{soft} ($b = 0.585$), respectively.
+We decided to call the instance \texttt{hard} ($b= 0.500$), \texttt{medium} ($b = 0.50$) and \texttt{soft} ($b = 0.585$), respectively.
 Furtermore, we have created subsets of these instances by just considering the first \texttt{size} organoids in the cost matrix.
 
 \subsubsection{Modularity Clustering}
-Janniks data is from \cite{kappesComparativeStudyModern2015}, but that is not the original source...
-\todo{Write this section and add original source}
-
+We tested our algorithm on six instances described in \cite{kappesComparativeStudyModern2015} in the context of clustering with respect to modularity.
+We refer to \cite{brandesModularityClustering2008} for the origin of three of these instances; the origin of the others is unknown to us.
+Their names are in order of the instance size \texttt{football} (115), \texttt{adjnoun} (112), \texttt{polbooks} (105), \texttt{lesmis} (77), \texttt{dolphins} (62) and \texttt{karate} (34).
+\cite{kappesComparativeStudyModern2015} have computed optimal solutions for all of them except \texttt{adjnoun}.
+Note that these are originally instances of the multicut problem.
+An optimal objective value of the corresponding \CP instance is obtained as follows:
+Let $K_{n} = (V_{n}, E_{n})$ be a complete graph and let $w \in \R^{E_{n}}$ be a cost vector.
+For all edges $e \in E_{n}$ we denote by $x_{e}$ the corresponding variable in the \CP instance defined by $K_{n}$ and $w$, and by $y_{e}$ the corresponding variable in the multicut problem instance defined by $K_{n}$ and $w$.
+The objective values of these problems are connected as follows:
+\[
+	\sum_{e \in E} x_{e} w_{e} = \sum_{e \in E}^{} (1-y_{e}) w_{e} = \sum_{e \in E}^{} w_{e} - \sum_{e \in E}^{} y_{e} w_{e}
+\]
+This allowes us to compare the results of our algorithm to the best known solution of the \texttt{adjnoun} instance and to the optimal solutions of the other instances. 
 
 \subsection{Random Data}\label{subsec:random_data}
 We also created \CP instances randomly and for different sizes.
 We will abbreviate all random instances starting with an \texttt{r\_} followed by the name and size of the instance,
-\eg, \texttt{r\_normal\_200\_[further parameters]} is an instance of $K_{200}$ with normally distributed edge weights according to further parameters.
+\eg, \texttt{r\_normal\_200\_[further parameters]} is an instance of $K_{200}$ with edge weights sampled from a normal distribution with \texttt{further parameters}.
 
 \subsubsection{Binary data (\texttt{r\_binary\_[size])}}\label{subsubsec:data_random_binary}
 The edge weights of the input graph are sampled from the set $\left\{ -1, 1 \right\}$ with equal probability.
-We created these instances with the intetion of being computationally ‘hard’.
+We created these instances with the intetion of being ‘hard’ to solve.
 That is because choosing between rewarding and penalizing edges randomly with the same numeric incentive creates many ‘conflicts’.
 
 \subsubsection{Uniform distribution (\texttt{r\_uniform\_[size]\_[lb]\_[ub]})}\label{subsubsec:data_random_uniform}

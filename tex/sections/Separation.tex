@@ -223,12 +223,12 @@ For $n \in \N$ the auxiliary graph $H$ for $K_{n}$ has the following dimensions:
 	\lvert V_{H} \rvert &= 4 \left( n(n-1) \right) = 4n^{2} - 4n \\
 	\lvert E_{H} \rvert &= \underbrace{2 \left( n(n-1) \right)}_{\text{inner-gadget edges}} + \underbrace{2 \left( n(n-1)(n-2) \right)}_{\text{inter-gadget edges}} = 2n^{3} - 4n^{2} + 2n \\
 \end{align*}
-Since the graph can contains edges with negative costs, Dijkstra’s Algorithm is not applicable.
-We implemented a Belman-Ford algorithm, \ie, a single-source-single-target shortest path algorithm that runs in time $\mathcal{O}(\lvert V_{H} \rvert \cdot \lvert E_{H} \rvert) = \mathcal{O}(n^{5})$.
+Since the graph can contains edges with negative costs, Dijkstra’s Algorithm (\cite{dijkstraNoteTwoProblems1959}) is not applicable.
+We implemented a Bellman-Ford algorithm (\cite{bellmanRoutingProblem1958}, \cite{fordNetworkFlowTheory1956}), \ie, a single-source-single-target shortest path algorithm that runs in time $\mathcal{O}(\lvert V_{H} \rvert \cdot \lvert E_{H} \rvert) = \mathcal{O}(n^{5})$.
 We need to run the algorithm for every $u_{1}^{i,j}\hat{u}_{1}^{i,j}$-pair in the auxiliary graph, \ie, $\mathcal{O}(n^{2})$ many times resulting in an overall run-time of $\mathcal{O}(n^{7})$.
-While a Floyd-Warshall algorithm would take only $\mathcal{O}(\lvert V \rvert^3) = \mathcal{O}(n^{6})$ many steps in total, there are some disadvantages that discouraged us from using it.
-Firstly, the Belman-Ford algorithm has space complexity of $\mathcal{O}(\lvert V \rvert) = \mathcal{O}(n^{2})$ whereas the space complexity of the Floyd-Warshall algorithm is of the order $\mathcal{O}(\lvert V \rvert^{2}) = \mathcal{O}(n^{4})$, which caused the algorithm to exceed 64GB of memory for our largest instances.
-Secondly, we do not have to compute all $\mathcal{O}(n^{2})$ many Belman-Ford iterations, if we simply choose not to.
+While a Floyd-Warshall algorithm (\cite{floydAlgorithm97Shortest1962}, \cite{warshallTheoremBooleanMatrices1962}) would take only $\mathcal{O}(\lvert V \rvert^3) = \mathcal{O}(n^{6})$ many steps in total, there are some disadvantages that discouraged us from using it.
+Firstly, the Bellman-Ford algorithm has space complexity of $\mathcal{O}(\lvert V \rvert) = \mathcal{O}(n^{2})$ whereas the space complexity of the Floyd-Warshall algorithm is of the order $\mathcal{O}(\lvert V \rvert^{2}) = \mathcal{O}(n^{4})$, which caused the algorithm to exceed 64GB of memory for our largest instances.
+Secondly, we do not have to compute all $\mathcal{O}(n^{2})$ many Bellman-Ford iterations, if we simply choose not to.
 We could, \eg, terminate after some number of violated constraints have been found, or if some time limit is exceeded.
 In this case we would still be able to report on the violated constraints found so far and add them to the next iteration of the LP.
 This is simply not possible for the Floyd-Warshall algorithm, which needs to be computed completely before any violated constraint can be found.
