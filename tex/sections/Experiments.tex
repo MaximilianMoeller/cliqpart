@@ -39,10 +39,29 @@ This results in extremely time-consuming computations, for which it was even dif
 There is a plethora of possible heuristics to avoid this, but we just decided to terminate the cutting plane procedure after 100\,000 iterations or after an hour of computation time, whichever happens first.
 
 \subsection{Separator Configuration}\label{subsec:run_configs}
-As for the data instances, every separator will get an abbreviation extended by configuration parameters so we can refer to them easily when discussing results.
-\todo{Write about \texttt{maxcut} and \texttt{tolerance} for all separators}
+We will now describe configuration parameters for the different separators.
+Like for the data instances, every separator will get an abbreviation so we can refer to them easily when discussing results.
+
+Due to numerical reasons we introduced a parameter \texttt{tolerance} for all separators and only regarded a constraint as violated if its degree of violation was bigger than \texttt{tolerance}.
+That is, for any constraint $a^{\top} x^{*} \leq \alpha$ we only consider it violated if $a^{\top} x^{*} - \alpha > \texttt{tolerance}$.
+We chose $\texttt{tolerance} = \num{e-6}$ for the whole project.
+Furthermore, we considered any solution $x^{*}$ integral if the following condition holds for all $e \in E_{n}$:
+\[
+ \big\lvert x_{e}^{*} - \lfloor x_{e}^{*} + 0.5 \rfloor \big\rvert \leq \texttt{tolerance}
+\]
+
+We limited the number of constraints that we would add in every iteration of the cutting plane algorithm by a parameter \texttt{maxcut}.
+If we were to set $\texttt{maxcut} = \infty$, \ie not restricting the number of added cutting planes, thousands of violated constraints could be found for even medium sized instances in every iteration.
+This would generally result in slower solving of the LP relaxition, which might result in slower overall performance.
+On the other hand, setting \texttt{maxcut} too small would result in only small improvements from one iteration to the next.
+In order to compare our results with those of \cite{grotschelCuttingPlaneAlgorithm1989} for the instances \texttt{cetacea} and \texttt{cats}, we chose $\texttt{maxcut} = 400$ for all separators.
+As we will discuss later, our obtained results suggest that $\texttt{maxcut} = 400$ was in fact not optimal for our problem instances or the modern hardware,
+but we did not experiment with this parameter enough to find better values.
 
 \subsubsection{Triangle Separator (\texorpdfstring{$\texttt{Δ}_{\texttt{[maxcut]}}^{\texttt{[variable once]}}$}{Δ})}
+\todo{we only enumerated 4*maxcut many and returned the maxcut most violated once}
+\todo{actually used maxcut = infinity}
+\todo{variable once}
 \subsubsection{2-partition Separator (\texorpdfstring{$\texttt{st}_{\texttt{[maxcut]}}^{\texttt{[heuristic]}}$}{Δ})}
 \subsubsection{two-chorded odd cycle Separator (\texorpdfstring{$\texttt{two}_{\texttt{[maxcut]}}$}{Δ})}
 \subsubsection{half-chorded odd cycle Separator (\texorpdfstring{$\texttt{half}_{\texttt{[maxcut]}}$}{Δ})}

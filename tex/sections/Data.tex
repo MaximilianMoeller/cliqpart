@@ -26,6 +26,7 @@ J. Presberger informed us that $b \in \left\{ 0.500, 0.550, 0.585 \right\}$ were
 The running time of the ILP solver increases drastically as the offset approaches $b = 0.500$, which is to be expected, as this creates the most ‘conflicts’.
 However, we have also been informed that the obtained clusterings tend to be more meaningful for $b$’s in the vicinity of $0.500$.
 We decided to call the instance \texttt{hard} ($b= 0.500$), \texttt{medium} ($b = 0.50$) and \texttt{soft} ($b = 0.585$), respectively.
+For numerical reasons, we scaled all weights by multiplying them by $\num{e3}$.
 Furtermore, we have created subsets of these instances by only considering the first \texttt{size} organoids, \ie the upper left $\texttt{size} \times \texttt{size}$ submatrix of $C$.
 
 \subsubsection{Modularity Clustering}
@@ -42,6 +43,7 @@ The objective values of these problems are connected as follows:
 	\sum_{e \in E} x_{e} w_{e} = \sum_{e \in E}^{} (1-y_{e}) w_{e} = \sum_{e \in E}^{} w_{e} - \sum_{e \in E}^{} y_{e} w_{e}
 \]
 This allowes us to compare the results of our algorithm to the best known solution of the \texttt{adjnoun} instance and to the optimal solutions of the other instances. 
+Again, for numerical reasons, we scaled all these instances by multiplying edge weights by $\num{e3}$.
 
 \subsection{Random Data}\label{subsec:random_data}
 We also created \CP instances randomly and for different sizes.
