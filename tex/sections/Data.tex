@@ -1,7 +1,7 @@
 \section{Data}\label{sec:data}
 In this section we will describe the data we used to test the separation routines.
 First we will present the instances available from the literature and then random instances we created.
-Every instance will get an abbreviation for later reference that we will denote by “Instance name (\texttt{Abbreviation})”.
+Every instance will get an abbreviation for later reference that we will denote by “Instance name (\texttt{abbreviation})”.
 Furthermore, some of the instances can be parametrized in some way, \eg, the size of the instance, or the parameters of a random distribution.
 We will include such parametrization parameters in the abbreviation.
 
@@ -20,13 +20,13 @@ Their solution resulted in an asymmetric cost matrix $C$, \ie for two organoids 
 For creating a \CP instance from this cost matrix we chose $w_{ij} = \func{min}(C_{i,j}, C_{j,i})$.
 Note that these are maximization problems instead of the usual minimization.
 
-Since these are all positive values, the resulting \CP instance would be trivial.
+Since all entries in $C$ are positive values, the resulting \CP instance would be trivial.
 We therefore offset the values by subtracting a constant value $b$ from every one.
 J. Presberger informed us that $b \in \left\{ 0.500, 0.550, 0.585 \right\}$ were adequate values for such an offset and provided us with the optimal values for each of the corresponding instances.
 The running time of the ILP solver increases drastically as the offset approaches $b = 0.500$, which is to be expected, as this creates the most ‘conflicts’.
 However, we have also been informed that the obtained clusterings tend to be more meaningful for $b$’s in the vicinity of $0.500$.
 We decided to call the instance \texttt{hard} ($b= 0.500$), \texttt{medium} ($b = 0.50$) and \texttt{soft} ($b = 0.585$), respectively.
-Furtermore, we have created subsets of these instances by just considering the first \texttt{size} organoids in the cost matrix.
+Furtermore, we have created subsets of these instances by only considering the first \texttt{size} organoids, \ie the upper left $\texttt{size} \times \texttt{size}$ submatrix of $C$.
 
 \subsubsection{Modularity Clustering}
 We tested our algorithm on six instances described in \cite{kappesComparativeStudyModern2015} in the context of clustering with respect to modularity.
@@ -46,12 +46,12 @@ This allowes us to compare the results of our algorithm to the best known soluti
 \subsection{Random Data}\label{subsec:random_data}
 We also created \CP instances randomly and for different sizes.
 We will abbreviate all random instances starting with an \texttt{r\_} followed by the name and size of the instance,
-\eg, \texttt{r\_normal\_200\_[further parameters]} is an instance of $K_{200}$ with edge weights sampled from a normal distribution with \texttt{further parameters}.
+\eg, \texttt{r\_normal\_150\_[further parameters]} is an instance of $K_{150}$ with edge weights sampled from a normal distribution with \texttt{further parameters}.
 
 \subsubsection{Binary data (\texttt{r\_binary\_[size])}}\label{subsubsec:data_random_binary}
-The edge weights of the input graph are sampled from the set $\left\{ -1, 1 \right\}$ with equal probability.
-We created these instances with the intetion of being ‘hard’ to solve.
-That is because choosing between rewarding and penalizing edges randomly with the same numeric incentive creates many ‘conflicts’.
+In these instances the edge weights are sampled from the set $\left\{ -1, 1 \right\}$ with equal probability.
+We created them with the intetion of being ‘hard’ to solve,
+because choosing between rewarding and penalizing edges randomly with the same numeric incentive should create many ‘conflicts’.
 
 \subsubsection{Uniform distribution (\texttt{r\_uniform\_[size]\_[lb]\_[ub]})}\label{subsubsec:data_random_uniform}
 In this instance type the edge weights are sampled from a continuous uniform distribution with interval boundaries \texttt{lb} below and \texttt{ub} above and with $\text{\texttt{lb}} < \text{\texttt{ub}}$.
@@ -60,6 +60,9 @@ We suspected these instances to be easier to solve than the binary data, especia
 \subsubsection{Normal distribution (\texttt{r\_normal\_[size]\_[mu]\_[sigma]})}\label{subsubsec:data_random_normal}
 Real-world data can often be described with normal distributions, which raises the question how applicable the separation routines are in practise.
 The edge weights of these instances are sampled from a normal distribution with mean \texttt{mu} and standard deviation \texttt{sigma}.
-We expected that a non-zero mean results in ‘easier’ instances, as many of the edges could be resolved trivially.
+We expected that a negative mean would result in ‘easier’ instances, as some subset of the negatively weighted edges might already form ‘isolated’ cliques, \ie vertices connected by negatively weighted edges to each other and by positively weighted edges to all other vertices.
+As discussed earlier, these would always end up in the same block of the partition induced by an optimal clique partitioning.
+This argument is ‘symmetric’ for a positive mean, where the positively weighted ‘isolated’ cliques would always end up in different blocks of the partition instead of the same block.
+We restricted our attention to positive means.
 Conversely, we expected little to no influence of the standard deviation to the ‘hardness’ of the instance.
 We have created instances for $(\text{\texttt{mu}}, \text{\texttt{sigma}}) \in \left\{ 0, 0.5, 2 \right\} \times \left\{ 0.5, 1, 2 \right\}$.

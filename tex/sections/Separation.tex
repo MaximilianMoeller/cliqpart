@@ -119,7 +119,8 @@ All edge weights are derived from \cref{eq:two-chorded_graph_weights}:
 
 We use the special node types $u$ and $\hat{u}$ to distinguish between even and odd cycles.
 In fact, $H$ can be thought of a special kind of bipartide graph divided into ${U = \big\{ u_{1}^{i,j}, u_{2}^{i,j} \mid 0 \leq i,j \leq n, i \neq j \big\}}$ and $\hat{U} = \big\{ \hat{u}_{1}^{i,j}, \hat{u}_{2}^{i,j} \mid 0 \leq i,j \leq n, i \neq j \big\}$.
-This is obviously not a bipartition in the standart sense, because of the inner-gadget edges $(u_{1}^{i,j}, u_{2}^{i,j})$ and $(\hat{u}_{1}^{i,j}, \hat{u}_{2}^{i,j})$, but they are really only there to precisely obtain the left-hand side of the inequality.
+This is obviously not a bipartition in the standart sense, because of the inner-gadget edges $(u_{1}^{i,j}, u_{2}^{i,j})$ and $(\hat{u}_{1}^{i,j}, \hat{u}_{2}^{i,j})$.
+However, they can be disregarded, as they are only there to precisely obtain the left-hand side of the inequality.
 The essential part is that we mark a special pair of nodes ($u_{1}^{i,j}$ and $\hat{u}_{1}^{i,j}$) in the two different parts of the bipartide graph which allows us to easily distinguish between odd and even cycles:
 Every odd cycle $v_{0}v_{1} \ldots v_{k-1}v_{0}$ in $K_{n}$ where $k$ is odd induces a walk
 \[
@@ -220,10 +221,10 @@ Therefore, assuming that all triangle inequalities are satisfied, $x^{*}$ violat
 In practise, the choice of the shortest path algorithm is important.
 For $n \in \N$ the auxiliary graph $H$ for $K_{n}$ has the following dimensions:
 \begin{align*}
-	\lvert V_{H} \rvert &= 4 \left( n(n-1) \right) = 4n^{2} - 4n \\
-	\lvert E_{H} \rvert &= \underbrace{2 \left( n(n-1) \right)}_{\text{inner-gadget edges}} + \underbrace{2 \left( n(n-1)(n-2) \right)}_{\text{inter-gadget edges}} = 2n^{3} - 4n^{2} + 2n \\
+	\lvert V_{H} \rvert &= 4 n(n-1) = 4n^{2} - 4n \\
+	\lvert E_{H} \rvert &= \underbrace{2 n(n-1)}_{\text{inner-gadget edges}} + \underbrace{2 n(n-1)(n-2)}_{\text{inter-gadget edges}} = 2n^{3} - 4n^{2} + 2n \\
 \end{align*}
-Since the graph can contains edges with negative costs, Dijkstra’s Algorithm (\cite{dijkstraNoteTwoProblems1959}) is not applicable.
+Since the graph might contain edges with negative costs, Dijkstra’s Algorithm (\cite{dijkstraNoteTwoProblems1959}) is not applicable.
 We implemented a Bellman-Ford algorithm (\cite{bellmanRoutingProblem1958}, \cite{fordNetworkFlowTheory1956}), \ie, a single-source-single-target shortest path algorithm that runs in time $\mathcal{O}(\lvert V_{H} \rvert \cdot \lvert E_{H} \rvert) = \mathcal{O}(n^{5})$.
 We need to run the algorithm for every $u_{1}^{i,j}\hat{u}_{1}^{i,j}$-pair in the auxiliary graph, \ie, $\mathcal{O}(n^{2})$ many times resulting in an overall run-time of $\mathcal{O}(n^{7})$.
 While a Floyd-Warshall algorithm (\cite{floydAlgorithm97Shortest1962}, \cite{warshallTheoremBooleanMatrices1962}) would take only $\mathcal{O}(\lvert V \rvert^3) = \mathcal{O}(n^{6})$ many steps in total, there are some disadvantages that discouraged us from using it.
@@ -264,5 +265,5 @@ The construction of $H$ is as above with the only difference being the value of 
 For every $(i,j) \in V^{2}$ with $i \neq j$ we set the weight of the two arcs $(u_{1}^{i,j},u_{2}^{i,j})$ and $(\hat{u}_{1}^{i,j},\hat{u}_{2}^{i,j})$ to be $x_{ij}$.
 For every $(i,j,k) \in V^{3}$ with $i,j,k$ pairwise distinct, we set the weight of the inter-gadget edges $(u_{2}^{i,j},\hat{u}_{1}^{j,k})$ and $(\hat{u}_{2}^{i,j}, u_{1}^{j,k})$ to be $1 - x_{i,k}$.
 Note that the weights in $H$ are all non-negative now, and hence we can use Dijkstra’s algorithm to check whether any $u_{1}^{i,j}\hat{u}_{1}^{i,j}$-walk has weight strictly smaller than $3$.
-This reduces running time to $\mathcal{O}(\lvert E \rvert + \lvert V \rvert \func{log} \lvert V \rvert) = \mathcal{O}(n^{3})$.
+This reduces running time to $\mathcal{O}(\lvert E_{H} \rvert + \lvert V_{H} \rvert \cdot\func{log} \lvert V_{H} \rvert) = \mathcal{O}(n^{3})$.
 As a further improvement, we can skip expanding vertices in the routine, whenever their current distance to the start vertex is already bigger than $3$, resulting in even faster average time.

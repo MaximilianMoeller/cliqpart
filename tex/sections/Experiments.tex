@@ -1,5 +1,5 @@
 \section{Computational Experiments}\label{sec:experiments}
-In this section we describe the experiments performed and present the results obtained from them.
+This section is concerned with our computational experiments and the results we obtained from them.
 First we explain the setup and configurations for the separation routines (\textit{separators} for short) mentioned in \cref{sec:separation}.
 Then we present the computational results along with some indications to their expressiveness.
 
@@ -11,7 +11,7 @@ The separation routines were implemented in \texttt{C++}.
 While some aspects of the code could be improved (\eg computations of shortest paths in parallel like in \cite{sorensenSeparationHeuristic2Partition2020}),
 performance was a big concern and we tried to implement the routines as efficiently as possible in the amount of time available for the project.
 
-\href{https://www.gurobi.com}{Gurobi} was used for both, computing the exact solution to the ILP problem and as the LP solver for the cutting plane algorithm.
+Gurobi \cite{gurobioptimizationllcGurobiOptimizerReference2023} was used for both, computing the exact solution to the ILP problem and as the LP solver for the cutting plane algorithm.
 We chose Gurobi because of its performance compared to other solvers (see \cite{meindlAnalysisCommercialFree2012}) and the capability of solving ILPs and LPs within the same framework.
 The code infrastructure is designed flexible enough to use the separation routines either as callbacks to Gurobis ILP solver, or by passing a LP solution directly to them.
 Therefore, replacing the LP solver would be fairly easy, \eg for comparing performances of different solvers for this specific problem.
@@ -38,6 +38,13 @@ For some instances there is a tendency of the algorithm to add cuts that improve
 This results in extremely time-consuming computations, for which it was even difficult to give an estimate about how long they might continue.
 There is a plethora of possible heuristics to avoid this, but we just decided to terminate the cutting plane procedure after 100\,000 iterations or after an hour of computation time, whichever happens first.
 
-\subsection{Separator Configurations}\label{subsec:run_configs}
+\subsection{Separator Configuration}\label{subsec:run_configs}
+As for the data instances, every separator will get an abbreviation extended by configuration parameters so we can refer to them easily when discussing results.
+\todo{Write about \texttt{maxcut} and \texttt{tolerance} for all separators}
+
+\subsubsection{Triangle Separator (\texorpdfstring{$\texttt{Δ}_{\texttt{[maxcut]}}^{\texttt{[variable once]}}$}{Δ})}
+\subsubsection{2-partition Separator (\texorpdfstring{$\texttt{st}_{\texttt{[maxcut]}}^{\texttt{[heuristic]}}$}{Δ})}
+\subsubsection{two-chorded odd cycle Separator (\texorpdfstring{$\texttt{two}_{\texttt{[maxcut]}}$}{Δ})}
+\subsubsection{half-chorded odd cycle Separator (\texorpdfstring{$\texttt{half}_{\texttt{[maxcut]}}$}{Δ})}
 
 \subsection{Results}\label{subsec:experiments_results}
