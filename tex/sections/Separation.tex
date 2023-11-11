@@ -1,4 +1,4 @@
-\section{Separation}\label{sec:separation}
+\section{Inequalities and Separation}\label{sec:separation}
 In this section we will describe the classes of inequalities that we separated as well as the algorithms used to do so.
 Most of the separation routines are configurable in one way or another.
 However, we will only explain the core algorithm in this section and leave the configuration parameters for \cref{subsec:run_configs}.
@@ -15,7 +15,7 @@ The $2$-partition inequalities first described by \cite{grotschelFacetsCliquePar
 	\begin{equation}\label{eq:2-partition_inequality}
 		\sum_{s \in S}^{} \sum_{t \in T}^{} x_{st} - \sum_{\substack{s, s' \in S \\ s \neq s'}}^{} x_{ss'} - \sum_{\substack{t, t' \in T \\ t \neq t'}}^{} x_{tt'} \leq \func{min}( \lvert S \rvert, \lvert T \rvert )
 	\end{equation}
-	is called a $2$\textit{-partition inequality}.
+	is called a $2$\textit{-partition inequality} or \textit{$\left[ S,T \right]$-inequality} for short.
 \end{definition}
 \begin{theorem}[Theorem 4.1 of \cite{grotschelFacetsCliquePartitioning1990}]
 	For every $n \geq 3$ and every two nonempty subsets $S, T$ of $V_{n}$, the corresponding $2$-partition inequality is valid for $\mathscr{P}_{n}$.

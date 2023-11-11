@@ -24,7 +24,7 @@ In every iteration we start by solving the current LP relaxation to obtain the s
 If $x^{*}$ satsfies all triangle inequalities and is integral, we have found an optimal solution and terminate.
 Otherwise we call the separators each after another (starting with the triangle separator) to separate $x^{*}$.
 If violated constraints are found, we add them to the LP and start with the next iteration without calling any further separators.
-It may thus happen, that a particular separator is never called even it was created according to the configuration,
+It may thus happen, that a particular separator is never called even if it was created according to the configuration,
 \eg because an integral solution was found by just calling the separators before it, or because we terminated computation early for some other reason.
 
 \subsection{Cut Deletion}\label{subsec:cut_deletion}
@@ -42,28 +42,61 @@ There is a plethora of possible heuristics to avoid this, but we just decided to
 We will now describe configuration parameters for the different separators.
 Like for the data instances, every separator will get an abbreviation so we can refer to them easily when discussing results.
 
-Due to numerical reasons we introduced a parameter \texttt{tolerance} for all separators and only regarded a constraint as violated if its degree of violation was bigger than \texttt{tolerance}.
+Due to numerical reasons we introduce a parameter \texttt{tolerance} for all separators and only regard constraints as violated when their violation degree exceeds this tolerance.
 That is, for any constraint $a^{\top} x^{*} \leq \alpha$ we only consider it violated if $a^{\top} x^{*} - \alpha > \texttt{tolerance}$.
 We chose $\texttt{tolerance} = \num{e-6}$ for the whole project.
-Furthermore, we considered any solution $x^{*}$ integral if the following condition holds for all $e \in E_{n}$:
+Furthermore, we consider any solution $x^{*}$ integral if the following condition holds for all $e \in E_{n}$:
 \[
  \big\lvert x_{e}^{*} - \lfloor x_{e}^{*} + 0.5 \rfloor \big\rvert \leq \texttt{tolerance}
 \]
 
-We limited the number of constraints that we would add in every iteration of the cutting plane algorithm by a parameter \texttt{maxcut}.
+We limit the number of constraints that we would add in every iteration of the cutting plane algorithm by a parameter \texttt{maxcut}.
 If we were to set $\texttt{maxcut} = \infty$, \ie not restricting the number of added cutting planes, thousands of violated constraints could be found for even medium sized instances in every iteration.
-This would generally result in slower solving of the LP relaxition, which might result in slower overall performance.
+This would generally result in slower solving of the LP relaxition, which might result in worse overall performance.
 On the other hand, setting \texttt{maxcut} too small would result in only small improvements from one iteration to the next.
 In order to compare our results with those of \cite{grotschelCuttingPlaneAlgorithm1989} for the instances \texttt{cetacea} and \texttt{cats}, we chose $\texttt{maxcut} = 400$ for all separators.
 As we will discuss later, our obtained results suggest that $\texttt{maxcut} = 400$ was in fact not optimal for our problem instances or the modern hardware,
-but we did not experiment with this parameter enough to find better values.
+but we did not experiment with this parameter enough to confidently suggest better values.
 
 \subsubsection{Triangle Separator (\texorpdfstring{$\texttt{Δ}_{\texttt{[maxcut]}}^{\texttt{[variable once]}}$}{Δ})}
-\todo{we only enumerated 4*maxcut many and returned the maxcut most violated once}
-\todo{actually used maxcut = infinity}
-\todo{variable once}
-\subsubsection{2-partition Separator (\texorpdfstring{$\texttt{st}_{\texttt{[maxcut]}}^{\texttt{[heuristic]}}$}{Δ})}
-\subsubsection{two-chorded odd cycle Separator (\texorpdfstring{$\texttt{two}_{\texttt{[maxcut]}}$}{Δ})}
-\subsubsection{half-chorded odd cycle Separator (\texorpdfstring{$\texttt{half}_{\texttt{[maxcut]}}$}{Δ})}
+As discussed earlier, we separate the triangle inequalities by mere enumeration and stop as soon as about $5\cdot\texttt{maxcut}$ violated inequalities are found.
+We then sort them by their violation degree and only add the \texttt{maxcut} most violated ones to the LP.
+
+The triangle separator is the only one for which we tried setting $\texttt{maxcut} = \infty$ and we will indicate that this setting was used by writing $\texttt{Δ}_{\infty}$.
+
+The enumeration of triangle inequalities is always carried out in the same order.
+We imagined that this could lead to a scenario where the ‘earlier’ regions of the graph would already be ‘partially’ solved, whereas in the ‘later’ regions of the enumeration order there would still be violated constraints with high violation degree.
+To circumvent this, we introduce another parameter called \texttt{variable once} which, when activated would affect the separator as follows:
+For every variable we add at most one triangle inequality containing this variable.
+We hoped that this would result in the graph being solved more ‘evenly’.
+The use of the \texttt{variable once} parameter will be indicated by $\texttt{Δ}^{\leq 1}$.
+We imagined that it would be most useful in combination with $\texttt{maxcut} = \infty$, because otherwise we would still only enumerate the $5 \cdot \texttt{maxcut}$ first violated inequalities, which might not cover ‘later’ regions of the graph.
+
+\subsubsection{2-Partition Separator (\texorpdfstring{$\texttt{st}^{\texttt{[heuristic]}}$}{Δ})}
+We use the two heuristics described in \cite{grotschelCuttingPlaneAlgorithm1989} to search for violated $\left[ S,T \right]$-inequalities with $\lvert S \rvert = 1$ and we do not want to repeat their explanation here.
+They will be notated by $\texttt{Δ}^{1}$ and $\texttt{Δ}^{2}$.
+As before, we add no more than \texttt{maxcut} violated inequalities to the LP, and because we did not experiment with this parameter for all further separators, we will not denote it in the abbreviations.
+
+\subsubsection{Two-Chorded (\texttt{two}) and Half-Chorded (\texttt{half}) Odd Cycle Separator}
+The separator for the two- and half-chorded odd cycle inequalities works mostly as described in \cref{subsec:two_chorded_separator}.
+However, we limit computation time to 15 minutes, because not imposing any time limit would sometimes result in the routine taking more than an hour to finish.
+Especially so for separation of the two-chorded odd cycyle inequalities due to the higher exponent in the time complexity of the routine (cf.\ \cref{subsec:two_chorded_separator} and \cref{subsec:half_chorded_separator}).
+We remark that the \texttt{maxcut} limit was often hit before the time limit.
 
 \subsection{Results}\label{subsec:experiments_results}
+\subsubsection{A Note on Computation Time}
+We want to address some flaws in the setup of our experiments.
+Unfortunately, we noticed them to late into the project and could not correct them in the time available.
+Firstly, while logging important variables (\eg, the number of cuts added and removed) every iteration, we made the mistake to also log every solution to the LP relaxation.
+For the non-random instances alone, this amounts to approximately 90 GB of text files.
+The issue here is that writing a solution file to disk takes some amount of time that we can hardly factor out of our results.
+Secondly, we did not log the times it took to solve the LP relaxation and then separating it independently.
+Rather we only recorded progress once every iteration and used the fact that the logging library timestamps every logged message to deduce running times.
+We can therefore not confidently say whether the time spend in one iteration is to be attributed to the LP solver or our separation routines.
+Admittedly, exact running time was of less concern to us than the qualitative differences in LP relaxations obtained from the use of various combinations of inequality classes.
+The simple logging techniques we used gave us a good grasp on the overall progress made per iteration.
+However, we do not believe that they were sophisticated enough to even report accurately on the time frames of interest here.
+Especially in (but not limited to) the first few iterations, many violated constraints can be found quickly, leading to durations in the order of milliseconds for a whole iteration.
+Nevertheless, we regret these flaws and suggest to interpret the obtained results with some caveats.
+
+We will thus round all times recorded to 0.1 seconds and make explicitly clear when even less time was spend by writing $\leq 0.1$.
