@@ -83,20 +83,48 @@ However, we limit computation time to 15 minutes, because not imposing any time 
 Especially so for separation of the two-chorded odd cycyle inequalities due to the higher exponent in the time complexity of the routine (cf.\ \cref{subsec:two_chorded_separator} and \cref{subsec:half_chorded_separator}).
 We remark that the \texttt{maxcut} limit was often hit before the time limit.
 
+\subsection{Separator Combinations}\label{subsec:separator_combinations}
+We are interested in the practical use of different combinations of these separators with possibly different configurations.
+In our experience, the separators for two- and half-chorded odd cycle inequalities needed considerably more time to find violated constraints than the others, which is due to the higher exponent in run time complexity.
+To evaluate whether the improvement in the tightness of the relaxation is worth the additional computation time required, we created multiple combinations of differently parametrized separators that we call \textit{run configurations}.
+The following table shows the names we chose to give to these run configurations and the separators they include in order:
+\begin{table}[H]
+	\centering
+	\begin{tabular}{|l||c|c|c|c|c|c|c||}
+		\hline
+			& \texttt{all} 	& \texttt{Δ-cycles} & \texttt{Δ-two} & \texttt{Δ-half}	& \texttt{Δ-st-1} & \texttt{Δ-st-2} & \texttt{Δ-st-12} \\[0.5ex]
+		\hline\hline
+		1 	& \texttt{Δ} 	& \texttt{Δ} 				& \texttt{Δ} 	& \texttt{Δ} 		& \texttt{Δ} 	& \texttt{Δ} 	& \texttt{Δ} 	\\ 
+		2 	& $\texttt{st}^{1}$ & \texttt{half} & \texttt{two} 			& \texttt{half} 				& $\texttt{st}^{1}$ 			& $\texttt{st}^{2}$  		& $\texttt{st}^{1}$			\\
+		3 	& $\texttt{st}^{2}$			& \texttt{two} 						&--- &--- &---  			&--- & $\texttt{st}^{2}$			\\
+		4 	& \texttt{half} &--- &---&---&---&---&---  \\
+		5 	& \texttt{two}	&--- &---&---&---&---&---	\\
+		\hline
+	\end{tabular}
+	\caption{Combining separators into run configurations.}
+\end{table}
+Furthermore, \texttt{Δ}, $\texttt{Δ}_{\infty}$, $\texttt{Δ}^{\leq 1}$ and $\texttt{Δ}_{\infty}^{\leq 1}$ can be viewed as full run configurations on their own.
+
 \subsection{Results}\label{subsec:experiments_results}
 \subsubsection{A Note on Computation Time}
 We want to address some flaws in the setup of our experiments.
 Unfortunately, we noticed them to late into the project and could not correct them in the time available.
-Firstly, while logging important variables (\eg, the number of cuts added and removed) every iteration, we made the mistake to also log every solution to the LP relaxation.
+Firstly, while logging important variables (\eg, the number of cuts added and removed) every iteration, we made the mistake to also log every solution to the LP relaxations.
 For the non-random instances alone, this amounts to approximately 90 GB of text files.
 The issue here is that writing a solution file to disk takes some amount of time that we can hardly factor out of our results.
-Secondly, we did not log the times it took to solve the LP relaxation and then separating it independently.
-Rather we only recorded progress once every iteration and used the fact that the logging library timestamps every logged message to deduce running times.
-We can therefore not confidently say whether the time spend in one iteration is to be attributed to the LP solver or our separation routines.
+Secondly, we did not log the times it took to solve the LP relaxation and then searching for violated constraints independently.
+Rather we only recorded progress once after every call to a separator and used the fact that the logging library timestamps every logged message to deduce running times.
+The time to solve the LP was thus always reported together with the first separator, which is always the triangle separator.
+Especially run configurations that only include triangle separators, \eg \texttt{Δ} and $\texttt{Δ}_{\infty}$, are therefore impossible to compare precisely.
+We would not know whether an increase in iteration time when using $\texttt{Δ}_{\infty}$ would be caused by the LP solver taking longer due to bigger LP size, or by the separator searching for all violated inequalities instead of terminating after \texttt{maxcut} have been found.
+Every further log in this iteration did then not include time spent on solving the LP, but rather just the time spent in our separation routines, because the LP solver had not been started again.
+This means that for iterations where the triangle separator failed to produce a violated inequality, we do know how much time was spent in all other separation routines separately. 
+
 Admittedly, exact running time was of less concern to us than the qualitative differences in LP relaxations obtained from the use of various combinations of inequality classes.
 The simple logging techniques we used gave us a good grasp on the overall progress made per iteration.
 However, we do not believe that they were sophisticated enough to even report accurately on the time frames of interest here.
-Especially in (but not limited to) the first few iterations, many violated constraints can be found quickly, leading to durations in the order of milliseconds for a whole iteration.
+Especially in (but not limited to) the first few iterations, many violated constraints can be found quickly, leading to durations in the order of milliseconds for a whole iteration, \ie solving the LP and separating the obtained solution.
 Nevertheless, we regret these flaws and suggest to interpret the obtained results with some caveats.
 
-We will thus round all times recorded to 0.1 seconds and make explicitly clear when even less time was spend by writing $\leq 0.1$.
+We will therefore refrain from breaking down execution times further and rather just state the total time spent on one run.
+\todo{ja?}
