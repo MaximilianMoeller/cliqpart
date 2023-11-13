@@ -1,0 +1,15 @@
+\appendix
+\begin{landscape}
+\section{Result data}\label{sec:result_data}
+\begin{table}[H]
+%	\csvreader[
+%		tabular=||c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c||,
+%		table head=\hline & \texttt{Δ} & $\texttt{Δ}_{\infty}$ & $\texttt{Δ}^{\leq 1}$ & $\texttt{Δ}_{\infty}^{\leq 1}$ & \texttt{st-1} & \texttt{st-1}& \texttt{st-1} & \texttt{st-2} & \texttt{st-2}& \texttt{st-2} & \texttt{st-12} & \texttt{st-12}& \texttt{st-12} & \texttt{half} & \texttt{two} & \texttt{cycles} & \texttt{all}& \texttt{all}& \texttt{all} \\\hline,
+%  		%table head=\hline \bfseries{Name} & \bfseries{Given Name} & \bfseries{Matriculation} & \bfseries{Gender} & \bfseries{Grade} \\\hline,
+%  		late after last line=\\\hline, % horizontal line at the end of the table
+%	]{dolphins_analysis.csv}{}{\csvlinetotablerow}
+	\csvautotabular{dolphins_analysis.csv}
+\end{table}
+%\texttt{Δ} & $\texttt{Δ}_{\infty}$ & $\texttt{Δ}^{\leq 1}$ & $\texttt{Δ}_{\infty}^{\leq 1}$ & \texttt{Δ-st-1} & \texttt{Δ-st-2} & \texttt{Δ-st-12} & \texttt{Δ-half} & \texttt{Δ-two}& \texttt{all} & \texttt{Δ-cycles} &
+
+\end{landscape}
