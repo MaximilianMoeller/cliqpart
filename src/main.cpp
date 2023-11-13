@@ -285,7 +285,13 @@ int main(int argc, char *argv[]) {
                 PLOGI << "Found integral solution in iteration " << iteration << ".";
 
                 PLOGI_(CSV_LOG)
-                      << "{\"message\": \"INTEGRAL_SOLUTION\""
+                      << "{\"message\": \"TERMINATION\""
+                      << ",\"cause\": "
+                         "{\"integral\": True"
+                         ",\"no_violated\": True"
+                      << ",\"time_limit\": False"
+                      << ",\"iteration_limit\": False"
+                      << "}"
                       << ",\"iteration\": " << iteration
                       << "}";
                 // remember to delete the memory of the solution when goto
@@ -320,6 +326,16 @@ int main(int argc, char *argv[]) {
             // If no separator found any violated constraints, or the iteration limit is exceeded,
             // terminate the LP loop
             if (violated_constraints.empty() || iteration >= ITERATION_LIMIT || time_limit_exceeded) {
+              PLOGI_(CSV_LOG)
+                    << "{\"message\": \"TERMINATION\""
+                    << ",\"cause\": "
+                       "{\"integral\": False"
+                       ",\"no_violated\": "<< (violated_constraints.empty() ? "True" : "False")
+                    << ",\"time_limit\": " << (time_limit_exceeded ? "True" : "False")
+                    << ",\"iteration_limit\": " << (iteration >= ITERATION_LIMIT ? "True" : "False")
+                    << "}"
+                    << ",\"iteration\": " << iteration
+                    << "}";
               break;
             }
               // otherwise, add violated constraints and remove inactive ones.
