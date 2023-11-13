@@ -6,7 +6,6 @@ log*
 # instances
 random_*
 *.sol
-!optimal.sol
 
 # results of the computation
 results/
