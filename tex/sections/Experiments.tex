@@ -36,7 +36,7 @@ Otherwise the algorithm might get stuck adding constraints we have previously re
 \subsection{Limiting Computation}\label{subsec:limiting_computation}
 For some instances there is a tendency of the algorithm to add cuts that improve the objective value only marginally for a large number of iterations in a row.
 This results in extremely time-consuming computations, for which it was even difficult to give an estimate about how long they might continue.
-There is a plethora of possible heuristics to avoid this, but we just decided to terminate the cutting plane procedure after 100\,000 iterations or after an hour of computation time, whichever happens first.
+There is a plethora of possible heuristics to avoid this, but we just decided to terminate the cutting plane procedure after 10\,000 iterations or after an hour of computation time, whichever happens first.
 
 \subsection{Separator Configuration}\label{subsec:run_configs}
 We will now describe configuration parameters for the different separators.
