@@ -18,7 +18,7 @@
 #include "ilp_callback.h"
 
 #define CSV_LOG 1
-#define ITERATION_LIMIT 100'000
+#define ITERATION_LIMIT 10'000
 #define TIME_LIMIT_SECONDS (60*60)
 
 using namespace std;
@@ -87,7 +87,7 @@ int main(int argc, char *argv[]) {
 
   // display colored console logging
   static plog::ColorConsoleAppender<plog::TxtFormatter> console_appender;
-  static plog::RollingFileAppender<plog::TxtFormatter> log_file_appender(main_log_file_path.c_str(), 16000000, 1);
+  static plog::RollingFileAppender<plog::TxtFormatter> log_file_appender(main_log_file_path.c_str());
   if (log_to_file) {
     // initialize the console logger and the file logger
     plog::init(log_level, &log_file_appender).addAppender(&console_appender);
@@ -101,7 +101,7 @@ int main(int argc, char *argv[]) {
   std::ofstream measurements_file{measurements_file_path, std::ios::out | std::ios::trunc};
   measurements_file.close();
   static plog::RollingFileAppender<plog::CsvFormatter>
-      measurements_file_appender(measurements_file_path.c_str(), 16000000, 1);
+      measurements_file_appender(measurements_file_path.c_str());
   plog::init<CSV_LOG>(plog::verbose, &measurements_file_appender);
 
   // loading configurations
@@ -121,9 +121,6 @@ int main(int argc, char *argv[]) {
     env->set(GRB_IntParam_OutputFlag, true);
     env->set(GRB_IntParam_LogToConsole, gurobi_console_log);
     env->start();
-    if (!log_to_file) {
-      env->set(GRB_StringParam_LogFile, "");
-    }
 
     // everything else needs to be rebuilt for every base dir
     for (auto &data_dir_path : data_dir_paths) {
@@ -148,8 +145,8 @@ int main(int argc, char *argv[]) {
 
       // only solve to optimality if it has neither been disabled by the user
       // nor has been solved before
-      if (!lp_only && (!filesystem::exists(data_dir_path / "optimal.sol")
-          || !filesystem::exists(data_dir_path / "measurements.csv"))) {
+      if (!lp_only && !(filesystem::exists(data_dir_path / "optimal.sol")
+          || filesystem::exists(data_dir_path / "measurements.csv"))) {
         PLOGI << "No optimal solution was found for data set '" << data_dir_path
               << "'. Starting solving to optimality.";
         if (log_to_file) {
@@ -180,20 +177,29 @@ int main(int argc, char *argv[]) {
         PLOGI << "Starting optimal solving";
 
         measurements_file_appender.setFileName((data_dir_path / "measurements.csv").c_str());
-        PLOGI_(CSV_LOG) << "Start optimal solve";
+        PLOGI_(CSV_LOG)
+              << "{\"message\": \"START_OPTIMAL_SOLVE\""
+              << "}";
         ilp_model.optimize();
         auto optimization_result = ilp_model.get(GRB_IntAttr_Status);
         if (optimization_result == GRB_OPTIMAL) {
-          PLOGI_(CSV_LOG) << "End optimal solve";
+          PLOGI_(CSV_LOG)
+                << "{\"message\": \"FINISHED_OPTIMAL_SOLVE\""
+                << "}";
           ilp_model.write(data_dir_path / "optimal.sol");
           PLOGI << "Finished optimal solving. Optimal objective value is: "
                 + to_string(ilp_model.get(GRB_DoubleAttr_ObjVal));
         } else if (optimization_result == GRB_TIME_LIMIT) {
-          PLOGI_(CSV_LOG) << "Time limit hit: " << optimality_time_limit << " seconds.";
+          PLOGI_(CSV_LOG)
+                << "{\"message\": \"OPTIMAL_SOLVE_TIME_LIMIT_EXCEEDED\""
+                << "}";
           PLOGI << "Solving to optimality hit time limit. Continuing with LP-relaxations.";
         }
-
       }
+
+      // disable gurobi logging for cutting plane procedure
+      env->set(GRB_IntParam_OutputFlag, false);
+      env->set(GRB_StringParam_LogFile, "");
 
       for (const auto &kRunConfig : run_configs) {
         PLOGI << "Starting run config '" << kRunConfig.name << "' for data set '" << data_dir_path << "'.";
@@ -223,15 +229,8 @@ int main(int argc, char *argv[]) {
 
           if (log_to_file) {
             auto const kLogFile = kNumberedRunDir / "log";
-            auto const kGurobiLogFile = kNumberedRunDir / "gurobi.log";
-            // own logs
             PLOGD << "Setting logfile to " << kLogFile;
             log_file_appender.setFileName(kLogFile.c_str());
-
-            // gurobi logs
-            // need to create file manually
-            std::ofstream outfile(kGurobiLogFile);
-            env->set(GRB_StringParam_LogFile, kGurobiLogFile);
           }
 
           // ### END RUN SETUP ###
@@ -246,7 +245,7 @@ int main(int argc, char *argv[]) {
           int iteration{0};
           vector<GRBTempConstr> violated_constraints;
 
-          bool time_limit_exceeded {false};
+          bool time_limit_exceeded{false};
 
           // main LP loop, solving LP relaxation and adding violated constraints
           measurements_file_appender.setFileName((kNumberedRunDir / "measurements.csv").c_str());
@@ -254,17 +253,30 @@ int main(int argc, char *argv[]) {
             // solving the LP and writing the solution to a file
             iteration++;
             model.optimize();
-            model.write(kNumberedRunDir / (to_string(iteration) + ".sol"));
+            double *solution = model.GetSolution();
+
+            PLOGI_(CSV_LOG)
+                  << "{\"message\": \"LP_SOLVED\""
+                  << ",\"iteration\": " << iteration
+                  << ",\"obj_value\": " << model.get(GRB_DoubleAttr_ObjVal)
+                  << "}";
+
+            // not really needed anymore, and better for comparison if it is off
+            // model.write(kNumberedRunDir / (to_string(iteration) + ".sol"));
 
             // enumerating violated constraints
             violated_constraints = {};
 
             for (auto &separator : separators) {
-              double* solution = model.GetSolution();
 
               violated_constraints = separator->SeparateSolution(solution, model.GetVars());
 
-              delete[](solution);
+              PLOGI_(CSV_LOG)
+                    << "{\"message\": \"SEPARATOR\""
+                    << ",\"iteration\": " << iteration
+                    << ",\"separator\": \"" << separator->Abbreviation() << "\""
+                    << ",\"violated_found\": " << violated_constraints.size()
+                    << "}";
 
               // if the triangle separator found no violated constraints and the solution is integral,
               // there is no need to search for other violated inequalities,
@@ -273,23 +285,14 @@ int main(int argc, char *argv[]) {
                 PLOGI << "Found integral solution in iteration " << iteration << ".";
 
                 PLOGI_(CSV_LOG)
-                      << "{\"iteration\": " << iteration
-                      << ",\"obj_value\": " << model.get(GRB_DoubleAttr_ObjVal)
-                      << ",\"violated_found\": 0"
-                      << ",\"separator\": \"Δ\"" // NOLINT(*-raw-string-literal)
-                      << ",\"integral\": true"
+                      << "{\"message\": \"INTEGRAL_SOLUTION\""
+                      << ",\"iteration\": " << iteration
                       << "}";
+                // remember to delete the memory of the solution when goto
+                delete[](solution);
                 // very clear usage of goto, don't blame me
                 goto no_violated_found;
               }
-
-              PLOGI_(CSV_LOG)
-                    << "{\"iteration\": " << iteration
-                    << ",\"obj_value\": " << model.get(GRB_DoubleAttr_ObjVal)
-                    << ",\"violated_found\": " << violated_constraints.size()
-                    << ",\"separator\": \"" << separator->Abbreviation() << "\""// NOLINT(*-raw-string-literal)
-                    << ",\"integral\": false"
-                    << "}";
 
               // If a separator found violated constraints, we want to add those to the model and optimize again
               // before calling other separators, because they might depend on the fact that a specific class
@@ -300,6 +303,9 @@ int main(int argc, char *argv[]) {
                 break;
               }
             }
+
+            // free memory of the solution after all separators used it
+            delete[](solution);
 
             // terminate separation early if allowed time limit was exceeded, check only every 10 iterations to
             //  reduce the number of syscalls
@@ -324,23 +330,20 @@ int main(int argc, char *argv[]) {
               }
               PLOGD << "Added " << violated_constraints.size() << " constraints in iteration " << iteration;
 
-              auto removed = model.DeleteCuts();
+              int removed = model.DeleteCuts();
 
               PLOGD << "Removed " << removed << " constraints in iteration " << iteration;
-              // debug verbosity level just to easily distinguish between this type of log and the one inside the
-              // separator loop
-              PLOGD_(CSV_LOG)
-                    << "{\"iteration\": " << iteration
-                    << ",\"obj_value\": " << model.get(GRB_DoubleAttr_ObjVal)
-                    << ",\"constraints_added\": " << violated_constraints.size()
-                    << ",\"constraints_removed\": " << removed
+              PLOGI_(CSV_LOG)
+                    << "{\"message\": \"CONSTRAINTS_REMOVED\""
+                    << ",\"iteration\": " << iteration
+                    << ",\"removed\": " << removed
                     << "}";
             }
 
           }
           no_violated_found:;
 
-          model.write(kNumberedRunDir / "0_last.sol");
+          model.write(kNumberedRunDir / "last.sol");
           PLOGI << "Finished run " << run_counter << "/" << kRunConfig.run_count << " for run config '"
                 << kRunConfig.name << "' and data set '" << data_dir_path << "'.";
           PLOGI << "Took " << iteration << " iterations and obtained objective value is "
