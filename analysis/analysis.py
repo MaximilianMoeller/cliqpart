@@ -47,7 +47,8 @@ def readin_measurements(file):
 #        }
 
         path_parts = Path(file).parts
-        data_name = path_parts[0]
+        print(path_parts)
+        data_name = path_parts[-4]
         numDir = path_parts[-2]
         runConfig = path_parts[-3].split("-2023")[0]
 
@@ -120,7 +121,7 @@ def plot(analysis):
 
 def create_csvs(data_name, alist, ilp_solution):
     data = []
-    data.append([f"{data_name}"] + [f"{a['name']}" for a in alist])
+    data.append([f"\\texttt{{{data_name}}}"] + [f"{a['name']}" for a in alist])
     data.append(["iterations"] + [a["iterations"][-1]["iteration"] for a in alist])
 
     with open(data_name + "_analysis.csv", 'w') as output_csv:
@@ -130,24 +131,24 @@ def create_csvs(data_name, alist, ilp_solution):
 def sort_and_rename(alist):
     ord_sub = {
             "Δ-1": [0,"\\texttt{Δ}"],
-            "Δ_no-maxcut-1": [1,"Δa"],
-            "Δ_var-once-1": [2,"Δb"],
-            "Δ_no-maxcut_var-once-1": [3,"Δc"],
-            "Δ_st1-1": [4,"a"],
-            "Δ_st1-2": [5,"b"],
-            "Δ_st1-3": [6,"c"],
-            "Δ_st2-1": [7,"d"],
-            "Δ_st2-2": [8,"e"],
-            "Δ_st2-3": [9,"f"],
-            "Δ_st12-3": [10,"g"],
-            "Δ_st12-1": [11,"h"],
-            "Δ_st12-2": [12,"i"],
-            "Δ_half-1": [13,"j"],
-            "Δ_two-1": [14,"k"],
-            "Δ_circles-1": [15,"l"],
-            "all-1": [16,"m"],
-            "all-2": [17,"n"],
-            "all-3": [18,"o"],
+            "Δ_no-maxcut-1": [1,"$\\texttt{Δ}_{\\infty}$"],
+            "Δ_var-once-1": [2,"$\\texttt{Δ}^{\\leq 1}$"],
+            "Δ_no-maxcut_var-once-1": [3,"$\\texttt{Δ}_{\\infty}^{\\leq 1}$"],
+            "Δ_st1-1": [4,"1"],
+            "Δ_st1-2": [5,"2"],
+            "Δ_st1-3": [6,"3"],
+            "Δ_st2-1": [7,"1"],
+            "Δ_st2-2": [8,"2"],
+            "Δ_st2-3": [9,"3"],
+            "Δ_st12-1": [10,"1"],
+            "Δ_st12-2": [11,"2"],
+            "Δ_st12-3": [12,"3"],
+            "Δ_half-1": [13,"\\texttt{Δ-half}"],
+            "Δ_two-1": [14,"\\texttt{Δ-two}"],
+            "Δ_circles-1": [15,"\\texttt{Δ-circles}"],
+            "all-1": [16,"1"],
+            "all-2": [17,"2"],
+            "all-3": [18,"3"],
             }
     alist.sort(key=lambda a: ord_sub[f"{a['run_config']}-{a['run_number']}"][0])
     for a in alist:
@@ -160,7 +161,7 @@ def main():
     args = parser.parse_args()
 
     path_parts = Path(args.files[0]).parts
-    data_name = path_parts[0]
+    data_name = path_parts[-4]
 
     alist = []
     for file in args.files:
