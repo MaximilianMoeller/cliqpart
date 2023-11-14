@@ -22,10 +22,10 @@ Note that these are maximization problems instead of the usual minimization.
 
 Since all entries in $C$ are positive values, the resulting \CP instance would be trivial.
 We therefore offset the values by subtracting a constant value $b$ from every one.
-J. Presberger informed us that $b \in \left\{ 0.500, 0.550, 0.585 \right\}$ were adequate values for such an offset and provided us with the optimal values for each of the corresponding instances.
+J. Presberger informed us that $b \in \left\{ 0.500, 0.555, 0.585 \right\}$ were adequate values for such an offset and provided us with the optimal values for each of the corresponding instances.
 The running time of the ILP solver increases drastically as the offset approaches $b = 0.500$, which is to be expected, as this creates the most ‘conflicts’.
 However, we have also been informed that the obtained clusterings tend to be more meaningful for $b$’s in the vicinity of $0.500$.
-We decided to call the instance \texttt{hard} ($b= 0.500$), \texttt{medium} ($b = 0.50$) and \texttt{soft} ($b = 0.585$), respectively.
+We decided to call the instance \texttt{hard} ($b= 0.500$), \texttt{medium} ($b = 0.555$) and \texttt{soft} ($b = 0.585$), respectively.
 For numerical reasons, we scaled all weights by multiplying them by $\num{e3}$.
 Furtermore, we have created subsets of these instances by only considering the first \texttt{size} organoids, \ie the upper left $\texttt{size} \times \texttt{size}$ submatrix of $C$.
 

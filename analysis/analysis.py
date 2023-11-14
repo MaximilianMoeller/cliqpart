@@ -48,12 +48,12 @@ def readin_measurements(file):
 
         path_parts = Path(file).parts
         print(path_parts)
-        data_name = path_parts[-4]
+        instance_name = path_parts[-4]
         numDir = path_parts[-2]
         runConfig = path_parts[-3].split("-2023")[0]
 
         analysis = {
-                "data_name": data_name,
+                "instance_name": instance_name,
                 "run_config": runConfig,
                 "run_number": numDir,
                 "total_time": (times[-1] - times[0]) / timedelta(seconds=1),
@@ -91,9 +91,75 @@ def readin_measurements(file):
         analysis["last_objective"] = analysis["iterations"][-1]["obj_value"]
         return analysis
 
+def order_and_label_runConfigs(rc_list):
+    ord_sub = {
+            "Δ-1": [0,"\\texttt{Δ}"],
+            "Δ_no-maxcut-1": [1,"$\\texttt{Δ}_{\\infty}$"],
+            "Δ_var-once-1": [2,"$\\texttt{Δ}^{\\leq 1}$"],
+            "Δ_no-maxcut_var-once-1": [3,"$\\texttt{Δ}_{\\infty}^{\\leq 1}$"],
+            "Δ_st1-1": [4,"1"],
+            "Δ_st1-2": [5,"2"],
+            "Δ_st1-3": [6,"3"],
+            "Δ_st2-1": [7,"1"],
+            "Δ_st2-2": [8,"2"],
+            "Δ_st2-3": [9,"3"],
+            "Δ_st12-1": [10,"1"],
+            "Δ_st12-2": [11,"2"],
+            "Δ_st12-3": [12,"3"],
+            "Δ_half-1": [13,"\\texttt{Δ-half}"],
+            "Δ_two-1": [14,"\\texttt{Δ-two}"],
+            "Δ_circles-1": [15,"\\texttt{Δ-cycles}"],
+            "all-1": [16,"1"],
+            "all-2": [17,"2"],
+            "all-3": [18,"3"],
+            }
+    rc_list.sort(key=lambda a: ord_sub[f"{a['run_config']}-{a['run_number']}"][0])
+    for a in rc_list:
+        a["label"] = ord_sub[f"{a['run_config']}-{a['run_number']}"][1]
+
+def instance_optimal_info(instance_name):
+    optimal_values = {
+            # grötschel wakabayashi
+            "cetacea" : {'value': -967, 'optmiality_proven': True, 'maximizing': False},
+            "wild_cats" : {'value': -1304, 'optmiality_proven': True, 'maximizing': False},
+
+            # constructed
+            "violated_half" : {'value': -4, 'optmiality_proven': True, 'maximizing': False},
+            "violated_2" : {'value': -3, 'optmiality_proven': True, 'maximizing': False},
+
+            # modularity clustering
+            "football" : {'value': 6.1332494165298363e+02, 'optmiality_proven': True, 'maximizing': True},
+            "adjnoun" : {'value': 314.2048442906573, 'optmiality_proven': False, 'maximizing': True},
+            "polbooks" : {'value': 5.4076747857117175e+02, 'optmiality_proven': True, 'maximizing': True},
+            "lesmis" : {'value': 5.8373891747783489e+02, 'optmiality_proven': True, 'maximizing': True},
+            "dolphins" : {'value': 5.4991891143546547e+02, 'optmiality_proven': True, 'maximizing': True},
+            "karate" : {'value': 4.6959237343852726e+02, 'optmiality_proven': True, 'maximizing': True},
+
+            # organoids
+            "organoid_40_soft" : {'value': 2.5080850000000023e+03, 'optmiality_proven': True, 'maximizing': True},
+            "organoid_40_medium" : {'value': 4.9381149999999934e+03, 'optmiality_proven': True, 'maximizing': True},
+            "organoid_40_hard" : {'value': 1.4510972999999998e+04, 'optmiality_proven': True, 'maximizing': True},
+            "organoid_80_soft" : {'value': 1.0279305000000011e+04, 'optmiality_proven': True, 'maximizing': True},
+            "organoid_80_medium" : {'value': 1.9974411999999982e+04, 'optmiality_proven': True, 'maximizing': True},
+            "organoid_80_hard" : {'value': 5.5988517999999989e+04, 'optmiality_proven': True, 'maximizing': True},
+            "organoid_100_soft" : {'value': 1.2815680000000011e+04, 'optmiality_proven': True, 'maximizing': True},
+            "organoid_100_medium" : {'value': 2.5669648999999969e+04, 'optmiality_proven': True, 'maximizing': True},
+            "organoid_100_hard" : {'value': 7.5138894000000044e+04, 'optmiality_proven': True, 'maximizing': True},
+            "organoid_160_soft" : {'value': 2.4628807000000023e+04, 'optmiality_proven': True, 'maximizing': True},
+            "organoid_160_medium" : {'value': 4.7814863999999958e+04, 'optmiality_proven': True, 'maximizing': True},
+            "organoid_160_hard" : {'value': 1.3533561700000061e+05, 'optmiality_proven': True, 'maximizing': True},
+            }
+
+    if instance_name in optimal_values:
+        return optimal_values[instance_name]
+    else:
+        print(f"{instance_name} could not be found in optimal_values_table!")
+        exit(-1)
+
 def plot(analysis):
 
-    ilp_sol = 0.5498994699576757 * 1e3
+    # todo get from instance_optimal_info()
+    ilp_sol = 0
 
     iterations = [it["iteration"] for it in analysis["iterations"]]
     lp_times = [it["lp_time"] for it in analysis["iterations"]]
@@ -119,57 +185,59 @@ def plot(analysis):
 
     plt.show()
 
-def create_csvs(data_name, alist, ilp_solution):
-    data = []
-    data.append([f"\\texttt{{{data_name}}}"] + [f"{a['name']}" for a in alist])
-    data.append(["iterations"] + [a["iterations"][-1]["iteration"] for a in alist])
+def highlight_value(table_row, value):
+    for i in range(len(table_row)):
+        if table_row[i] == value:
+            table_row[i] = f"\\textbf{{{table_row[i]}}}"
+        
 
-    with open(data_name + "_analysis.csv", 'w') as output_csv:
+def single_instance_analysis(instance_name, rc_list):
+    order_and_label_runConfigs(rc_list)
+    opt_info = instance_optimal_info(instance_name)
+    data = []
+    # first row
+    data.append([f"\\texttt{{{instance_name}}}"] + [f"{rc['label']}" for rc in rc_list])
+    
+    iterations = ["# iterations"] + [rc["iterations"][-1]["iteration"] for rc in rc_list]
+    highlight_value(iterations, min(iterations[1:]))
+    data.append(iterations)
+
+    # norm to best times -> fixed width in table
+    times = ["time"] + [float(f"{rc['total_time']:.2f}") for rc in rc_list]
+    highlight_value(times, min(times[1:]))
+    data.append(times)
+
+    # norm to best objective (calc gap) -> fixed width in table
+    objectives = ["objective"] + [float(f"{rc['last_objective']:.2f}") for rc in rc_list]
+    highlight_value(objectives,  min(objectives[1:]) if opt_info["maximizing"] else max(objectives[1:]))
+    data.append(objectives)
+
+    with open(instance_name + "_analysis.csv", 'w') as output_csv:
         writer = csv.writer(output_csv)
         writer.writerows(data)
 
-def sort_and_rename(alist):
-    ord_sub = {
-            "Δ-1": [0,"\\texttt{Δ}"],
-            "Δ_no-maxcut-1": [1,"$\\texttt{Δ}_{\\infty}$"],
-            "Δ_var-once-1": [2,"$\\texttt{Δ}^{\\leq 1}$"],
-            "Δ_no-maxcut_var-once-1": [3,"$\\texttt{Δ}_{\\infty}^{\\leq 1}$"],
-            "Δ_st1-1": [4,"1"],
-            "Δ_st1-2": [5,"2"],
-            "Δ_st1-3": [6,"3"],
-            "Δ_st2-1": [7,"1"],
-            "Δ_st2-2": [8,"2"],
-            "Δ_st2-3": [9,"3"],
-            "Δ_st12-1": [10,"1"],
-            "Δ_st12-2": [11,"2"],
-            "Δ_st12-3": [12,"3"],
-            "Δ_half-1": [13,"\\texttt{Δ-half}"],
-            "Δ_two-1": [14,"\\texttt{Δ-two}"],
-            "Δ_circles-1": [15,"\\texttt{Δ-cycles}"],
-            "all-1": [16,"1"],
-            "all-2": [17,"2"],
-            "all-3": [18,"3"],
-            }
-    alist.sort(key=lambda a: ord_sub[f"{a['run_config']}-{a['run_number']}"][0])
-    for a in alist:
-        a["name"] = ord_sub[f"{a['run_config']}-{a['run_number']}"][1]
-
 
 def main():
-    parser = argparse.ArgumentParser(description="Run on all 'measurements.csv' for one data set to create analysis.csv.")
+    parser = argparse.ArgumentParser(prog="CliqPartAnalysis",
+                                     description="Analysis tool for results obtained from the cliqpart executable.")
+    parser.add_argument('-m',
+                        '--multi-instances',
+                        dest='multiParse',
+                        action='store_true',
+                        help="Use this flag if you supply measurements for more than one instance.")
     parser.add_argument('files', nargs='+')
     args = parser.parse_args()
 
-    path_parts = Path(args.files[0]).parts
-    data_name = path_parts[-4]
+    if not args.multiParse:
+        path_parts = Path(args.files[0]).parts
+        instance_name = path_parts[-4]
 
-    alist = []
-    for file in args.files:
-        a = readin_measurements(file)
-        alist.append(a)
+        rc_list = []
+        for file in args.files:
+            a = readin_measurements(file)
+            rc_list.append(a)
 
-    sort_and_rename(alist)
-    create_csvs(data_name, alist, 0.5498994699576757 * 1e3)
+        single_instance_analysis(instance_name, rc_list)
 
 if __name__ == "__main__":
     main()

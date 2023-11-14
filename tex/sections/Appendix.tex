@@ -4,8 +4,10 @@
 
 \begin{table}[H]
 \centering
+\resizebox{\linewidth}{!}{
 \csvreader[
 	no head,
+	respect sharp,
 	column count = 20,
 	tabular={cccccccccccccccccccc},
 	table head = {\toprule
@@ -17,6 +19,7 @@
 	table foot = {\bottomrule},
 	late after first line=\\\midrule,
 ]{analysisCSVs/dolphins_analysis.csv}{}{\csvlinetotablerow}
+}
 \caption{Analysis of \texttt{dolphins} data}
 \end{table}
 

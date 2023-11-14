@@ -1,2 +1,4 @@
-\texttt{dolphins},\texttt{Δ},$\texttt{Δ}_{\infty}$,$\texttt{Δ}^{\leq 1}$,$\texttt{Δ}_{\infty}^{\leq 1}$,1,2,3,1,2,3,1,2,3,\texttt{Δ-half},\texttt{Δ-two},\texttt{Δ-circles},1,2,3
-iterations,12,4,18,16,43,40,41,36,29,28,29,53,32,12,12,12,25,48,34
+\texttt{dolphins},\texttt{Δ},$\texttt{Δ}_{\infty}$,$\texttt{Δ}^{\leq 1}$,$\texttt{Δ}_{\infty}^{\leq 1}$,1,2,3,1,2,3,1,2,3,\texttt{Δ-half},\texttt{Δ-two},\texttt{Δ-cycles},1,2,3
+# iterations,12,\textbf{4},18,16,43,40,41,36,29,28,29,53,32,12,12,12,25,48,34
+time,0.08,\textbf{0.03},0.12,0.12,0.22,0.21,0.21,0.21,0.16,0.18,0.15,0.27,0.21,5.62,3.85,9.41,0.15,0.23,0.2
+objective,552.86,552.86,552.86,552.86,\textbf{549.92},\textbf{549.92},\textbf{549.92},\textbf{549.92},\textbf{549.92},\textbf{549.92},\textbf{549.92},\textbf{549.92},\textbf{549.92},552.86,552.86,552.86,\textbf{549.92},\textbf{549.92},\textbf{549.92}
