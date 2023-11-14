@@ -145,7 +145,7 @@ def sort_and_rename(alist):
             "Δ_st12-3": [12,"3"],
             "Δ_half-1": [13,"\\texttt{Δ-half}"],
             "Δ_two-1": [14,"\\texttt{Δ-two}"],
-            "Δ_circles-1": [15,"\\texttt{Δ-circles}"],
+            "Δ_circles-1": [15,"\\texttt{Δ-cycles}"],
             "all-1": [16,"1"],
             "all-2": [17,"2"],
             "all-3": [18,"3"],
