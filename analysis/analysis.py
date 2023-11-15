@@ -106,9 +106,9 @@ def order_and_label_runConfigs(rc_list):
             "Δ_st12-1": [10,"1"],
             "Δ_st12-2": [11,"2"],
             "Δ_st12-3": [12,"3"],
-            "Δ_half-1": [13,"\\texttt{Δ-half}"],
-            "Δ_two-1": [14,"\\texttt{Δ-two}"],
-            "Δ_circles-1": [15,"\\texttt{Δ-cycles}"],
+            "Δ_half-1": [13,"\\texttt{Δ-½}"],
+            "Δ_two-1": [14,"\\texttt{Δ-2}"],
+            "Δ_circles-1": [15,"\\texttt{Δ-c}"],
             "all-1": [16,"1"],
             "all-2": [17,"2"],
             "all-3": [18,"3"],
@@ -196,9 +196,9 @@ def single_instance_analysis(instance_name, rc_list):
     opt_info = instance_optimal_info(instance_name)
     data = []
     # first row
-    data.append([f"\\texttt{{{instance_name}}}"] + [f"{rc['label']}" for rc in rc_list])
+    data.append([""] + [f"{rc['label']}" for rc in rc_list])
     
-    iterations = ["# iterations"] + [rc["iterations"][-1]["iteration"] for rc in rc_list]
+    iterations = ["# it."] + [rc["iterations"][-1]["iteration"] for rc in rc_list]
     highlight_value(iterations, min(iterations[1:]))
     data.append(iterations)
 
@@ -208,9 +208,14 @@ def single_instance_analysis(instance_name, rc_list):
     data.append(times)
 
     # norm to best objective (calc gap) -> fixed width in table
-    objectives = ["objective"] + [float(f"{rc['last_objective']:.2f}") for rc in rc_list]
-    highlight_value(objectives,  min(objectives[1:]) if opt_info["maximizing"] else max(objectives[1:]))
-    data.append(objectives)
+    objectives = ["objective"] + [rc['last_objective'] for rc in rc_list]
+    best_relaxation = min(objectives[1:]) if opt_info["maximizing"] else max(objectives[1:])
+
+    gaps = list(map(lambda x: abs(x - opt_info["value"]) / abs(x), objectives[1:]))
+    gaps = ["gap"] + list(map(lambda x: float(f"{x:.2f}"),gaps))
+
+    highlight_value(gaps, min(gaps[1:]))
+    data.append(gaps)
 
     with open(instance_name + "_analysis.csv", 'w') as output_csv:
         writer = csv.writer(output_csv)

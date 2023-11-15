@@ -1,26 +1,37 @@
 \appendix
 \begin{landscape}
+
 \section{Result data}\label{sec:result_data}
+
+\newcommand{\mycsvtable}[1]{
+	\resizebox{\linewidth}{!}{
+		\csvreader[
+			no head,
+			respect sharp,
+			column count = 20,
+			tabular={@{}lccccccccccccccccccc@{}},
+			table head = {\toprule
+				&&&&&\multicolumn{3}{c}{\texttt{Δ-st-1}}
+				&\multicolumn{3}{c}{\texttt{Δ-st-2}}
+				&\multicolumn{3}{c}{\texttt{Δ-st-12}}
+				&&&&\multicolumn{3}{c}{\texttt{all}}
+				\\ \cmidrule(lr){6-8}\cmidrule(lr){9-11}\cmidrule(lr){12-14}\cmidrule(lr){18-20}},
+			table foot = {\bottomrule},
+			late after first line=\\\midrule,
+		]{#1}{}{\csvlinetotablerow}
+	}
+}
 
 \begin{table}[H]
 \centering
-\resizebox{\linewidth}{!}{
-\csvreader[
-	no head,
-	respect sharp,
-	column count = 20,
-	tabular={cccccccccccccccccccc},
-	table head = {\toprule
-		&&&&&\multicolumn{3}{c}{\texttt{Δ-st-1}}
-		&\multicolumn{3}{c}{\texttt{Δ-st-2}}
-		&\multicolumn{3}{c}{\texttt{Δ-st-12}}
-		&&&&\multicolumn{3}{c}{\texttt{all}}
-		\\ \cmidrule(lr){6-8}\cmidrule(lr){9-11}\cmidrule(lr){12-14}\cmidrule(lr){18-20}},
-	table foot = {\bottomrule},
-	late after first line=\\\midrule,
-]{analysisCSVs/dolphins_analysis.csv}{}{\csvlinetotablerow}
-}
 \caption{Analysis of \texttt{dolphins} data}
+\mycsvtable{analysisCSVs/dolphins_analysis.csv}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Analysis of \texttt{adjnoun} data}
+\mycsvtable{analysisCSVs/adjnoun_analysis.csv}
 \end{table}
 
 \end{landscape}
