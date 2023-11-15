@@ -1,7 +1,6 @@
 \section{Computational Experiments}\label{sec:experiments}
-This section is concerned with our computational experiments and the results we obtained from them.
-First we explain the setup and configurations for the separation routines (\textit{separators} for short) mentioned in \cref{sec:separation}.
-Then we present the computational results along with some indications to their expressiveness.
+This section is concerned with the setup of our computational experiments.
+We explain the overall procedure of the algorithm, configuration parameters for the separation routines (called \textit{separators} for short), and ways of combining separators into \textit{run configurations}.
 
 \subsection{Setup}\label{subsec:experiments_setup}
 All tests were performed on the same machine running Ubuntu 23.04 as the operating system.
@@ -83,7 +82,7 @@ However, we limit computation time to 15 minutes, because not imposing any time 
 Especially so for separation of the two-chorded odd cycyle inequalities due to the higher exponent in the time complexity of the routine (cf.\ \cref{subsec:two_chorded_separator} and \cref{subsec:half_chorded_separator}).
 We remark that the \texttt{maxcut} limit was often hit before the time limit.
 
-\subsection{Separator Combinations}\label{subsec:separator_combinations}
+\subsection{Combining Separators}\label{subsec:run_configurations}
 We are interested in the practical use of different combinations of these separators with possibly different configurations.
 In our experience, the separators \texttt{half} and \texttt{two} needed considerably more time to terminate than other separators, which is due to the higher exponent in run time complexity.
 To evaluate whether the obtained improvement in tightness of the relaxation is worth the additional computation time required,
@@ -109,10 +108,3 @@ We did not test what consequences exchanging the \texttt{Δ}-separator for $\tex
 \label{tab:run_configurations}
 \end{table}
 
-\subsection{Results}\label{subsec:experiments_results}
-\subsubsection{A Note on Computation Time}
-Admittedly, exact running time was of less concern to us than the qualitative differences in LP relaxations obtained from the use of different run configurations.
-The measurement techniques we used gave us a good grasp on the overall progress made per iteration.
-However, we do not believe that they were sophisticated enough to report accurately on the time frames of interest here.
-Especially in (but not limited to) the first few iterations, many violated constraints can be found quickly, leading to durations in the order of milliseconds for a whole iteration, \ie solving the LP and separating the obtained solution.
-While we do feel comfortable reporting on durations in the order of seconds and upwards, which can often be found for the \texttt{half} and \texttt{two} separators as well as for the overall computation time of a run, we advice the reader to treat smaller durations with caution.

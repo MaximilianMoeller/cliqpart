@@ -1,13 +1,15 @@
 \appendix
 \begin{landscape}
 
-\section{Result data}\label{sec:result_data}
+\section{Empirical Data}\label{sec:empirical_data}
 
 \newcommand{\mycsvtable}[1]{
 	\resizebox{\linewidth}{!}{
 		\csvreader[
+			separator=semicolon,
 			no head,
 			respect sharp,
+			respect percent,
 			column count = 20,
 			tabular={@{}lccccccccccccccccccc@{}},
 			table head = {\toprule
@@ -24,14 +26,122 @@
 
 \begin{table}[H]
 \centering
-\caption{Analysis of \texttt{dolphins} data}
+\caption{Computational results for \texttt{cetacea}}
+\mycsvtable{analysisCSVs/cetacea_analysis.csv}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Computational results for \texttt{cats}}
+\mycsvtable{analysisCSVs/wild_cats_analysis.csv}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Computational results for \texttt{football}}
+\mycsvtable{analysisCSVs/football_analysis.csv}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Computational results for \texttt{adjnoun}}
+\mycsvtable{analysisCSVs/adjnoun_analysis.csv}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Computational results for \texttt{polbooks}}
+\mycsvtable{analysisCSVs/polbooks_analysis.csv}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Computational results for \texttt{lesmis}}
+\mycsvtable{analysisCSVs/lesmis_analysis.csv}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Computational results for \texttt{dolphins}}
 \mycsvtable{analysisCSVs/dolphins_analysis.csv}
 \end{table}
 
 \begin{table}[H]
 \centering
-\caption{Analysis of \texttt{adjnoun} data}
-\mycsvtable{analysisCSVs/adjnoun_analysis.csv}
+\caption{Computational results for \texttt{karate}}
+\mycsvtable{analysisCSVs/karate_analysis.csv}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Computational results for \texttt{organoid\_160\_hard}}
+\mycsvtable{analysisCSVs/organoid_160_hard_analysis.csv}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Computational results for \texttt{organoid\_160\_medium}}
+\mycsvtable{analysisCSVs/organoid_160_medium_analysis.csv}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Computational results for \texttt{organoid\_160\_soft}}
+\mycsvtable{analysisCSVs/organoid_160_soft_analysis.csv}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Computational results for \texttt{organoid\_100\_hard}}
+\mycsvtable{analysisCSVs/organoid_100_hard_analysis.csv}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Computational results for \texttt{organoid\_100\_medium}}
+\mycsvtable{analysisCSVs/organoid_100_medium_analysis.csv}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Computational results for \texttt{organoid\_100\_soft}}
+\mycsvtable{analysisCSVs/organoid_100_soft_analysis.csv}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Computational results for \texttt{organoid\_80\_hard}}
+\mycsvtable{analysisCSVs/organoid_80_hard_analysis.csv}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Computational results for \texttt{organoid\_80\_medium}}
+\mycsvtable{analysisCSVs/organoid_80_medium_analysis.csv}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Computational results for \texttt{organoid\_80\_soft}}
+\mycsvtable{analysisCSVs/organoid_80_soft_analysis.csv}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Computational results for \texttt{organoid\_40\_hard}}
+\mycsvtable{analysisCSVs/organoid_40_hard_analysis.csv}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Computational results for \texttt{organoid\_40\_medium}}
+\mycsvtable{analysisCSVs/organoid_40_medium_analysis.csv}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Computational results for \texttt{organoid\_40\_soft}}
+\mycsvtable{analysisCSVs/organoid_40_soft_analysis.csv}
 \end{table}
 
 \end{landscape}

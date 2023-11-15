@@ -1,0 +1,9 @@
+;\texttt{Δ};$\texttt{Δ}_{\infty}$;$\texttt{Δ}^{\leq 1}$;$\texttt{Δ}_{\infty}^{\leq 1}$;1;2;3;1;2;3;1;2;3;\texttt{Δ-½};\texttt{Δ-2};\texttt{Δ-c};1;2;3
+# it.;\textbf{{4}};\textbf{{4}};{12};{12};\textbf{{4}};\textbf{{4}};\textbf{{4}};\textbf{{4}};\textbf{{4}};\textbf{{4}};\textbf{{4}};\textbf{{4}};\textbf{{4}};\textbf{{4}};\textbf{{4}};\textbf{{4}};\textbf{{4}};\textbf{{4}};\textbf{{4}}
+calls;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+objective;;;;;;;;;;;;;;;;;;;
+bound;\textbf{2.508};\textbf{2.508};\textbf{2.508};\textbf{2.508};\textbf{2.508};\textbf{2.508};\textbf{2.508};\textbf{2.508};\textbf{2.508};\textbf{2.508};\textbf{2.508};\textbf{2.508};\textbf{2.508};\textbf{2.508};\textbf{2.508};\textbf{2.508};\textbf{2.508};\textbf{2.508};\textbf{2.508}
+gap;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$
+time;;;;;;;;;;;;;;;;;;;
+seconds;\textbf{0.003};\textbf{0.003};0.005;0.005;\textbf{0.003};\textbf{0.003};\textbf{0.003};\textbf{0.003};\textbf{0.003};\textbf{0.003};\textbf{0.003};\textbf{0.003};\textbf{0.003};\textbf{0.003};\textbf{0.003};\textbf{0.003};\textbf{0.003};\textbf{0.003};\textbf{0.003}
+relative;\textbf{1.00};\textbf{1.00};1.67;1.67;\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00}

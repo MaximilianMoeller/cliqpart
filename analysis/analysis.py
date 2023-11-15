@@ -56,8 +56,11 @@ def readin_measurements(file):
                 "instance_name": instance_name,
                 "run_config": runConfig,
                 "run_number": numDir,
+                "iterations": [],
+
                 "total_time": (times[-1] - times[0]) / timedelta(seconds=1),
-                "iterations": []
+                "termination": {},
+                "last_objective": None,
                 }
 
         iteration_dict = {}
@@ -70,7 +73,6 @@ def readin_measurements(file):
                         "lp_size": (analysis["iterations"][-1]["lp_size"] + analysis["iterations"][-1]["separators"][-1][1] - analysis["iterations"][-1]["removed"]) if len(analysis["iterations"]) > 0 else 0,
                         "separators": [],
                         "removed": 0,
-                        "termination": {}
                         }
 
             elif message["message"] == "SEPARATOR":
@@ -85,7 +87,7 @@ def readin_measurements(file):
                 analysis["iterations"].append(iteration_dict)
 
             elif message["message"] == "TERMINATION":
-                iteration_dict["termination"] = message["cause"]
+                analysis["termination"] = message["cause"]
                 analysis["iterations"].append(iteration_dict)
 
         analysis["last_objective"] = analysis["iterations"][-1]["obj_value"]
@@ -120,34 +122,34 @@ def order_and_label_runConfigs(rc_list):
 def instance_optimal_info(instance_name):
     optimal_values = {
             # grötschel wakabayashi
-            "cetacea" : {'value': -967, 'optmiality_proven': True, 'maximizing': False},
-            "wild_cats" : {'value': -1304, 'optmiality_proven': True, 'maximizing': False},
+            "cetacea" : {'value': -967, 'optmiality_proven': True, 'maximizing': False, 'scaling': 1},
+            "wild_cats" : {'value': -1304, 'optmiality_proven': True, 'maximizing': False, 'scaling': 1},
 
             # constructed
-            "violated_half" : {'value': -4, 'optmiality_proven': True, 'maximizing': False},
-            "violated_2" : {'value': -3, 'optmiality_proven': True, 'maximizing': False},
+            "violated_half" : {'value': -4, 'optmiality_proven': True, 'maximizing': False, 'scaling': 1},
+            "violated_2" : {'value': -3, 'optmiality_proven': True, 'maximizing': False, 'scaling': 1},
 
             # modularity clustering
-            "football" : {'value': 6.1332494165298363e+02, 'optmiality_proven': True, 'maximizing': True},
-            "adjnoun" : {'value': 314.2048442906573, 'optmiality_proven': False, 'maximizing': True},
-            "polbooks" : {'value': 5.4076747857117175e+02, 'optmiality_proven': True, 'maximizing': True},
-            "lesmis" : {'value': 5.8373891747783489e+02, 'optmiality_proven': True, 'maximizing': True},
-            "dolphins" : {'value': 5.4991891143546547e+02, 'optmiality_proven': True, 'maximizing': True},
-            "karate" : {'value': 4.6959237343852726e+02, 'optmiality_proven': True, 'maximizing': True},
+            "football" : {'value': 6.1332494165298363e+02, 'optmiality_proven': True, 'maximizing': True, 'scaling': 1e+03},
+            "adjnoun" : {'value': 314.2048442906573, 'optmiality_proven': False, 'maximizing': True, 'scaling': 1e+03},
+            "polbooks" : {'value': 5.4076747857117175e+02, 'optmiality_proven': True, 'maximizing': True, 'scaling': 1e+03},
+            "lesmis" : {'value': 5.8373891747783489e+02, 'optmiality_proven': True, 'maximizing': True, 'scaling': 1e+03},
+            "dolphins" : {'value': 5.4991891143546547e+02, 'optmiality_proven': True, 'maximizing': True, 'scaling': 1e+03},
+            "karate" : {'value': 4.6959237343852726e+02, 'optmiality_proven': True, 'maximizing': True, 'scaling': 1e+03},
 
             # organoids
-            "organoid_40_soft" : {'value': 2.5080850000000023e+03, 'optmiality_proven': True, 'maximizing': True},
-            "organoid_40_medium" : {'value': 4.9381149999999934e+03, 'optmiality_proven': True, 'maximizing': True},
-            "organoid_40_hard" : {'value': 1.4510972999999998e+04, 'optmiality_proven': True, 'maximizing': True},
-            "organoid_80_soft" : {'value': 1.0279305000000011e+04, 'optmiality_proven': True, 'maximizing': True},
-            "organoid_80_medium" : {'value': 1.9974411999999982e+04, 'optmiality_proven': True, 'maximizing': True},
-            "organoid_80_hard" : {'value': 5.5988517999999989e+04, 'optmiality_proven': True, 'maximizing': True},
-            "organoid_100_soft" : {'value': 1.2815680000000011e+04, 'optmiality_proven': True, 'maximizing': True},
-            "organoid_100_medium" : {'value': 2.5669648999999969e+04, 'optmiality_proven': True, 'maximizing': True},
-            "organoid_100_hard" : {'value': 7.5138894000000044e+04, 'optmiality_proven': True, 'maximizing': True},
-            "organoid_160_soft" : {'value': 2.4628807000000023e+04, 'optmiality_proven': True, 'maximizing': True},
-            "organoid_160_medium" : {'value': 4.7814863999999958e+04, 'optmiality_proven': True, 'maximizing': True},
-            "organoid_160_hard" : {'value': 1.3533561700000061e+05, 'optmiality_proven': True, 'maximizing': True},
+            "organoid_40_soft" : {'value': 2.5080850000000023e+03, 'optmiality_proven': True, 'maximizing': True, 'scaling': 1e+03},
+            "organoid_40_medium" : {'value': 4.9381149999999934e+03, 'optmiality_proven': True, 'maximizing': True, 'scaling': 1e+03},
+            "organoid_40_hard" : {'value': 1.4510972999999998e+04, 'optmiality_proven': True, 'maximizing': True, 'scaling': 1e+03},
+            "organoid_80_soft" : {'value': 1.0279305000000011e+04, 'optmiality_proven': True, 'maximizing': True, 'scaling': 1e+03},
+            "organoid_80_medium" : {'value': 1.9974411999999982e+04, 'optmiality_proven': True, 'maximizing': True, 'scaling': 1e+03},
+            "organoid_80_hard" : {'value': 5.5988517999999989e+04, 'optmiality_proven': True, 'maximizing': True, 'scaling': 1e+03},
+            "organoid_100_soft" : {'value': 1.2815680000000011e+04, 'optmiality_proven': True, 'maximizing': True, 'scaling': 1e+03},
+            "organoid_100_medium" : {'value': 2.5669648999999969e+04, 'optmiality_proven': True, 'maximizing': True, 'scaling': 1e+03},
+            "organoid_100_hard" : {'value': 7.5138894000000044e+04, 'optmiality_proven': True, 'maximizing': True, 'scaling': 1e+03},
+            "organoid_160_soft" : {'value': 2.4628807000000023e+04, 'optmiality_proven': True, 'maximizing': True, 'scaling': 1e+03},
+            "organoid_160_medium" : {'value': 4.7814863999999958e+04, 'optmiality_proven': True, 'maximizing': True, 'scaling': 1e+03},
+            "organoid_160_hard" : {'value': 1.3533561700000061e+05, 'optmiality_proven': True, 'maximizing': True, 'scaling': 1e+03},
             }
 
     if instance_name in optimal_values:
@@ -185,9 +187,9 @@ def plot(analysis):
 
     plt.show()
 
-def highlight_value(table_row, value):
+def highlight_values(table_row, mark_indices):
     for i in range(len(table_row)):
-        if table_row[i] == value:
+        if mark_indices[i]:
             table_row[i] = f"\\textbf{{{table_row[i]}}}"
         
 
@@ -198,27 +200,65 @@ def single_instance_analysis(instance_name, rc_list):
     # first row
     data.append([""] + [f"{rc['label']}" for rc in rc_list])
     
-    iterations = ["# it."] + [rc["iterations"][-1]["iteration"] for rc in rc_list]
-    highlight_value(iterations, min(iterations[1:]))
-    data.append(iterations)
+    # extract
+    iterations = [rc["iterations"][-1]["iteration"] for rc in rc_list]
+    # find best
+    mark_indices = [it == min(iterations) for it in iterations]
+    # format
+    iterations = list(map(lambda x: f"{{{x:,}}}", iterations))
+    # highlight
+    highlight_values(iterations, mark_indices)
+    # add
+    data.append(["# it."] + iterations)
 
-    # norm to best times -> fixed width in table
-    times = ["time"] + [float(f"{rc['total_time']:.2f}") for rc in rc_list]
-    highlight_value(times, min(times[1:]))
-    data.append(times)
+    # calls to non-Δ-separators
+    calls = [sum([len(iteration["separators"]) - 1 for iteration in rc["iterations"]]) for rc in rc_list]
+    data.append(["calls"] + calls)
 
-    # norm to best objective (calc gap) -> fixed width in table
-    objectives = ["objective"] + [rc['last_objective'] for rc in rc_list]
-    best_relaxation = min(objectives[1:]) if opt_info["maximizing"] else max(objectives[1:])
+    # objectives, absolute and gaps
+    objectives = [rc['last_objective'] / opt_info["scaling"] for rc in rc_list]
+    gaps = list(map(lambda x: abs(x - (opt_info["value"] / opt_info["scaling"])) / abs(opt_info["value"] / opt_info["scaling"]), objectives))
+    integrals = [rc["termination"]["integral"] for rc in rc_list]
 
-    gaps = list(map(lambda x: abs(x - opt_info["value"]) / abs(x), objectives[1:]))
-    gaps = ["gap"] + list(map(lambda x: float(f"{x:.2f}"),gaps))
+    best_gap = min(gaps)
+    mark_indices = [abs(gap - best_gap) < 1e-9 for gap in gaps]
 
-    highlight_value(gaps, min(gaps[1:]))
-    data.append(gaps)
+    objectives = list(map(lambda x: f"{x:.4g}", objectives))
 
-    with open(instance_name + "_analysis.csv", 'w') as output_csv:
-        writer = csv.writer(output_csv)
+    highlight_values(objectives, mark_indices)
+    for i in range(len(gaps)):
+        (integral, mark) = (integrals[i], mark_indices[i])
+        if integral:
+            gaps[i] = f"$\\bm{{{gaps[i]:.1%}}}^{{*}}$"
+        elif mark:
+            gaps[i] = f"$\\bm{{{gaps[i]:.1%}}}$"
+        else:
+            gaps[i] = f"{gaps[i]:.1%}"
+
+    data.append(["objective"] + ["" for _ in range(0,19)])
+    data.append(["bound"] + objectives)
+    data.append(["gap"] + gaps)
+
+    # time, absolute and relative
+    # avoid division by 0
+    times = [max(0.001, rc['total_time']) for rc in rc_list]
+    min_time = min(times)
+    rel_times = [t / min_time for t in times]
+
+    mark_indices = [time == min_time for time in times]
+
+    times = list(map(lambda x: f"{x:.3f}", times))
+    rel_times = list(map(lambda x: f"{x:.2f}", rel_times))
+
+    highlight_values(times, mark_indices)
+    highlight_values(rel_times, mark_indices)
+
+    data.append(["time"] + ["" for _ in range(0,19)])
+    data.append(["seconds"] + times)
+    data.append(["relative"] + rel_times)
+
+    with open("analysisCSVs/" + instance_name + "_analysis.csv", 'w') as output_csv:
+        writer = csv.writer(output_csv, delimiter=";")
         writer.writerows(data)
 
 
@@ -233,15 +273,17 @@ def main():
     parser.add_argument('files', nargs='+')
     args = parser.parse_args()
 
-    if not args.multiParse:
-        path_parts = Path(args.files[0]).parts
-        instance_name = path_parts[-4]
+    instances = {}
+    for file in args.files:
 
-        rc_list = []
-        for file in args.files:
-            a = readin_measurements(file)
-            rc_list.append(a)
+        instance_name = Path(file).parts[-4]
+        if instance_name not in instances:
+            instances[instance_name] = []
 
+        measurement = readin_measurements(file)
+        instances[instance_name].append(measurement)
+
+    for (instance_name, rc_list) in instances.items():
         single_instance_analysis(instance_name, rc_list)
 
 if __name__ == "__main__":
