@@ -28,24 +28,6 @@ def readin_measurements(file):
         times = [parse_time(row[0] + " " + row[1]) for row in headerless]
         messages = [parse_dict(row[6]) for row in headerless]
 
-
-#       Format of the analysis dict
-#        {
-#            # in seconds
-#            "total_time" = 0.5,
-#            # every iteration gets a dictionary with the important features
-#            "iterations" = [
-#                {
-#                    # in ms
-#                    "LP_time" : 10,
-#                    "obj_value": 110293,
-#                    # list of tuples of the form (separator_abbreviation, violated_found, time in ms)
-#                    "separators": [("Δ", 0), ("ST", 14)],
-#                    "removed": 130,
-#                    "integral": False}
-#            ]
-#        }
-
         path_parts = Path(file).parts
         print(path_parts)
         instance_name = path_parts[-4]
@@ -158,34 +140,6 @@ def instance_optimal_info(instance_name):
         print(f"{instance_name} could not be found in optimal_values_table!")
         exit(-1)
 
-def plot(analysis):
-
-    # todo get from instance_optimal_info()
-    ilp_sol = 0
-
-    iterations = [it["iteration"] for it in analysis["iterations"]]
-    lp_times = [it["lp_time"] for it in analysis["iterations"]]
-    lp_sizes = [it["lp_size"] for it in analysis["iterations"]]
-    objectives = [it["obj_value"] for it in analysis["iterations"]]
-    gaps = [(abs(lp_sol - ilp_sol) / abs(lp_sol)) for lp_sol in objectives]
-    separator_times = [sum([sep[2] for sep in it["separators"]]) for it in analysis["iterations"]]
-
-    font = {'family': 'DejaVu Sans',
-        'weight': 'medium',
-        'size': 15}
-
-    fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1, sharex=True, layout='constrained')
-
-    ax1.set_ylabel("LP Solver Time / ms")
-    ax1.plot(iterations, lp_times)
-    ax2.set_ylabel("LP Size")
-    ax2.plot(iterations, lp_sizes)
-    ax3.set_ylabel("Gap of LP relaxation")
-    ax3.plot(iterations, gaps)
-    ax4.set_ylabel("Separator Time")
-    ax4.plot(iterations, separator_times)
-
-    plt.show()
 
 def highlight_values(table_row, mark_indices):
     for i in range(len(table_row)):
@@ -196,12 +150,15 @@ def highlight_values(table_row, mark_indices):
 def single_instance_analysis(instance_name, rc_list):
     order_and_label_runConfigs(rc_list)
     opt_info = instance_optimal_info(instance_name)
-    data = []
-    # first row
-    data.append([""] + [f"{rc['label']}" for rc in rc_list])
+    raw_data, formatted_data = [], []
+    ### first row ##
+    separator_names = [f"{rc['label']}" for rc in rc_list]
+    formatted_data.append([""] + separator_names)
     
+    ### iterations ###
     # extract
     iterations = [rc["iterations"][-1]["iteration"] for rc in rc_list]
+    raw_data.append(iterations.copy())
     # find best
     mark_indices = [it == min(iterations) for it in iterations]
     # format
@@ -209,15 +166,58 @@ def single_instance_analysis(instance_name, rc_list):
     # highlight
     highlight_values(iterations, mark_indices)
     # add
-    data.append(["# it."] + iterations)
+    formatted_data.append(["# it."] + iterations)
 
-    # calls to non-Δ-separators
+    ### calls to non-Δ-separators ###
     calls = [sum([len(iteration["separators"]) - 1 for iteration in rc["iterations"]]) for rc in rc_list]
-    data.append(["calls"] + calls)
+    raw_data.append(calls.copy())
+    formatted_data.append(["# $\\centernot{\\texttt{Δ}}$-calls"] + calls)
 
-    # objectives, absolute and gaps
+    ### cutting planes ###
+    # separators: [(run_configs) [(iterations) [(separators) (abbreviation, violated, time)]]]
+    separators = [[iteration["separators"] for iteration in rc["iterations"]] for rc in rc_list]
+    # extract
+    total_cuts, max_cuts, min_cuts, non_triangle_cuts = [], [], [], []
+    for rc in rc_list:
+        seps_by_it = [iteration["separators"] for iteration in rc["iterations"]]
+        total_cuts.append(sum([it[-1][1] for it in seps_by_it]))
+        max_cuts.append(max([it[-1][1] for it in seps_by_it]))
+        min_cuts.append(min(filter(lambda x: x!=0, [it[-1][1] for it in seps_by_it])))
+        non_triangle_cuts.append(sum([it[-1][1] if it[-1][0] != "Δ" else 0 for it in seps_by_it]))
+
+    total_removed = [sum([it["removed"] for it in rc["iterations"]]) for rc in rc_list]
+
+    raw_data.append(total_cuts.copy())
+    raw_data.append(max_cuts.copy())
+    raw_data.append(min_cuts.copy())
+    raw_data.append(non_triangle_cuts.copy())
+    raw_data.append(total_removed.copy())
+
+    # find best
+    mark_added = [cuts == min(total_cuts) for cuts in total_cuts]
+    # format
+    total_cuts = list(map(lambda x: f"{{{x:,}}}", total_cuts))
+    max_cuts = list(map(lambda x: f"{{{x:,}}}", max_cuts))
+    min_cuts = list(map(lambda x: f"{{{x:,}}}", min_cuts))
+    non_triangle_cuts = list(map(lambda x: f"{{{x:,}}}", non_triangle_cuts))
+    total_removed = list(map(lambda x: f"{{{x:,}}}", total_removed))
+    # highlight
+    highlight_values(total_cuts, mark_added)
+    # add
+    formatted_data.append(["cuts"] + ["" for _ in range(0,19)])
+    formatted_data.append(["# total"] + total_cuts)
+    formatted_data.append(["# max"] + max_cuts)
+    formatted_data.append(["# min"] + min_cuts)
+    formatted_data.append(["# $\\centernot{\\texttt{Δ}}$-cuts"] + non_triangle_cuts)
+    formatted_data.append(["# removed"] + total_removed)
+
+    ### objectives, absolute and gaps ###
     objectives = [rc['last_objective'] / opt_info["scaling"] for rc in rc_list]
     gaps = list(map(lambda x: abs(x - (opt_info["value"] / opt_info["scaling"])) / abs(opt_info["value"] / opt_info["scaling"]), objectives))
+
+    raw_data.append(objectives.copy())
+    raw_data.append(gaps.copy())
+
     integrals = [rc["termination"]["integral"] for rc in rc_list]
 
     best_gap = min(gaps)
@@ -235,16 +235,19 @@ def single_instance_analysis(instance_name, rc_list):
         else:
             gaps[i] = f"{gaps[i]:.1%}"
 
-    data.append(["objective"] + ["" for _ in range(0,19)])
-    data.append(["bound"] + objectives)
-    data.append(["gap"] + gaps)
+    formatted_data.append(["objective"] + ["" for _ in range(0,19)])
+    formatted_data.append(["bound"] + objectives)
+    formatted_data.append(["gap"] + gaps)
 
-    # time, absolute and relative
+    ### times, absolute and normed ###
     # avoid division by 0
     times = [max(0.001, rc['total_time']) for rc in rc_list]
-    min_time = min(times)
-    rel_times = [t / min_time for t in times]
+    rel_times = [t / times[0] for t in times]
 
+    raw_data.append(times.copy())
+    raw_data.append(rel_times.copy())
+
+    min_time = min(times)
     mark_indices = [time == min_time for time in times]
 
     times = list(map(lambda x: f"{x:.3f}", times))
@@ -253,14 +256,43 @@ def single_instance_analysis(instance_name, rc_list):
     highlight_values(times, mark_indices)
     highlight_values(rel_times, mark_indices)
 
-    data.append(["time"] + ["" for _ in range(0,19)])
-    data.append(["seconds"] + times)
-    data.append(["relative"] + rel_times)
+    formatted_data.append(["time"] + ["" for _ in range(0,19)])
+    formatted_data.append(["seconds"] + times)
+    formatted_data.append(["relative"] + rel_times)
 
     with open("analysisCSVs/" + instance_name + "_analysis.csv", 'w') as output_csv:
         writer = csv.writer(output_csv, delimiter=";")
-        writer.writerows(data)
+        writer.writerows(formatted_data)
+    return raw_data
 
+def plot(analysis):
+
+    separator_names = ["Δ", "Δ_∞", "Δ^<=1", "Δ_∞^<=1", 1, 2, 3, 1, 2, 3, 1, 2, 3, "Δ-half", "Δ-2", "Δ-c", 1, 2, 3]
+    font = {'family': 'DejaVu Sans',
+        'weight': 'medium',
+        'size': 15}
+
+    #fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1, sharex=True, layout='constrained')
+
+    #ax1.set_ylabel("LP Solver Time / ms")
+    #ax1.plot(iterations, lp_times)
+    #ax2.set_ylabel("LP Size")
+    #ax2.plot(iterations, lp_sizes)
+    #ax3.set_ylabel("Gap of LP relaxation")
+    #ax3.plot(iterations, gaps)
+    #ax4.set_ylabel("Separator Time")
+    #ax4.plot(iterations, separator_times)
+
+    # maybe should be filtered for when more complicated separators are actually called?
+    # -> nope, defeats point of run configuration!
+    rel_times = list(zip(*[instance[-1] for instance in analysis]))[1:]
+
+    fig, axs = plt.subplots()
+    axs.boxplot(rel_times)
+    axs.set_yscale('log')
+    axs.set_xticklabels(separator_names[1:], rotation=45)
+
+    plt.show()
 
 def main():
     parser = argparse.ArgumentParser(prog="CliqPartAnalysis",
@@ -275,7 +307,6 @@ def main():
 
     instances = {}
     for file in args.files:
-
         instance_name = Path(file).parts[-4]
         if instance_name not in instances:
             instances[instance_name] = []
@@ -283,8 +314,11 @@ def main():
         measurement = readin_measurements(file)
         instances[instance_name].append(measurement)
 
+    raw_multi_instance_data = []
     for (instance_name, rc_list) in instances.items():
-        single_instance_analysis(instance_name, rc_list)
+        raw_multi_instance_data.append(single_instance_analysis(instance_name, rc_list))
+
+    plot(raw_multi_instance_data)
 
 if __name__ == "__main__":
     main()
