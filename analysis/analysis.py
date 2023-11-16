@@ -267,13 +267,20 @@ def single_instance_analysis(instance_name, rc_list):
 
 def plot(analysis):
 
-    separator_names = ["Δ", "Δ_∞", "Δ^<=1", "Δ_∞^<=1", 1, 2, 3, 1, 2, 3, 1, 2, 3, "Δ-half", "Δ-2", "Δ-c", 1, 2, 3]
-    font = {'family': 'DejaVu Sans',
-        'weight': 'medium',
-        'size': 15}
+    separator_names= [
+        "\\texttt{Δ}",
+        "$\\texttt{Δ}_{\\infty}$",
+        "$\\texttt{Δ}^{\\leq 1}$",
+        "$\\texttt{Δ}_{\\infty}^{\\leq 1}$",
+        "\\texttt{Δ-st-1}",
+        "\\texttt{Δ-st-2}",
+        "\\texttt{Δ-st-12}",
+        "\\texttt{Δ-½}",
+        "\\texttt{Δ-2}",
+        "\\texttt{Δ-c}",
+        "\\texttt{all}"]
 
     #fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1, sharex=True, layout='constrained')
-
     #ax1.set_ylabel("LP Solver Time / ms")
     #ax1.plot(iterations, lp_times)
     #ax2.set_ylabel("LP Size")
@@ -285,14 +292,53 @@ def plot(analysis):
 
     # maybe should be filtered for when more complicated separators are actually called?
     # -> nope, defeats point of run configuration!
-    rel_times = list(zip(*[instance[-1] for instance in analysis]))[1:]
+    rel_times = list(zip(*[instance[-1] for instance in analysis]))
+    gaps = list(zip(*[instance[-3] for instance in analysis]))
+    # still contains three lines per run config containing st-separators
+    (triangle_rows, st1_rows, st2_rows, st12_rows, circle_rows, all_rows) = tuple([rel_times[0:4]] + [rel_times[i:i+3] for i in range(4, len(rel_times), 3)])
+    #print(*st1_rows, sep='\n')
+    time_data = triangle_rows \
+                + [list(map(lambda x: sum(x) / len(x), zip(*st1_rows)))] \
+                + [list(map(lambda x: sum(x) / len(x), zip(*st2_rows)))] \
+                + [list(map(lambda x: sum(x) / len(x), zip(*st12_rows)))] \
+                + circle_rows \
+                + [list(map(lambda x: sum(x) / len(x), zip(*all_rows)))]
 
-    fig, axs = plt.subplots()
-    axs.boxplot(rel_times)
-    axs.set_yscale('log')
-    axs.set_xticklabels(separator_names[1:], rotation=45)
+    (triangle_rows, st1_rows, st2_rows, st12_rows, circle_rows, all_rows) = tuple([gaps[0:4]] + [gaps[i:i+3] for i in range(4, len(gaps), 3)])
+    print(*triangle_rows, sep='\n')
+    gap_data = triangle_rows \
+                + [list(map(lambda x: sum(x) / len(x), zip(*st1_rows)))] \
+                + [list(map(lambda x: sum(x) / len(x), zip(*st2_rows)))] \
+                + [list(map(lambda x: sum(x) / len(x), zip(*st12_rows)))] \
+                + circle_rows \
+                + [list(map(lambda x: sum(x) / len(x), zip(*all_rows)))]
+                 
 
-    plt.show()
+    plt.rcParams.update({
+    "text.usetex": True,
+    "pgf.texsystem": "lualatex"
+    })
+
+    fig, (ax_time, ax_gap) = plt.subplots(2, 1, sharex=True, layout='constrained')
+    ax_time.boxplot(time_data,
+                    labels=separator_names,
+                    widths=0.6,
+                    medianprops=dict(color='#0069b4'),
+                    positions=list(map(lambda x: 1.5*x, range(1, len(time_data) + 1))))
+    ax_time.set_yscale('log')
+    ax_time.yaxis.grid(True)
+    ax_gap.boxplot(gap_data,
+                   labels=separator_names,
+                   widths=0.6,
+                   showfliers=True,
+                   medianprops=dict(color='#0069b4'),
+                   positions=list(map(lambda x: 1.5*x, range(1, len(time_data) + 1))))
+    ax_gap.yaxis.grid(True)
+    ax_gap.set_yscale('log')
+    #ax_time.set_xticklabels(separator_names[1:])
+
+    #plt.show()
+    plt.savefig('analysisCSVs/time_bars.pgf')
 
 def main():
     parser = argparse.ArgumentParser(prog="CliqPartAnalysis",

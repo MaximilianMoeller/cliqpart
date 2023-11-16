@@ -1,6 +1,6 @@
 \section{Empirical Results}\label{sec:empirical_results}
-This section will present the empirical results of our experiments and seek to explain them.
-After some remarks, we will mostly explain aggregated data.
+In this section we will present the empirical results of our experiments and try to explain them.
+After some remarks, we will mostly focus on aggregated data.
 The fully detailed results can be found in \cref{sec:empirical_data}.
 
 \subsection{A Note on Computation Time}
@@ -16,3 +16,20 @@ To resolve this issue, we will round all smaller time measurements to one millis
 At the time of writing, the experiments on our randomly created data are still being performed.
 We only managed to finish them in time for $K_{25}$, the smallest instance size we considered.
 If anything, this confirms our suspicion that random instances would be computationally costly compared to natural ones.
+
+\subsection{Optimal solutions}\label{subsec:optimal_solutions}
+% TODOOOOOOO!!!!!!
+
+\begin{figure}
+	\centering
+	\resizebox{\linewidth}{!}{
+	\input{analysisCSVs/time_bars.pgf}}
+	\bigskip
+	\caption[Performance of run configurations]{Performance of run configurations averaged over all instances and experiment repetitions.
+		The upper chart shows relative running time that was normalized with respect to the \texttt{Δ} run configuration.
+		Depicted in the lower chart are average relative gaps to the best known solutions.
+		Both charts are scaled logarithmically.
+		All box plots are drawn in the standard way, \ie boxes are from $Q_{1}$ to $Q_{3}$, blue mark the median, and whiskers extend by $1.5*\var{IQR}$.}
+	\label{fig:time_bars}
+\end{figure}
+
