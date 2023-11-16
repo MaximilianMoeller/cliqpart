@@ -1,0 +1,23 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: cliqpart
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Maximilian
+    family-names: Moeller
+    email: maximilian.moeller@mailbox.tu-dresden.de
+    affiliation: TU Dresden
+repository-code: 'https://github.com/MaximilianMoeller/cliqpart'
+abstract: >-
+  A cutting-plane algorithm for the CliquePartitioning
+  Problem.
+keywords:
+  - combinatorial-optimization
+  - clique-partitioning
+  - cutting-plane-algorithm
+license: MIT
