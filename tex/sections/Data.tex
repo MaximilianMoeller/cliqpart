@@ -9,13 +9,13 @@ We will include such parametrization parameters in the abbreviation.
 \subsubsection{Cetacea (\texttt{cetacea}) and Wild Cats (\texttt{cats})}\label{subsubsec:data_cetacea}
 These instances arose from the classification of cetacea (whales, porpoises, and dolphins) and wild cats, respectively.
 We copied them from \cite{grotschelCuttingPlaneAlgorithm1989}, in order to sanity-check our implementation,
-and consider them as the easiest among our test data, because integral solution were already found after 2 (resp. 3) iterations by just separating triangle inequalities.
+and consider them as the easiest among our test data, because integral solution were already found after three iterations by just separating triangle inequalities.
 
 \subsubsection{Organoid Clustering (\texttt{organoid\_[size]\_[difficulty]})}
-In \cite{presbergerSegmentationClusteringOrganoids2023} the author studied clustering of organoids in light microscopy images, where \CP showed up naturally.
+In \cite{presbergerSegmentationClusteringOrganoids2023}, J. Presberger studied clustering of organoids in light microscopy images, where \CP showed up naturally.
 The findings of this work are yet to be published in a separate paper, but we obtained one instance after private communication.
-It consists of pairwise similarities of 160 organoids measured in an interval $(0,1)$, where a value of $1$ means that two organoids are identical and a value of $0$ means they are dissimilar.
-A challenge in modelling the similarity between different organoids was mapping one organoids components to those of another organoid.
+It consists of pairwise similarities of 160 organoids measured in an interval $(0,1)$, where values of $1$ (resp.\ $0$) correspond to high (resp.\ low) similarity.
+A challenge in modelling this similarity between different organoids is mapping one organoids components to those of another organoid.
 Their solution resulted in an asymmetric cost matrix $C$, \ie for two organoids $i, j$ the similarity value $C_{i,j}$ would not necessarily equal $C_{j,i}$.
 For creating a \CP instance from this cost matrix we chose $w_{ij} = \func{min}(C_{i,j}, C_{j,i})$.
 Note that these are maximization problems instead of the usual minimization.
@@ -60,11 +60,11 @@ In this instance type the edge weights are sampled from a continuous uniform dis
 We suspected these instances to be easier to solve than the binary data, especially when using asymetric boundaries, \eg \texttt{r\_uniform\_[size]\_-10\_+100}, because in an instance like this, ‘conflicts’ are often already solved by the numeric value of the ‘conflicting’ edges.
 
 \subsubsection{Normal distribution (\texttt{r\_normal\_[size]\_[mu]\_[sigma]})}\label{subsubsec:data_random_normal}
-Real-world data can often be described with normal distributions, which raises the question how applicable the separation routines are in practise.
+Real-world data can often be modeled using normal distributions, which raises the question how applicable the separation routines are in practise.
 The edge weights of these instances are sampled from a normal distribution with mean \texttt{mu} and standard deviation \texttt{sigma}.
 We expected that a negative mean would result in ‘easier’ instances, as some subset of the negatively weighted edges might already form ‘isolated’ cliques, \ie vertices connected by negatively weighted edges to each other and by positively weighted edges to all other vertices.
 As discussed earlier, these would always end up in the same block of the partition induced by an optimal clique partitioning.
 This argument is ‘symmetric’ for a positive mean, where the positively weighted ‘isolated’ cliques would always end up in different blocks of the partition instead of the same block.
-We restricted our attention to positive means.
+For this reason we could restrict our attention to positive means.
 Conversely, we expected little to no influence of the standard deviation to the ‘hardness’ of the instance.
 We have created instances for $(\text{\texttt{mu}}, \text{\texttt{sigma}}) \in \left\{ 0, 0.5, 2 \right\} \times \left\{ 0.5, 1, 2 \right\}$.

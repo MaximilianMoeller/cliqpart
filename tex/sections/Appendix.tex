@@ -11,137 +11,242 @@
 			respect sharp,
 			respect percent,
 			column count = 20,
-			tabular={@{}lccccccccccccccccccc@{}},
+			tabular={@{}rlccccccccccccccccccc@{}},
 			table head = {\toprule
-				&&&&&\multicolumn{3}{c}{\texttt{Δ-st-1}}
+				&&&&&&\multicolumn{3}{c}{\texttt{Δ-st-1}}
 				&\multicolumn{3}{c}{\texttt{Δ-st-2}}
 				&\multicolumn{3}{c}{\texttt{Δ-st-12}}
 				&&&&\multicolumn{3}{c}{\texttt{all}}
-				\\ \cmidrule(lr){6-8}\cmidrule(lr){9-11}\cmidrule(lr){12-14}\cmidrule(lr){18-20}},
+				\\ \cmidrule(lr){7-9}\cmidrule(lr){10-12}\cmidrule(lr){13-15}\cmidrule(lr){19-21}},
 			table foot = {\bottomrule},
 			late after first line=\\\midrule,
-		]{#1}{}{\csvlinetotablerow}
+		]{#1}{}{\thecsvrow &\csvlinetotablerow}
 	}
 }
 
 \begin{table}[H]
 \centering
 \caption{Computational results for \texttt{cetacea}}
+\bigskip
 \mycsvtable{analysisCSVs/cetacea_analysis.csv}
+\label{tab:cetacea}
 \end{table}
 
-\begin{table}[H]
+\cref{tab:cetacea} shows the empirical results for the \texttt{cetacea} data set.
+The table is organized as follows:
+\begin{itemize}
+	\item 1: Each column contains statistics for one \textit{run configuration} (cf.\ \cref{subsec:run_configurations}),
+		and run configurations containing at least one \texttt{st}-separator are further split to show results for the three repetitions of the experiment.
+	\item 2-3: Row 2 shows the number of iterations it took for the run configuration to finish. 
+		In bold is the least amount of iterations.
+		Row 3 shows how often non-triangle-separators were called, which is at least as high as the number of iterations in which a non-triangle-separator was called (not shown).
+	\item 4-9: Information about cutting planes. 
+		Row 5 shows how many were added in total during the whole run (least amount in bold),
+		row 6 and 7 show the maximum (resp. minimum) amount of cuts added per iteration.
+		If the algorithm terminated because no violated constraint was found in the last iteration, it is excluded from row 7.
+		Row 8 shows the total number of non-triangle-constraints added
+		and row 9 shows the total number of constraints that were later removed from the LP.
+	\item 10-12: Information about the obtained objective.
+		Row 11 shows the objective value of the last iteration, \ie the tightest relaxation this run configuration could produce.
+		Row 12 shows the relative gap to the best known solution.
+		The tightest relaxations are in bold and row 12 indicates by a $^{*}$ when an integral, \ie optimal solution was found.
+	\item 13-15: Information about running time.
+		Row 14 shows the maximum between the total running time of the algorithm in seconds and one millisecond to emphasize that durations beneath this threshold were not measured.
+		Row 15 shows this time normalized to the running time of the run configuration \texttt{Δ}.
+\end{itemize}
+All non-integer values (rows 10-15) are rounded to preserve at least some clarity.
+It might thus happen, \eg, that a very small (but non-zero) relative gap is shown as $0.0\%$, but neither in bold nor with a $^{*}$.
+
+\newpage
+
+\begin{table}[p]
 \centering
 \caption{Computational results for \texttt{cats}}
+\bigskip
 \mycsvtable{analysisCSVs/wild_cats_analysis.csv}
+\label{tab:cats}
+\\[10pt]
+The structure of the table is as for \cref{tab:cetacea}.
 \end{table}
 
-\begin{table}[H]
+\begin{table}[p]
 \centering
 \caption{Computational results for \texttt{football}}
+\bigskip
 \mycsvtable{analysisCSVs/football_analysis.csv}
+\label{tab:football}
+\\[10pt]
+The structure of the table is as for \cref{tab:cetacea}.
 \end{table}
 
-\begin{table}[H]
+\begin{table}[p]
 \centering
 \caption{Computational results for \texttt{adjnoun}}
+\bigskip
 \mycsvtable{analysisCSVs/adjnoun_analysis.csv}
+\label{tab:adjnoun}
+\\[10pt]
+The structure of the table is as for \cref{tab:cetacea}.
 \end{table}
 
-\begin{table}[H]
+\begin{table}[p]
 \centering
 \caption{Computational results for \texttt{polbooks}}
+\bigskip
 \mycsvtable{analysisCSVs/polbooks_analysis.csv}
+\label{tab:polbooks}
+\\[10pt]
+The structure of the table is as for \cref{tab:cetacea}.
 \end{table}
 
-\begin{table}[H]
+\begin{table}[p]
 \centering
 \caption{Computational results for \texttt{lesmis}}
+\bigskip
 \mycsvtable{analysisCSVs/lesmis_analysis.csv}
+\label{tab:lesmis}
+\\[10pt]
+The structure of the table is as for \cref{tab:cetacea}.
 \end{table}
 
-\begin{table}[H]
+\begin{table}[p]
 \centering
 \caption{Computational results for \texttt{dolphins}}
+\bigskip
 \mycsvtable{analysisCSVs/dolphins_analysis.csv}
+\label{tab:dolphins}
+\\[10pt]
+The structure of the table is as for \cref{tab:cetacea}.
 \end{table}
 
-\begin{table}[H]
+\begin{table}[p]
 \centering
 \caption{Computational results for \texttt{karate}}
+\bigskip
 \mycsvtable{analysisCSVs/karate_analysis.csv}
+\label{tab:karate}
+\\[10pt]
+The structure of the table is as for \cref{tab:cetacea}.
 \end{table}
 
-\begin{table}[H]
+\begin{table}[p]
 \centering
 \caption{Computational results for \texttt{organoid\_160\_hard}}
+\bigskip
 \mycsvtable{analysisCSVs/organoid_160_hard_analysis.csv}
+\label{tab:organoid_160_hard}
+\\[10pt]
+The structure of the table is as for \cref{tab:cetacea}.
 \end{table}
 
-\begin{table}[H]
+\begin{table}[p]
 \centering
 \caption{Computational results for \texttt{organoid\_160\_medium}}
+\bigskip
 \mycsvtable{analysisCSVs/organoid_160_medium_analysis.csv}
+\label{tab:organoid_160_medium}
+\\[10pt]
+The structure of the table is as for \cref{tab:cetacea}.
 \end{table}
 
-\begin{table}[H]
+\begin{table}[p]
 \centering
 \caption{Computational results for \texttt{organoid\_160\_soft}}
+\bigskip
 \mycsvtable{analysisCSVs/organoid_160_soft_analysis.csv}
+\label{tab:organoid_160_soft}
+\\[10pt]
+The structure of the table is as for \cref{tab:cetacea}.
 \end{table}
 
-\begin{table}[H]
+\begin{table}[p]
 \centering
 \caption{Computational results for \texttt{organoid\_100\_hard}}
+\bigskip
 \mycsvtable{analysisCSVs/organoid_100_hard_analysis.csv}
+\label{tab:organoid_100_hard}
+\\[10pt]
+The structure of the table is as for \cref{tab:cetacea}.
 \end{table}
 
-\begin{table}[H]
+\begin{table}[p]
 \centering
 \caption{Computational results for \texttt{organoid\_100\_medium}}
+\bigskip
 \mycsvtable{analysisCSVs/organoid_100_medium_analysis.csv}
+\label{tab:organoid_100_medium}
+\\[10pt]
+The structure of the table is as for \cref{tab:cetacea}.
 \end{table}
 
-\begin{table}[H]
+\begin{table}[p]
 \centering
 \caption{Computational results for \texttt{organoid\_100\_soft}}
+\bigskip
 \mycsvtable{analysisCSVs/organoid_100_soft_analysis.csv}
+\label{tab:organoid_100_soft}
+\\[10pt]
+The structure of the table is as for \cref{tab:cetacea}.
 \end{table}
 
-\begin{table}[H]
+\begin{table}[p]
 \centering
 \caption{Computational results for \texttt{organoid\_80\_hard}}
+\bigskip
 \mycsvtable{analysisCSVs/organoid_80_hard_analysis.csv}
+\label{tab:organoid_80_hard}
+\\[10pt]
+The structure of the table is as for \cref{tab:cetacea}.
 \end{table}
 
-\begin{table}[H]
+\begin{table}[p]
 \centering
 \caption{Computational results for \texttt{organoid\_80\_medium}}
+\bigskip
 \mycsvtable{analysisCSVs/organoid_80_medium_analysis.csv}
+\label{tab:organoid_80_medium}
+\\[10pt]
+The structure of the table is as for \cref{tab:cetacea}.
 \end{table}
 
-\begin{table}[H]
+\begin{table}[p]
 \centering
 \caption{Computational results for \texttt{organoid\_80\_soft}}
+\bigskip
 \mycsvtable{analysisCSVs/organoid_80_soft_analysis.csv}
+\label{tab:organoid_80_soft}
+\\[10pt]
+The structure of the table is as for \cref{tab:cetacea}.
 \end{table}
 
-\begin{table}[H]
+\begin{table}[p]
 \centering
 \caption{Computational results for \texttt{organoid\_40\_hard}}
+\bigskip
 \mycsvtable{analysisCSVs/organoid_40_hard_analysis.csv}
+\label{tab:organoid_40_hard}
+\\[10pt]
+The structure of the table is as for \cref{tab:cetacea}.
 \end{table}
 
-\begin{table}[H]
+\begin{table}[p]
 \centering
 \caption{Computational results for \texttt{organoid\_40\_medium}}
+\bigskip
 \mycsvtable{analysisCSVs/organoid_40_medium_analysis.csv}
+\label{tab:organoid_40_medium}
+\\[10pt]
+The structure of the table is as for \cref{tab:cetacea}.
 \end{table}
 
-\begin{table}[H]
+\begin{table}[p]
 \centering
 \caption{Computational results for \texttt{organoid\_40\_soft}}
+\bigskip
 \mycsvtable{analysisCSVs/organoid_40_soft_analysis.csv}
+\label{tab:organoid_40_soft}
+\\[10pt]
+The structure of the table is as for \cref{tab:cetacea}.
 \end{table}
 
 \end{landscape}

@@ -1,7 +1,18 @@
 \section{Empirical Results}\label{sec:empirical_results}
+This section will present the empirical results of our experiments and seek to explain them.
+After some remarks, we will mostly explain aggregated data.
+The fully detailed results can be found in \cref{sec:empirical_data}.
+
 \subsection{A Note on Computation Time}
 Admittedly, exact running time was of less concern to us than the qualitative differences in LP relaxations obtained from the use of different run configurations.
 The measurement techniques we used gave us a good grasp on the overall progress made per iteration.
 However, we do not believe that they were sophisticated enough to report accurately on the time frames of interest here.
-Especially in (but not limited to) the first few iterations, many violated constraints can be found quickly, leading to durations in the order of milliseconds for a whole iteration, \ie solving the LP and separating the obtained solution.
-While we do feel comfortable reporting on durations in the order of seconds and upwards, which can often be found for the \texttt{half} and \texttt{two} separators as well as for the overall computation time of a run, we advice the reader to treat smaller durations with caution.
+Especially in (but not limited to) the first few iterations, many violated constraints can be found quickly,
+leading to durations in the order of milliseconds for a whole iteration, \ie solving the LP and separating the obtained solution.
+However, we only measured durations of time with a resolution of milliseconds, therefore separators would sometimes appear to have taken 0 milliseconds of time.
+To resolve this issue, we will round all smaller time measurements to one millisecond and advice the reader to treat such small durations with caution.
+
+\subsection{Experiments on random data}
+At the time of writing, the experiments on our randomly created data are still being performed.
+We only managed to finish them in time for $K_{25}$, the smallest instance size we considered.
+If anything, this confirms our suspicion that random instances would be computationally costly compared to natural ones.
