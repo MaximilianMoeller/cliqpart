@@ -155,12 +155,9 @@ def single_instance_analysis(instance_name, rc_list, update_csv):
         raw_data.append(gaps.copy())
 
     integrals = [rc["termination"]["integral"] for rc in rc_list]
-
-    objectives = list(map(lambda x: f"{x:.4g}", objectives))
-    highlight_values(objectives, mark_indices)
-
     if no_gap:
         gaps = ["—"] * len(objectives)
+        mark_indices = [obj == min(objectives) if opt_info["maximizing"] else obj == max(objectives) for obj in objectives]
     else:
         best_gap = min(gaps)
         mark_indices = [abs(gap - best_gap) < 1e-9 for gap in gaps]
@@ -173,6 +170,9 @@ def single_instance_analysis(instance_name, rc_list, update_csv):
                 gaps[i] = f"$\\bm{{{gaps[i]:.1%}}}$"
             else:
                 gaps[i] = f"{gaps[i]:.1%}"
+
+    objectives = list(map(lambda x: f"{x:.4g}", objectives))
+    highlight_values(objectives, mark_indices)
 
     formatted_data.append(["objective"] + ["" for _ in range(0,19)])
     formatted_data.append(["bound"] + objectives)
