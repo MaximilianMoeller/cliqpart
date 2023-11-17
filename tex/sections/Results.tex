@@ -22,14 +22,24 @@ If anything, this confirms our suspicion that random instances would be computat
 
 \begin{figure}
 	\centering
-	\resizebox{\linewidth}{!}{
-	\input{analysisCSVs/time_bars.pgf}}
+	\resizebox{0.95\linewidth}{!}{
+	\input{analysisCSVs/time_and_gap_bars.pgf}}
 	\bigskip
-	\caption[Performance of run configurations]{Performance of run configurations averaged over all instances and experiment repetitions.
-		The upper chart shows relative running time that was normalized with respect to the \texttt{Δ} run configuration.
-		Depicted in the lower chart are average relative gaps to the best known solutions.
-		Both charts are scaled logarithmically.
-		All box plots are drawn in the standard way, \ie boxes are from $Q_{1}$ to $Q_{3}$, blue mark the median, and whiskers extend by $1.5*\var{IQR}$.}
-	\label{fig:time_bars}
+	\caption[Performance of run configurations]{Performance of run configurations on all instances, averaged for run configurations containing a \texttt{st}-separator.
+		The upper chart shows relative running time that was normalized with respect to the \texttt{Δ} run configuration (first column).
+		The ordinate is logarthmically scaled.
+		Depicted in the lower chart are relative gaps to the best known repsective solution, again averaged for run configurations containing a \texttt{st}-separator.
+		All box plots are drawn in the standard way, \ie boxes are from $Q_{1}$ to $Q_{3}$, the blue mark highlights the median, and whiskers extend by $1.5*\var{IQR}$.}
+	\label{fig:time_and_gap_bars}
 \end{figure}
 
+\begin{figure}
+	\centering
+	\resizebox{0.95\linewidth}{!}{
+	\input{analysisCSVs/lin_gap_bars.pgf}}
+\end{figure}
+\begin{figure}
+	\centering
+	\resizebox{0.95\linewidth}{!}{
+	\input{analysisCSVs/log_gap_bars.pgf}}
+\end{figure}

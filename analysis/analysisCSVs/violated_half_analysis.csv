@@ -11,5 +11,6 @@ objective;;;;;;;;;;;;;;;;;;;
 bound;-4.667;-4.667;-4.667;-4.667;-4.667;-4.667;-4.667;-4.667;-4.667;-4.667;-4.667;-4.667;-4.667;\textbf{-4};-4.2;\textbf{-4};\textbf{-4};\textbf{-4};\textbf{-4}
 gap;16.7%;16.7%;16.7%;16.7%;16.7%;16.7%;16.7%;16.7%;16.7%;16.7%;16.7%;16.7%;16.7%;$\bm{0.0%}^{*}$;5.0%;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$
 time;;;;;;;;;;;;;;;;;;;
-seconds;\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};0.072;0.013;\textbf{0.001};0.005;0.005;\textbf{0.001};\textbf{0.001};\textbf{0.001};0.046;0.008;0.035
-relative;\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};72.00;13.00;\textbf{1.00};5.00;5.00;\textbf{1.00};\textbf{1.00};\textbf{1.00};46.00;8.00;35.00
+total \si[per-mode=symbol]{\per\second};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};0.072;0.013;\textbf{0.001};0.005;0.005;\textbf{0.001};\textbf{0.001};\textbf{0.001};0.046;0.008;0.035
+normalized;\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};72.00;13.00;\textbf{1.00};5.00;5.00;\textbf{1.00};\textbf{1.00};\textbf{1.00};46.00;8.00;35.00
+lp time \si[per-mode=symbol]{\per\second};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};0.050;0.008;\textbf{0.001};0.002;0.003;\textbf{0.001};\textbf{0.001};\textbf{0.001};0.028;0.005;0.018
