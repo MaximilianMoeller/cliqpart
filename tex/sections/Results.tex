@@ -1,9 +1,8 @@
 \section{Empirical Results}\label{sec:empirical_results}
 In this section we will present the empirical results of our experiments and try to explain them.
-After some remarks, we will mostly focus on aggregated data.
-The fully detailed results can be found in \cref{sec:empirical_data}.
+The fully detailed results are shown in \cref{sec:empirical_data}.
 
-\subsection{A Note on Computation Time}
+\subsection{A Note on Computation Time}\label{subsec:note_computation_time}
 Admittedly, exact running time was of less concern to us than the qualitative differences in LP relaxations obtained from the use of different run configurations.
 The measurement techniques we used gave us a good grasp on the overall progress made per iteration.
 However, we do not believe that they were sophisticated enough to report accurately on the time frames of interest here.
@@ -12,18 +11,67 @@ leading to durations in the order of milliseconds for a whole iteration, \ie sol
 However, we only measured durations of time with a resolution of milliseconds, therefore separators would sometimes appear to have taken 0 milliseconds of time.
 To resolve this issue, we will round all smaller time measurements to one millisecond and advice the reader to treat such small durations with caution.
 
-\subsection{Experiments on random data}
+\subsection{Experiments on Random Instances}\label{subsec:random_experiments}
 At the time of writing, some of the experiments on our randomly created data are still being performed.
 We only managed to finish them in time for $K_{25}$ and $K_{50}$, the two smallest instance sizes we considered.
 If anything, this confirms our suspicion that random instances would be computationally costly compared to natural ones.
 
-\subsection{Optimal solutions}\label{subsec:optimal_solutions}
-% TODOOOOOOO!!!!!!
+\subsection{Relative Gaps}\label{subsec:gaps}
+Whenever an optimal solution is known to us, we show the \textit{relative gap} between our obtained LP bounds and this optimal solution, ie
+\[
+	\func{gap}(z, z') \coloneqq \frac{\lvert z - z' \rvert}{\lvert z \rvert}
+\]
+where $z$ is the objective value of the optimal solution and $z'$ is the objective value of the tightest LP relaxation.
+We can ignore the case $z = 0$, because if it is the optimal solution of some instance, then the empty clique partitioning is also an optimal solution.
+
+\subsection{Results for \texttt{cetacea} and \texttt{cats}}
+As mentioned earlier, these instances are among the easiest ones we examined.
+Since our \texttt{Δ}-run configuration coincides with the technique used by \cite{grotschelCuttingPlaneAlgorithm1989}, we obtain the same results as them with regards to iteration count and the number of constraints added.
+However, we could also remove some constraints again in a later iteration, which \cite{grotschelCuttingPlaneAlgorithm1989} did not.
+All other run configurations that make use of the \texttt{Δ}-separator behave in the same way, as they will also find the integral solution after three iterations.
+For \texttt{cats}, the $\texttt{Δ}_{\infty}$-run configuration can find the integral solution after three iterations instead of four, because it can add already add some constraints earlier.
+Interestingly, the $\texttt{Δ}^{\leq 1}$- and $\texttt{Δ}_{\infty}^{\leq 1}$-run configurations need only very few constraints to arrive at the integral solution, because they solve the problem more ‘evenly’.
+
+\subsection{Results for modularity clustering}
+The most interesting of these data sets is probably \texttt{adjnoun} (cf.\ \cref{tab:adjnoun}), because it is the only non-random instance for which we could not find an optimal solution.
+Since the solution found by \cite{kappesComparativeStudyModern2015} was still much better than best bounds we obtained,
+we simply used its objective value to compute the relative gaps, even though its optimality has not been proven.
+The actual gap to an optimal solution might only be higher, yet the gaps we calculated this way were still the biggest we observed among all non-random instances.
+
+Interestingly, the $\texttt{Δ}_{\infty}^{\leq 1}$-run configuration always needs the least amount of constraints to converge to a solution, which we assume is due to the nature of ‘evenly’ adding constraints in all regions of the graph.
+Likewise, the $\texttt{Δ}_{\infty}$-run configuration almost always terminated fastest while still producing good bounds on all but the \texttt{adjnoun} instance.
+This suggests that our choice of $\texttt{maxcut} = 400$ was indeed not optimal.
+Our measurements confirm that the thousands of constraints added to the LP \textit{do} increase the time it takes to solve one iteration, however, this seems to be more than compensated for by the low number of iterations needed to converge to a solution.
+
+We also note that on all but the \texttt{adjnoun} instance we obtained fairly good results by just separating triangle inequalities.
+
+\subsection{Organoid instances}
+% on all but o_80_soft optimal solutions were found, which might of course happen.
+% $\texttt{Δ}_{\infty}^{\leq 1}$ seems to always perform quite well 
+% (this is somewhat contradicting the statement above where $\texttt{Δ}_{\infty}$ would perform best, because LP size does not matter)
+% (or does it? with maxcut or without maxcut, but with var_once -> very many small iterations | no maxcut -> few very heavy iterations | both parameters on -> medium many medium heavy iterations  (good compromise?))
+% additional time consumption of circle separators not worth it -> only marginally better that Δ-separators
+% st-separators ell worth it, often optimal solution with almost the same run times as Δ
+
+% comparisson on non-random data
+
+% random instances
+% some have no optimal value -> no gap, shows that they are quite hard (binary, symmetric uniform, tight normal)
+% Δ have huge gaps, sts perform well (st1), or have good gaps (st2), but not really both
+% circles have better gaps, but take long
+% normal instances with mu = 2 sometimes have no negative edge weights at all (-> trivial solution) and are generally much easier to solve
+% for normal, sigma has little effect, but only for mu = 0, otherwise sigma controls whether trivial or not!
+% Δ-1/2 faster than Δ-2 (?) -> bigger exponent
+
+\subsection{Comparative observations}\label{subsec:comparative_observations}
+% show relative gaps in logarithmic -> st-separators aim for finding ‘integral’ solutions (gap often 1e-6, which is also integrality tolerance.)
+% show lin gaps and time for random, non_random and all to show how much harder random instances are
+% show time_and_gap_bars to show that circle inequalities are not worth in practise
 
 \begin{figure}
 	\centering
 	\resizebox{0.95\linewidth}{!}{
-	\input{analysisCSVs/non_random_time_and_gap_bars.pgf}}
+	\input{analysisCSVs/all_time_and_gap_bars.pgf}}
 	\bigskip
 	\caption[Performance of run configurations]{Performance of run configurations on all instances, averaged for run configurations containing a \texttt{st}-separator.
 		The upper chart shows relative running time that was normalized with respect to the \texttt{Δ} run configuration (first column).
@@ -41,5 +89,5 @@ If anything, this confirms our suspicion that random instances would be computat
 \begin{figure}
 	\centering
 	\resizebox{0.95\linewidth}{!}{
-	\input{analysisCSVs/non_random_lin_gap_bars.pgf}}
+	\input{analysisCSVs/random_log_gap_bars.pgf}}
 \end{figure}

@@ -43,13 +43,13 @@ The table is organized as follows:
 	\item 4-9: Information about cutting planes. 
 		Row 5 shows how many were added in total during the whole run (least amount in bold),
 		row 6 and 7 show the maximum (resp. minimum) amount of cuts added per iteration.
-		If the algorithm terminated because no violated constraint was found in the last iteration, it is excluded from row 7.
+		If the algorithm terminated because no violated constraint was found in the last iteration, it is excluded from row 7, because the minimum would then always be 0.
 		Row 8 shows the total number of non-triangle-constraints added
 		and row 9 shows the total number of constraints that were later removed from the LP.
 	\item 10-12: Information about the obtained objective.
 		Row 11 shows the objective value of the last iteration, \ie the tightest relaxation that this run configuration could produce.
-		Row 12 shows the relative gap (cf.\ \cref{subsec:optimal_solutions})to the best known solution.
-		The tightest relaxations are in bold and row 12 indicates by a $^{*}$ when an integral, \ie optimal solution was found.
+		Row 12 shows the relative gap (cf.\ \cref{subsec:gaps}) to the optimal solution, and a “–” if no optimal solution is known.
+		The tightest relaxations are in bold and row 12 indicates by a $^{*}$ when an integral solution was found.
 	\item 13-16: Information about running time.
 		Row 14 shows the maximum between the total running time of the algorithm in seconds and one millisecond to emphasize that durations beneath this threshold were not measured.
 		Row 15 shows this time normalized to the running time of the run configuration \texttt{Δ}.
