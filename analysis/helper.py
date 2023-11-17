@@ -86,6 +86,20 @@ def instance_optimal_info(instance_name):
             "random_normal_s25_2_2":        {'value': -2.5893529195978708e+01, 'optmiality_proven': True, 'maximizing': False, 'scaling': 1},
             "random_normal_s25_2_0.5":      {'value': 0, 'optmiality_proven': True, 'maximizing': False, 'scaling': 1},
             "random_normal_s25_2_1":        {'value': -2.3073216688670639e+00, 'optmiality_proven': True, 'maximizing': False, 'scaling': 1},
+
+            "random_normal_s50_0.5_1":      {'value': -7.3323179002002320e+01, 'optmiality_proven': True, 'maximizing': False, 'scaling': 1},
+            "random_normal_s50_0_0.5":      {'value': None, 'optmiality_proven': False, 'maximizing': False, 'scaling': 1},
+            "random_normal_s50_0_2":        {'value': None, 'optmiality_proven': False, 'maximizing': False, 'scaling': 1},
+            "random_normal_s50_0.5_2":      {'value': -1.9821372187934747e+02, 'optmiality_proven': True, 'maximizing': False, 'scaling': 1},
+            "random_normal_s50_0_1":        {'value': None, 'optmiality_proven': False, 'maximizing': False, 'scaling': 1},
+            "random_uniform_s50_-10_100":   {'value': -2.0407377419357891e+02, 'optmiality_proven': True, 'maximizing': False, 'scaling': 1},
+            "random_uniform_s50_-100_100":  {'value': None, 'optmiality_proven': False, 'maximizing': False, 'scaling': 1},
+            "random_binary_s50":            {'value': None, 'optmiality_proven': False, 'maximizing': False, 'scaling': 1},
+            "random_uniform_s50_-1_1":      {'value': None, 'optmiality_proven': False, 'maximizing': False, 'scaling': 1},
+            "random_normal_s50_0.5_0.5":    {'value': -1.9014241663064709e+01, 'optmiality_proven': True, 'maximizing': False, 'scaling': 1},
+            "random_normal_s50_2_2":        {'value': -5.8818801289591669e+01, 'optmiality_proven': True, 'maximizing': False, 'scaling': 1},
+            "random_normal_s50_2_0.5":      {'value': 0, 'optmiality_proven': True, 'maximizing': False, 'scaling': 1},
+            "random_normal_s50_2_1":        {'value': -6.0397797864336562e+00, 'optmiality_proven': True, 'maximizing': False, 'scaling': 1},
             }
 
     if instance_name in optimal_values:

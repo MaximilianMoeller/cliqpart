@@ -5,6 +5,7 @@ from pathlib import Path
 import csv
 import argparse
 from datetime import datetime, timedelta
+import math
 
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
@@ -140,28 +141,38 @@ def single_instance_analysis(instance_name, rc_list, update_csv):
     opt_info = instance_optimal_info(instance_name)
     opt_value, opt_scaling = opt_info["value"], opt_info["scaling"]
     objectives = [rc['last_objective'] / opt_scaling for rc in rc_list]
+    no_gap = opt_value == None
+    if no_gap:
+        opt_value = math.inf
     gap_calc = lambda obj: abs(obj - (opt_value / opt_scaling)) / abs(opt_value / opt_scaling) if opt_value != 0 else abs(obj)
     gaps = list(map(gap_calc, objectives))
 
     raw_data.append(objectives.copy())
-    raw_data.append(gaps.copy())
+
+    if no_gap:
+        raw_data.append([])
+    else:
+        raw_data.append(gaps.copy())
 
     integrals = [rc["termination"]["integral"] for rc in rc_list]
 
-    best_gap = min(gaps)
-    mark_indices = [abs(gap - best_gap) < 1e-9 for gap in gaps]
-
     objectives = list(map(lambda x: f"{x:.4g}", objectives))
-
     highlight_values(objectives, mark_indices)
-    for i in range(len(gaps)):
-        (integral, mark) = (integrals[i], mark_indices[i])
-        if integral:
-            gaps[i] = f"$\\bm{{{gaps[i]:.1%}}}^{{*}}$"
-        elif mark:
-            gaps[i] = f"$\\bm{{{gaps[i]:.1%}}}$"
-        else:
-            gaps[i] = f"{gaps[i]:.1%}"
+
+    if no_gap:
+        gaps = ["—"] * len(objectives)
+    else:
+        best_gap = min(gaps)
+        mark_indices = [abs(gap - best_gap) < 1e-9 for gap in gaps]
+
+        for i in range(len(gaps)):
+            (integral, mark) = (integrals[i], mark_indices[i])
+            if integral:
+                gaps[i] = f"$\\bm{{{gaps[i]:.1%}}}^{{*}}$"
+            elif mark:
+                gaps[i] = f"$\\bm{{{gaps[i]:.1%}}}$"
+            else:
+                gaps[i] = f"{gaps[i]:.1%}"
 
     formatted_data.append(["objective"] + ["" for _ in range(0,19)])
     formatted_data.append(["bound"] + objectives)
@@ -202,7 +213,7 @@ def single_instance_analysis(instance_name, rc_list, update_csv):
             writer.writerows(formatted_data)
     return raw_data
 
-def plot(analysis):
+def plot(analysis, file_prefix):
 
     separator_names= [
         "\\texttt{Δ}",
@@ -244,7 +255,9 @@ def plot(analysis):
     # maybe should be filtered for when more complicated separators are actually called?
     # -> nope, defeats point of run configuration!
     normed_times = list(zip(*[instance[-2] for instance in analysis]))
-    gaps = list(zip(*[instance[-4] for instance in analysis]))
+    # filter out instances for which the gap is not known
+    gaps = list(zip(*filter(lambda x: len(x) > 0, [instance[-4] for instance in analysis])))
+
     # still contains three lines per run config containing st-separators
     (triangle_rows, st1_rows, st2_rows, st12_rows, circle_rows, all_rows) = tuple([normed_times[0:4]] + [normed_times[i:i+3] for i in range(4, len(normed_times), 3)])
     #print(*st1_rows, sep='\n')
@@ -289,10 +302,11 @@ def plot(analysis):
                    medianprops=dict(color='#0069b4'),
                    positions=list(map(lambda x: 1.5*x, range(1, len(time_data) + 1))))
     ax_gap.yaxis.grid(True)
+    ax_gap.yaxis.set_major_formatter(mtick.PercentFormatter(1.0))
     ax_gap.set_ylabel('Relative gaps to the best known solution')
     ax_gap.set_xlabel('Run configuration')
 
-    plt.savefig('analysisCSVs/time_and_gap_bars.pgf')
+    plt.savefig('analysisCSVs/' + file_prefix + 'time_and_gap_bars.pgf')
     print("Saving time_and_gap_bars.pgf")
 
     ### separate normalized times plot ### 
@@ -313,7 +327,7 @@ def plot(analysis):
     ax_time.yaxis.grid(True, which='major')
     ax_time.set_ylabel('Running times normalized wrt.\\ \\texttt{Δ}')
 
-    plt.savefig('analysisCSVs/time_bars.pgf')
+    plt.savefig('analysisCSVs/' + file_prefix + 'time_bars.pgf')
     print("Saving time_bars.pgf")
 
     ### separate linear relative gaps ### 
@@ -336,7 +350,7 @@ def plot(analysis):
     ax_gap.set_ylabel('Relative gaps to the best known solution')
     ax_gap.set_xlabel('Run configuration')
 
-    plt.savefig('analysisCSVs/lin_gap_bars.pgf')
+    plt.savefig('analysisCSVs/' + file_prefix + 'lin_gap_bars.pgf')
     print("Saving lin_gap_bars.pgf")
 
     ### separate logarithmic relative gaps ### 
@@ -359,7 +373,7 @@ def plot(analysis):
     ax_gap.set_ylabel('Relative gaps to the best known solution')
     ax_gap.set_xlabel('Run configuration')
 
-    plt.savefig('analysisCSVs/log_gap_bars.pgf')
+    plt.savefig('analysisCSVs/' + file_prefix + 'log_gap_bars.pgf')
     print("Saving log_gap_bars.pgf")
 
 def main():
@@ -370,6 +384,10 @@ def main():
                         dest='update',
                         action='store_true',
                         help="Use this flag to update csv files.")
+    parser.add_argument('-n', '--name',
+                        dest='name',
+                        required=True,
+                        help="A prefix that plot files will get.")
     args = parser.parse_args()
 
     instances = {}
@@ -385,7 +403,7 @@ def main():
     for (instance_name, rc_list) in instances.items():
         raw_multi_instance_data.append(single_instance_analysis(instance_name, rc_list, args.update))
 
-    plot(raw_multi_instance_data)
+    plot(raw_multi_instance_data, args.name)
 
 if __name__ == "__main__":
     main()

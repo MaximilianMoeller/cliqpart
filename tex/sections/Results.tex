@@ -13,8 +13,8 @@ However, we only measured durations of time with a resolution of milliseconds, t
 To resolve this issue, we will round all smaller time measurements to one millisecond and advice the reader to treat such small durations with caution.
 
 \subsection{Experiments on random data}
-At the time of writing, the experiments on our randomly created data are still being performed.
-We only managed to finish them in time for $K_{25}$, the smallest instance size we considered.
+At the time of writing, some of the experiments on our randomly created data are still being performed.
+We only managed to finish them in time for $K_{25}$ and $K_{50}$, the two smallest instance sizes we considered.
 If anything, this confirms our suspicion that random instances would be computationally costly compared to natural ones.
 
 \subsection{Optimal solutions}\label{subsec:optimal_solutions}
@@ -23,7 +23,7 @@ If anything, this confirms our suspicion that random instances would be computat
 \begin{figure}
 	\centering
 	\resizebox{0.95\linewidth}{!}{
-	\input{analysisCSVs/time_and_gap_bars.pgf}}
+	\input{analysisCSVs/non_random_time_and_gap_bars.pgf}}
 	\bigskip
 	\caption[Performance of run configurations]{Performance of run configurations on all instances, averaged for run configurations containing a \texttt{st}-separator.
 		The upper chart shows relative running time that was normalized with respect to the \texttt{Δ} run configuration (first column).
@@ -36,10 +36,10 @@ If anything, this confirms our suspicion that random instances would be computat
 \begin{figure}
 	\centering
 	\resizebox{0.95\linewidth}{!}{
-	\input{analysisCSVs/lin_gap_bars.pgf}}
+	\input{analysisCSVs/random_lin_gap_bars.pgf}}
 \end{figure}
 \begin{figure}
 	\centering
 	\resizebox{0.95\linewidth}{!}{
-	\input{analysisCSVs/log_gap_bars.pgf}}
+	\input{analysisCSVs/non_random_lin_gap_bars.pgf}}
 \end{figure}
