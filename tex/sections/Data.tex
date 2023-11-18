@@ -12,7 +12,7 @@ We copied them from \cite{grotschelCuttingPlaneAlgorithm1989}, in order to sanit
 and consider them as the easiest among our test data, because integral solution were already found after three iterations by just separating triangle inequalities.
 
 \subsubsection{Organoid Clustering (\texttt{organoid\_[size]\_[difficulty]})}
-In \cite{presbergerSegmentationClusteringOrganoids2023}, J. Presberger studied clustering of organoids in light microscopy images, where \CP showed up naturally.
+In \cite{presbergerSegmentationClusteringOrganoids2023}, J.\,Presberger studied clustering of organoids in light microscopy images, where \CP showed up naturally.
 The findings of this work are yet to be published in a separate paper, but we obtained one instance after private communication.
 It consists of pairwise similarities of 160 organoids measured in an interval $(0,1)$, where values of $1$ (resp.\ $0$) correspond to high (resp.\ low) similarity.
 A challenge in modelling this similarity between different organoids is mapping one organoids components to those of another organoid.
@@ -22,7 +22,7 @@ Note that these are maximization problems instead of the usual minimization.
 
 Since all entries in $C$ are positive values, the resulting \CP instance would be trivial.
 We therefore offset the values by subtracting a constant value $b$ from every one.
-J. Presberger informed us that $b \in \left\{ 0.500, 0.555, 0.585 \right\}$ were adequate values for such an offset and provided us with the optimal values for each of the corresponding instances.
+J.\,Presberger informed us that $b \in \left\{ 0.500, 0.555, 0.585 \right\}$ were adequate values for such an offset and provided us with the optimal values for each of the corresponding instances.
 The running time of the ILP solver increases drastically as the offset approaches $b = 0.500$, which is to be expected, as this creates the most ‘conflicts’.
 However, we have also been informed that the obtained clusterings tend to be more meaningful for $b$’s in the vicinity of $0.500$.
 We decided to call the instance \texttt{hard} ($b= 0.500$), \texttt{medium} ($b = 0.555$) and \texttt{soft} ($b = 0.585$), respectively.
