@@ -1,5 +1,5 @@
 \section{Introduction}
-\subsection{About this project}\label{subsec:about}
+\subsection{About this Project}\label{subsec:about}
 The goal of this student research project was to gain some familiarity with the \CP problem in particular and combinatorial optimization techniques in general.
 Knowledge about classes of facet-defining inequalities is of vital interest for solving combinatorial optimization problems through branch-and-cut algorithms.
 Therefore, the task of the project was to review the available literature on such classes and implement separation routines for as many of them as possible.
@@ -25,7 +25,7 @@ The structure of the document is as follows:
 	\caption{Structure of this document}
 \end{table}
 
-\subsection{The \CP problem}\label{subsec:cp_problem}
+\subsection{The \CP Problem}\label{subsec:cp_problem}
 The \CP problem is a combinatorial optimization problem that was first investigated by \cite{grotschelFacetsCliquePartitioning1990} as a framework for aggregation of binary relations.
 The objective is to cluster a given set of objects with respect to their pairwise similarities into ‘maximally homogenous’ sets.
 
@@ -138,15 +138,15 @@ Nevertheless, one can imagine applications where a ‘good’ estimate on the op
 We will compare the results of this approach with optimal solutions obtained by the ILP solver when available.
 For bigger instances, comparing only the results obtained by different parametrizations of the cutting plane procedure might already give a ‘good’ estimate on the optimal objective value.
 
-\subsection{The Multicut Problem}
-We briefly mention that the \CP problem is equivalent to the multicut problem (see \eg \cite{chopraPartitionProblem1993}, \cite{dezaCliqueWebFacetsMulticut1992}).
+\subsection{The \MC Problem}
+We briefly mention that the \CP problem is equivalent to the \MC problem (see \eg \cite{chopraPartitionProblem1993}, \cite{dezaCliqueWebFacetsMulticut1992}).
 The main difference is that for some clique partitioning $A$ of $K_{n}$, the corresponding multicut consist precisely of the edges $E_{n} \setminus A$.
-For any edge $e \in E_{n}$ the value $x_{e} = 1$ for the multicut variable means that $e$ is part of the multicut, \ie not part of the correpsonding \CP, and vice versa.
-We therefore get the following relation between the \CP polytope $\mathscr{P}_{n}$ and the multicut polytope $\mathscr{M}_{n}$:
+For any edge $e \in E_{n}$ the value $x_{e} = 1$ for the multicut variable means that $e$ is part of the multicut, \ie not part of the correpsonding clique partitioning, and vice versa.
+We therefore get the following relation between the \CP polytope $\mathscr{P}_{n}$ and the \MC polytope $\mathscr{M}_{n}$:
 \[
 	\mathscr{M}_{n} = \left\{ \mathbbm{1}^{E_{n}} - x \mid x \in \mathscr{P}_{n} \right\}
 \]
 where $\mathbbm{1}^{E_{n}}$ denotes the vector of dimension $\lvert E_{n} \rvert$ with all entries equal to $1$.
 
-Furthermore, the multicut problem is seldom restricted to the case of complete graphs.
-However, any results obtained for the multicut problem of the complete graph can be easily transferred to the \CP problem and vice versa.
+Furthermore, the \MC problem is seldom restricted to the case of complete graphs.
+However, any results obtained for the \MC problem of the complete graph can be easily transferred to the \CP problem and vice versa.

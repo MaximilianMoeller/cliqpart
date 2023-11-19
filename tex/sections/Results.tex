@@ -52,7 +52,7 @@ We also note that on all but the \texttt{adjnoun} instance we obtained fairly go
 For all organoid clustering instances except \texttt{organoid\_80\_soft} the optimal solution could be found.
 This surprised us at first, since we created the sub-instances of \texttt{organoid\_160\_[difficulty]} with the intention of being easier to solve.
 However, this might of course happen, because in the larger instance there might be more surrounding ‘context’ to resolve conflicts.
-We also remark that for instances of the same size, the \texttt{[difficulty]} parameter had much bigger influence on the running time of the algorithm than on the relative gap.
+We also remark that for instances of the same size, the \texttt{[difficulty]} parameter had much greater influence on the running time of the algorithm than on the relative gap.
 
 On the bigger instances, $\texttt{Δ}_{\infty}^{\leq 1}$ is among the fastest run configurations.
 This might seem somewhat contradicting to the statement above, where $\texttt{Δ}_{\infty}$ would perform best,
@@ -82,7 +82,7 @@ This allows us to compare running times across instances and run configurations.
 	\label{fig:non_random_time_bars}
 \end{figure}
 
-We found that separating chorded circle inequalities was hardly ever worth the additional time consumption of the algorithm.
+We found that separating chorded cycle inequalities was hardly ever worth the additional time consumption of the algorithm.
 \cref{fig:non_random_log_gap_bars} shows that the improvements in the objective bound when using \texttt{half} or \texttt{two} were marginal.
 
 \begin{figure}[H]
