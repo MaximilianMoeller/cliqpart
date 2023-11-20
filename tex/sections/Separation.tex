@@ -1,13 +1,13 @@
 \section{Inequalities and Separation}\label{sec:separation}
-In this section we will describe the classes of inequalities that we separated as well as the algorithms used to do so.
+In this section we will describe the classes of inequalities that we separated as well as the algorithms we used to do so.
 Most of the separation routines are configurable in one way or another.
 However, we will only explain the core algorithm in this section and leave the configuration parameters for \cref{subsec:run_configs}.
 
-\subsection{Triangle inequalities}\label{subsec:triangle_separator}
+\subsection{Triangle Inequalities}\label{subsec:triangle_separator}
 In any complete graph $K_{n}$ there are only $3n(n-1)(n-2) = \mathcal{O}(n^{3})$ triangle inequalities.
 We found that complete enumeration runs in acceptable time even for the biggest instances we tested.
 
-\subsection{\texorpdfstring{$2$-partition}{2-partition} inequalities}\label{subsec:two_partition_separator}
+\subsection{\texorpdfstring{$2$-partition}{2-partition} Inequalities}\label{subsec:two_partition_separator}
 The $2$-partition inequalities first described by \cite{grotschelFacetsCliquePartitioning1990} are a generalization of triangle inequalities.
 \begin{definition}[$2$-partition inequalities, Section 4 of \cite{grotschelFacetsCliquePartitioning1990}]\label{def:2-partition_inequality}
 	Let $K_{n} = (V_{n}, E_{n})$ be a complete graph.
@@ -22,12 +22,25 @@ The $2$-partition inequalities first described by \cite{grotschelFacetsCliquePar
 	It defines a facet if and only if $\lvert  S \rvert \neq \lvert T \rvert$.
 \end{theorem}
 \cite{oostenCliquePartitioningProblem2001a} showed that separation of 2-partition inequalities is already \textsc{NP}-hard for any fixed $\lvert S \rvert$.
-We therefore resorted to the heuristic separation routines described in \cite{grotschelFacetsCliquePartitioning1990}.
+We therefore resorted to two heuristic separation routines described in \cite{grotschelFacetsCliquePartitioning1990}, which both search for violated 2-partition inequalities with $\lvert S \rvert = 1$.
+For completeness, we briefly repeat their explanation.
+For every $v \in V_{n}$ we do the following:
+Set $W \coloneqq \left\{ w \in V_{n} \setminus \left\{ v \right\} \mid 0 < x_{vw}^{*} <1 \right\}$, where $x^{*}$ is the current solution vector.
+Choose some ordering on $W$, set $T \coloneqq \emptyset$, and for every $i \in W$ (in the chosen ordering) we set
+\begin{equation}\label{eq:st_heuristic1}
+	T \coloneqq T \cup \left\{ i \right\} \quad \text{if } x^{*}_{ij}=0 \text{ for all } j \in T.
+\end{equation}
+We can then check whether the $\left[ \left\{ v \right\}, T \right]$-inequality is satisfied.
+If not, we add it to the LP and repeat the procedure with the reverse ordering on $W$.
+The second heuristic works the same way as the first, we only replace \cref{eq:st_heuristic1} by
+\begin{equation}\label{eq:st_heuristic2}
+	T \coloneqq T \cup \left\{ i \right\} \quad \text{if } x^{*}_{iv} - \sum_{j \in T}^{} x_{ij} > 0.
+\end{equation}
 
 The 2-partition inequalities are even further generalized by the \textit{clique-web inequalities} presented in \cite{dezaCliqueWebFacetsMulticut1992}.
 This broader class does also contain other polynomial-time-seperable subclasses that we could not consider in the time available for the project.
 
-\subsection{Two-chorded odd cycle inequalities}\label{subsec:two_chorded_separator}
+\subsection{Two-chorded odd cycle Inequalities}\label{subsec:two_chorded_separator}
 \begin{definition}[Two-chorded cycle inequalities, Section 5 of \cite{grotschelFacetsCliquePartitioning1990}]\label{def:2-chorded_cycle_inequality}
 	Let $K_{n} = (V_{n}, E_{n})$ be a complete graph, let $5 \leq k \leq n$, and let $v: \Z_{k} \to V_{n}$ be injective.
 	The \textit{two-chorded cycle inequality} with respect to $v$ is defined as
@@ -56,7 +69,7 @@ We will focus on the technique used by \cite{mullerPartialOrderPolytope1996}.
 Their paper is mainly concerned with the partial order polytope of a directed graph.
 The algorithm described for separating \textit{odd closed walk} inequalities can be adapted to to separate a class of valid inequalities for the \CP polytope, that contains the class of two-chorded odd cycle inequalities.
 
-In this paper, we are only interested in the class of two-chorded inequalities (and not this broader class) and will therefore repeat the argument given, but slightly adapted for this narrower class.
+In this paper, we are only interested in the class of two-chorded odd cycle inequalities (and not this broader class) and will therefore repeat the argument given, but slightly adapted for this narrower class.
 
 Consider \cref{fig:support_graph_two-chorded_odd_cycle_inequality}.
 We can obtain the left-hand side of the associated inequality by following the closed walk
@@ -88,7 +101,7 @@ This suggests that we could try find some ‘special walk’ in an appropriate a
         }
 	\end{tikzpicture}
 	\caption[Support graph of a two-chorded odd cycle inequality]{Support graph of a two-chorded odd cycle inequality for $k$ = 7.
-	Solid/Dashed lines represent variables with coefficient $+ / - 1$, respectively.}
+	Solid (resp.\ dashed) lines represent variables with coefficient $+1$ (resp.\ $-1$).}
 	\label{fig:support_graph_two-chorded_odd_cycle_inequality}
 \end{figure}
 
@@ -110,7 +123,7 @@ We will call four such nodes a \textit{gadget} and the two edges inside a gadget
 Both inner-gadget edges get the weight $\frac{1}{2} - x_{ij}$.
 Furthermore for every (directed) triple $(i,j,k) \in V_{n}^{3}$ with $i,j,k$ pairwise distinct, we add the two arcs $(u_{2}^{i,j}, \hat{u}_{1}^{j,k})$ and $(\hat{u}_{2}^{i,j}, u_{1}^{j,k})$ to $E_{H}$, called \textit{inter-gadget edges}.
 Both of them are assigned the weight $x_{ik}$.
-All edge weights are derived from \cref{eq:two-chorded_graph_weights}:
+Note how all edge weights are derived from \cref{eq:two-chorded_graph_weights}:
 \begin{equation*}
 	\sum_{i \in \Z_k} \biggl( \underbrace{ \frac{1}{2} -x_{v_i v_{i+1}} }_{\text{inner-gadget weights}} + \underbrace{x_{v_i v_{i+2}}}_{\text{inter-gadget weights}} \biggr) \geq \frac{1}{2}
 \end{equation*}
@@ -119,7 +132,7 @@ All edge weights are derived from \cref{eq:two-chorded_graph_weights}:
 
 We use the special node types $u$ and $\hat{u}$ to distinguish between even and odd cycles.
 In fact, $H$ can be thought of a special kind of bipartide graph divided into ${U = \big\{ u_{1}^{i,j}, u_{2}^{i,j} \mid 0 \leq i,j \leq n, i \neq j \big\}}$ and $\hat{U} = \big\{ \hat{u}_{1}^{i,j}, \hat{u}_{2}^{i,j} \mid 0 \leq i,j \leq n, i \neq j \big\}$.
-This is obviously not a bipartition in the standart sense, because of the inner-gadget edges $(u_{1}^{i,j}, u_{2}^{i,j})$ and $(\hat{u}_{1}^{i,j}, \hat{u}_{2}^{i,j})$.
+This is obviously not a bipartition in the standard sense, because of the inner-gadget edges $(u_{1}^{i,j}, u_{2}^{i,j})$ and $(\hat{u}_{1}^{i,j}, \hat{u}_{2}^{i,j})$.
 However, they can be disregarded, as they are only there to precisely obtain the left-hand side of the inequality.
 The essential part is that we mark a special pair of nodes ($u_{1}^{i,j}$ and $\hat{u}_{1}^{i,j}$) in the two different parts of the bipartide graph which allows us to easily distinguish between odd and even cycles:
 Every odd cycle $v_{0}v_{1} \ldots v_{k-1}v_{0}$ in $K_{n}$ where $k$ is odd induces a walk
@@ -175,7 +188,7 @@ Therefore, assuming that all triangle inequalities are satisfied, $x^{*}$ violat
 \end{figure}
 }
 
-\begin{figure}[H]
+\begin{figure}[ht]
 	\centering
 	\resizebox{0.95\textwidth}{!}{
 			\begin{tikzpicture}
@@ -212,6 +225,7 @@ Therefore, assuming that all triangle inequalities are satisfied, $x^{*}$ violat
 
 		}
 	\end{tikzpicture}}
+	\vspace{10pt}
 	\caption[Walk in $H$]{The auxiliary graph $H$ for $K_{7}$.
 	The $u_{1}^{0,1}\hat{u}_{1}^{0,1}$-walk corrsponding to the inequality in \cref{fig:support_graph_two-chorded_odd_cycle_inequality} is shown in blue.
 	All other inter-gadget weights are left out for clarity.}
@@ -235,7 +249,7 @@ In this case we would still be able to report on the violated constraints found 
 This is simply not possible for the Floyd-Warshall algorithm, which needs to be computed completely before any violated constraint can be found.
 
 
-\subsection{Half-chorded odd cycle inequalities}\label{subsec:half_chorded_separator}
+\subsection{Half-chorded odd cycle Inequalities}\label{subsec:half_chorded_separator}
 
 \begin{definition}[Half-chorded odd cycle inequalities, Definition 10 of \cite{andresPolyhedralStudyLifted2022}]\label{def:half-chorded}
 	Let $5 \leq k \leq n$ with $k$ odd, let $d = \frac{k-1}{2}$, and let $v: \Z_{k} \to V_{n}$ be injective.
@@ -264,6 +278,7 @@ By subtracting $k$ from both sides and multiplying by $-1$ we obtain:
 The construction of $H$ is as above with the only difference being the value of the edge weights:
 For every $(i,j) \in V^{2}$ with $i \neq j$ we set the weight of the two arcs $(u_{1}^{i,j},u_{2}^{i,j})$ and $(\hat{u}_{1}^{i,j},\hat{u}_{2}^{i,j})$ to be $x_{ij}$.
 For every $(i,j,k) \in V^{3}$ with $i,j,k$ pairwise distinct, we set the weight of the inter-gadget edges $(u_{2}^{i,j},\hat{u}_{1}^{j,k})$ and $(\hat{u}_{2}^{i,j}, u_{1}^{j,k})$ to be $1 - x_{i,k}$.
-Note that the weights in $H$ are all non-negative now, and hence we can use Dijkstra’s algorithm to check whether any $u_{1}^{i,j}\hat{u}_{1}^{i,j}$-walk has weight strictly smaller than $3$.
-This reduces running time to $\mathcal{O}(\lvert E_{H} \rvert + \lvert V_{H} \rvert \cdot\func{log} \lvert V_{H} \rvert) = \mathcal{O}(n^{3})$.
+
+Note that the edge weights in $H$ are all non-negative, and hence we can use Dijkstra’s algorithm (\cite{dijkstraNoteTwoProblems1959}) to check whether any $u_{1}^{i,j}\hat{u}_{1}^{i,j}$-walk has weight strictly smaller than $3$.
+This reduces running time to $\mathcal{O}(\lvert E_{H} \rvert + \lvert V_{H} \rvert \cdot\func{log} \lvert V_{H} \rvert) = \mathcal{O}(n^{3})$ for a single call to the shortest path algorithm and thus to $\mathcal{O}(n^{5})$ for all $(u_{1}^{i,j}, \hat{u}_{1}^{i,j})$-pairs.
 As a further improvement, we can skip expanding vertices in the routine, whenever their current distance to the start vertex is already bigger than $3$, resulting in even faster average time.

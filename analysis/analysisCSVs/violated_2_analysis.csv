@@ -1,9 +1,16 @@
 ;\texttt{Δ};$\texttt{Δ}_{\infty}$;$\texttt{Δ}^{\leq 1}$;$\texttt{Δ}_{\infty}^{\leq 1}$;1;2;3;1;2;3;1;2;3;\texttt{Δ-½};\texttt{Δ-2};\texttt{Δ-c};1;2;3
 # it.;\textbf{{2}};\textbf{{2}};{5};{5};\textbf{{2}};\textbf{{2}};\textbf{{2}};\textbf{{2}};\textbf{{2}};\textbf{{2}};\textbf{{2}};\textbf{{2}};\textbf{{2}};\textbf{{2}};{3};{3};{3};{3};{3}
-calls;0;0;0;0;1;1;1;1;1;1;2;2;2;1;1;2;4;4;4
+# $\centernot{\texttt{Δ}}$-calls;0;0;0;0;1;1;1;1;1;1;2;2;2;1;1;2;4;4;4
+cuts;;;;;;;;;;;;;;;;;;;
+# total;\textbf{{7}};\textbf{{7}};{10};{10};\textbf{{7}};\textbf{{7}};\textbf{{7}};\textbf{{7}};\textbf{{7}};\textbf{{7}};\textbf{{7}};\textbf{{7}};\textbf{{7}};\textbf{{7}};{21};{21};{21};{21};{21}
+# max;{7};{7};{4};{4};{7};{7};{7};{7};{7};{7};{7};{7};{7};{7};{14};{14};{14};{14};{14}
+# min;{7};{7};{1};{1};{7};{7};{7};{7};{7};{7};{7};{7};{7};{7};{7};{7};{7};{7};{7}
+# $\centernot{\texttt{Δ}}$-cuts;{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{14};{14};{14};{14};{14}
+# removed;{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0}
 objective;;;;;;;;;;;;;;;;;;;
 bound;-3.5;-3.5;-3.5;-3.5;-3.5;-3.5;-3.5;-3.5;-3.5;-3.5;-3.5;-3.5;-3.5;-3.5;\textbf{-3};\textbf{-3};\textbf{-3};\textbf{-3};\textbf{-3}
 gap;16.7%;16.7%;16.7%;16.7%;16.7%;16.7%;16.7%;16.7%;16.7%;16.7%;16.7%;16.7%;16.7%;16.7%;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$
 time;;;;;;;;;;;;;;;;;;;
-seconds;\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001}
-relative;\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00}
+total \si[per-mode=symbol]{\per\second};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001}
+normalized;\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00}
+lp time \si[per-mode=symbol]{\per\second};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001}

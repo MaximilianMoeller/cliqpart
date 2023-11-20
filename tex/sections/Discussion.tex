@@ -1,6 +1,11 @@
-\section{Discussion}\label{sec:discussion}
+\section{Conclusion}\label{sec:discussion}
+\CP is a computationally difficult optimization problem.
+We achieved good results with respect to running time and relative gap to optimal soultions on most natural instances,
+while random instances posed a much harder challenge.
+This is due to the fact that in natural instances there is often some underlying structure to the problem of clustering.
+If, \eg in the \texttt{cats} instance, cat $a$ and cat $b$ are similar wrt.\ to some characteristics and then also cat $b$ and cat $c$ are similar,
+it is very likely that cat $a$ and $c$ are also similar.
+There are no such underlying sturctures in randomly created instances, which makes the problem much harder in general.
 
-\subsection{Future Work and Improvements}\label{subsec:future_work}
-For two-chorded odd cycle inequalities:
-When the Belman-Ford algorithm for a pair $u_{1}^{i,j}\hat{u}_{1}^{i,j}$ has returned no violated path we know that this edge is not part of any violated cycle.
-We could therefore delete this gadget from the auxiliary graph and continue the search for other violated inequalities.
+We confirm the impression of \cite{grotschelCuttingPlaneAlgorithm1989} that separating triangle- and $\left[ S,T \right]$-inequalities is often enough to arrive at integral and thus optimal solutions.
+Especially for practical applications, the separation of half- and two-chorded odd cycle inequalities does not seem to be worth the additional computational resources required.

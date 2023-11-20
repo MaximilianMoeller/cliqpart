@@ -1,7 +1,129 @@
 \section{Empirical Results}\label{sec:empirical_results}
-\subsection{A Note on Computation Time}
+In this section we will present the empirical results of our experiments and try to explain them.
+The fully detailed results are shown in \cref{sec:empirical_data}.
+
+\subsection{A Note on Computation Time}\label{subsec:note_computation_time}
 Admittedly, exact running time was of less concern to us than the qualitative differences in LP relaxations obtained from the use of different run configurations.
 The measurement techniques we used gave us a good grasp on the overall progress made per iteration.
 However, we do not believe that they were sophisticated enough to report accurately on the time frames of interest here.
-Especially in (but not limited to) the first few iterations, many violated constraints can be found quickly, leading to durations in the order of milliseconds for a whole iteration, \ie solving the LP and separating the obtained solution.
-While we do feel comfortable reporting on durations in the order of seconds and upwards, which can often be found for the \texttt{half} and \texttt{two} separators as well as for the overall computation time of a run, we advice the reader to treat smaller durations with caution.
+Especially in (but not limited to) the first few iterations, many violated constraints can be found quickly,
+leading to durations in the order of milliseconds for a whole iteration, \ie solving the LP and separating the obtained solution.
+However, we only measured durations of time with a resolution of milliseconds, therefore separators would sometimes appear to have taken 0 milliseconds of time.
+To resolve this issue, we will round all smaller time measurements to one millisecond and advice the reader to treat such small durations with caution.
+
+\subsection{Experiments on Random Instances}\label{subsec:random_experiments}
+At the time of writing, some of the experiments on our randomly created data are still being performed.
+We only managed to finish them in time for $K_{25}$ and $K_{50}$, the two smallest instance sizes we considered.
+If anything, this confirms our suspicion that random instances would be computationally costly compared to natural ones.
+
+\subsection{Relative Gaps}\label{subsec:gaps}
+Whenever an optimal solution is known to us, we show the \textit{relative gap} between our obtained LP bounds and this optimal solution, ie
+\[
+	\func{gap}(z, z') \coloneqq \frac{\lvert z - z' \rvert}{\lvert z \rvert}
+\]
+where $z$ is the objective value of the optimal solution and $z'$ is the objective value of the tightest LP relaxation.
+We can ignore the case $z = 0$, because if it is the optimal solution of some instance, then the empty clique partitioning is also an optimal solution for that instance.
+
+\subsection{Results for \texttt{cetacea} and \texttt{cats}}
+As mentioned earlier, the instances \texttt{cetacea} and \texttt{cats} are among the easiest ones we examined.
+Since our \texttt{Δ}-run configuration coincides with the technique used by \cite{grotschelCuttingPlaneAlgorithm1989}, we obtain the same results as them with regards to iteration count and the number of constraints added.
+However, we could also remove some constraints again in a later iteration, which \cite{grotschelCuttingPlaneAlgorithm1989} did not.
+All other run configurations that make use of the \texttt{Δ}-separator behave in the same way, as they will also find the integral solution by just separating triangle inequalities.
+For \texttt{cats}, the $\texttt{Δ}_{\infty}$-run configuration can find the integral solution after three iterations instead of four, because it can add already add some constraints earlier.
+Interestingly, the $\texttt{Δ}^{\leq 1}$- and $\texttt{Δ}_{\infty}^{\leq 1}$-run configurations need only very few constraints to arrive at the integral solution.
+
+\subsection{Results for Modularity Clustering Instances}
+The most interesting of these data sets is probably \texttt{adjnoun} (cf.\ \cref{tab:adjnoun}), because it is the only non-random instance for which we could not find an optimal solution.
+Since the solution found by \cite{kappesComparativeStudyModern2015} was still much better than best bounds we obtained,
+we simply used its objective value to compute the relative gaps, even though its optimality has not been proven.
+The actual gap to an optimal solution might therefore be higher.
+Yet, the gaps we calculated this way were still the biggest we observed among all non-random instances.
+It is a good example of how the size of the graph does not fully determine the ‘hardness’ of the instance.
+
+The $\texttt{Δ}_{\infty}^{\leq 1}$-run configuration always needs the least amount of constraints to converge to a solution, which we assume is due to the nature of ‘evenly’ adding constraints in all regions of the graph.
+On the other hand, the $\texttt{Δ}_{\infty}$-run configuration almost always terminated fastest while still producing good bounds on all but the \texttt{adjnoun} instance.
+This suggests that our choice of $\texttt{maxcut} = 400$ was indeed not optimal.
+Our measurements confirm that the thousands of constraints added to the LP \textit{do} increase the time it takes to solve one iteration, however, this seems to be more than compensated for by the low number of iterations needed to converge to a solution.
+With modern hardware and LP solvers, limiting the size of the LP relaxations seems to be of less importance than it was in older literature (\eg \cite{grotschelCuttingPlaneAlgorithm1989}).
+
+We also note that on all but the \texttt{adjnoun} instance we obtained fairly good results by just separating triangle inequalities.
+
+\subsection{Results for Organoid Instances}
+For all organoid clustering instances except \texttt{organoid\_80\_soft} the optimal solution could be found.
+This surprised us at first, since we created the sub-instances of \texttt{organoid\_160\_[difficulty]} with the intention of being easier to solve.
+However, this might of course happen, because in the larger instance there might be more surrounding ‘context’ to resolve conflicts.
+We also remark that for instances of the same size, the \texttt{[difficulty]} parameter had much greater influence on the running time of the algorithm than on the relative gap.
+
+On the bigger instances, $\texttt{Δ}_{\infty}^{\leq 1}$ is among the fastest run configurations.
+This might seem somewhat contradicting to the statement above, where $\texttt{Δ}_{\infty}$ would perform best,
+because LP size would not matter that much and adding many constraints to reduce iteration count proved useful.
+However, using $\texttt{Δ}_{\infty}$ leads to few very ‘heavy’ iterations, \ie iterations in which a large LP has to be solved.
+On the other extreme, $\texttt{Δ}_{\infty}$ and $\texttt{Δ}^{\leq 1}$ take many very ‘light’ iterations; many of the constraints are later removed again which keeps the LP size roughly the same.
+By adding only few highly violated constraints that also target different regions of the graph, $\texttt{Δ}_{\infty}^{\leq 1}$ seems to strike a good balance between the two.
+This is highlighted by the fact that it also always among the run configurations that remove the fewest constraints from the LP again.
+% maybe a bar chart?
+
+\subsection{Conclusion for Natural Instances}
+\cref{fig:non_random_time_bars} shows a comparison of running times of all run configurations on the non-random instances.
+We arbitrarily chose the \texttt{Δ}-run configuration and normalized all other running times with respect to it.
+This allows us to compare running times across instances and run configurations.
+
+\begin{figure}[H]
+	\centering
+	\resizebox{0.95\linewidth}{!}{
+	\input{analysisCSVs/non_random_time_bars.pgf}}
+	\bigskip
+	\caption[Running time on non-random data]{Running time of run configurations on non-random instances.
+		For run configurations containing a \texttt{st}-separator the results were averaged per instance among the three runs.
+		All results are normalized with respect to the \texttt{Δ} run configuration (first column).
+		The ordinate is logarthmically scaled.
+		%Depicted in the lower chart are relative gaps to the best known repsective solution, again averaged for run configurations containing a \texttt{st}-separator.
+		Box plots are drawn in the standard way, \ie boxes are from $Q_{1}$ to $Q_{3}$, the blue mark highlights the median, and whiskers extend by $1.5*\var{IQR}$.}
+	\label{fig:non_random_time_bars}
+\end{figure}
+
+We found that separating chorded cycle inequalities was hardly ever worth the additional time consumption of the algorithm.
+\cref{fig:non_random_log_gap_bars} shows that the improvements in the objective bound when using \texttt{half} or \texttt{two} were marginal.
+
+\begin{figure}[H]
+	\centering
+	\resizebox{0.95\linewidth}{!}{
+	\input{analysisCSVs/non_random_log_gap_bars.pgf}}
+	\bigskip
+	\caption[Relative gaps on non-random data]{Relative gaps of run configurations on non-random instances.
+		For run configurations containing a \texttt{st}-separator the results were averaged per instance among the three runs.
+		%The upper chart shows relative running time that was normalized with respect to the \texttt{Δ} run configuration (first column).
+		The ordinate is logarthmically scaled.
+		Box plots are drawn in the standard way, \ie boxes are from $Q_{1}$ to $Q_{3}$, the blue mark highlights the median, and whiskers extend by $1.5*\var{IQR}$.}
+	\label{fig:non_random_log_gap_bars}
+\end{figure}
+
+The tendency of run configurations that contain \texttt{st}-separators to produce relative gaps of the order \num{e-6} is an artifact of the fact that we did not round the values when creating these charts.
+Since we measure integrality of a solution with a tolerance of \num{e-6}, it is to be expected that the relative gap of that solution to the (actual) integral solution is also of that order.
+
+\subsection{Random Instances}
+It is easy to see that randomly created instances are in general much harder than the natural ones.
+We could not obtain optimal solutions for some of them and hence cannot compute relative gaps.
+For instances where we could obtain optimal solutions, the large relative gaps that remain when only separating triangle inequalities are quite remarkable.
+\cref{fig:random_time_and_gap_bars} summarizes the results for random instances.
+Again, $\texttt{Δ}_{\infty}$ is the fastest run configuration on almost all instances, while $\texttt{Δ}_{\infty}^{\leq 1}$ performs a bit worse.
+We suspect that $\texttt{Δ}_{\infty}^{\leq 1}$ could not achieve the same balance as before, because in the random instances more ‘conflicts’ lead to a higher number of constraints with a high violation degree.
+Adding only one constraint per variable and iteration might not be enough to quickly converge towards a solution.
+We found that \texttt{Δ-st-1} has reasonable running times, while \texttt{Δ-st-2} and \texttt{Δ-st-12} would frequently hit the iteration limit.
+Nevertheless, they often produced the best bonuds, indicating that they might even produce better bounds when given more time or iterations.
+We also observed that the run configurtations \texttt{Δ-½}, \texttt{Δ-2} and \texttt{Δ-c} consistently found somewhat better bounds than were obtained by just separating triangle inequalities.
+This is in contrast to the non-random instances where they were only marginally better.
+However, these improvements were once again tied to considerable increases in computation time.
+
+\begin{figure}[H]
+	\centering
+	\resizebox{0.95\linewidth}{!}{
+	\input{analysisCSVs/random_time_and_gap_bars.pgf}}
+	\bigskip
+	\caption[Performance on random data]{Performance of run configurations on random instances, averaged for run configurations containing a \texttt{st}-separator.
+		The upper chart is structured like \cref{fig:non_random_time_bars}.
+		The lower chart differst from \cref{fig:non_random_log_gap_bars} in that the axis is linearly scaled.
+		Instances for which no relative gap could be calculated are left out for the lower chart.
+	}
+	\label{fig:random_time_and_gap_bars}
+\end{figure}

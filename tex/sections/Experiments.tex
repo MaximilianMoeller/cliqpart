@@ -6,7 +6,7 @@ We explain the overall procedure of the algorithm, configuration parameters for 
 All tests were performed on the same machine running Ubuntu 23.04 as the operating system.
 The machine contains an Intel Core i9-12900KF processor running at 4.9 GHz and 64GB of DDR5 RAM. 
 
-The separation routines were implemented in \texttt{C++}.
+The separation routines were implemented in \texttt{C++} and are publicly available (\cite{moellerCliqpart2023}).
 While some aspects of the code could be improved (\eg computations of shortest paths in parallel like in \cite{sorensenSeparationHeuristic2Partition2020}),
 performance was a big concern and we tried to implement the routines as efficiently as possible in the amount of time available for the project.
 
@@ -64,19 +64,19 @@ We then sort them by their violation degree and only add the \texttt{maxcut} mos
 The triangle separator is the only one for which we tried setting $\texttt{maxcut} = \infty$ and we will indicate that this setting was used by writing $\texttt{Δ}_{\infty}$.
 
 The enumeration of triangle inequalities is always carried out in the same order.
-We imagined that this could lead to a scenario where the ‘earlier’ regions of the graph would already be ‘partially’ solved, whereas in the ‘later’ regions of the enumeration order there would still be violated constraints with high violation degree.
-To circumvent this, we introduce another parameter called \texttt{variable once} which, when activated would affect the separator as follows:
+We imagined that this could lead to a scenario where the ‘earlier’ regions of the graph would already be ‘partially’ solved, whereas in the ‘later’ regions in this enumeration order could still contain violated constraints with high violation degree.
+To circumvent this, we introduce another parameter called \texttt{variable once} which, when activated, would affect the separator as follows:
 For every variable we add at most one triangle inequality containing this variable.
 We hoped that this would result in the graph being solved more ‘evenly’.
 The use of the \texttt{variable once} parameter will be indicated by $\texttt{Δ}^{\leq 1}$.
 We imagined that it would be most useful in combination with $\texttt{maxcut} = \infty$, because otherwise we would still only enumerate the $5 \cdot \texttt{maxcut}$ first violated inequalities, which might not cover ‘later’ regions of the graph.
 
 \subsubsection{2-Partition Separator (\texorpdfstring{$\texttt{st}^{\texttt{[heuristic]}}$}{Δ})}
-We use the two heuristics described in \cite{grotschelCuttingPlaneAlgorithm1989} to search for violated $\left[ S,T \right]$-inequalities with $\lvert S \rvert = 1$ and we do not want to repeat their explanation here.
+As explained in \cref{subsec:two_partition_separator}, we used two separation heuristics invented by \cite{grotschelCuttingPlaneAlgorithm1989}.
 They will be notated by $\texttt{st}^{1}$ and $\texttt{st}^{2}$.
-As before, we add no more than \texttt{maxcut} violated inequalities to the LP, and because we did not experiment with this parameter for all further separators, we will not denote it in the abbreviations.
+As before, we add no more than \texttt{maxcut} violated inequalities to the LP, and because we did not experiment with this parameter for all further separators, we will not denote it in all further abbreviations.
 
-\subsubsection{Two-Chorded (\texttt{two}) and Half-Chorded (\texttt{half}) Odd Cycle Separator}
+\subsubsection{Two-Chorded (\texttt{two}) and Half-Chorded (\texttt{half}) Odd Cycle Separators}
 The separator for the two- and half-chorded odd cycle inequalities works mostly as described in \cref{subsec:two_chorded_separator}.
 However, we limit computation time to 15 minutes, because not imposing any time limit would sometimes result in the routine taking more than an hour to finish.
 Especially so for separation of the two-chorded odd cycyle inequalities due to the higher exponent in the time complexity of the routine (cf.\ \cref{subsec:two_chorded_separator} and \cref{subsec:half_chorded_separator}).
@@ -90,7 +90,8 @@ we created descriptions of which separators should be used in which order during
 The separators \texttt{Δ}, $\texttt{Δ}_{\infty}$, $\texttt{Δ}^{\leq 1}$ and $\texttt{Δ}_{\infty}^{\leq 1}$ each form a simple one-elementary run configuration.
 \cref{tab:run_configurations} shows the names of seven further run configurations we created and the separators they include in order.
 Notice that all of them start with a \texttt{Δ}-separator, because all other separators implicitly rely on the fact that the solution does not violate any triangle inequalities.
-We did not test what consequences exchanging the \texttt{Δ}-separator for $\texttt{Δ}_{\infty}$, $\texttt{Δ}^{\leq 1}$ or $\texttt{Δ}_{\infty}^{\leq 1}$ would have.
+We did not test what consequences exchanging the initial \texttt{Δ}-separator for $\texttt{Δ}_{\infty}$, $\texttt{Δ}^{\leq 1}$ or $\texttt{Δ}_{\infty}^{\leq 1}$ would have.
+
 \begin{table}
 \centering
 \begin{tabular}{lccccccc}
@@ -104,7 +105,11 @@ We did not test what consequences exchanging the \texttt{Δ}-separator for $\tex
 5 & —               & —               & —               	& —    			& — 			& —      		& \texttt{two}      \\
 \bottomrule
 \end{tabular}
-\caption{Combining separators into run configurations.}
+\vspace{10pt}
+\caption[Run Configurations]{Each row shows the name of a \textit{run configuration} and the separators it consists of in order.
+We chose to order subsequent separators after the initial \texttt{Δ}-separator by (expected) running time.}
 \label{tab:run_configurations}
 \end{table}
 
+The separators $\texttt{st}^{1}$ and $\texttt{st}^{2}$ contain random computations, namely choosing the ordering on $W$.
+In order to achive some comparability, we chose to run each run configuration where at least one of them is present three times per data set.
