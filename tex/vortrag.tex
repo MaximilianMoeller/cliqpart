@@ -1,0 +1,406 @@
+% !TEX TS-program = lualatex
+\documentclass{beamer}
+
+\input{preamble.tex}
+\usepackage{tudscrcolor}
+
+% Beamer styling
+\usetheme{Dresden}
+\setbeamertemplate{itemize items}[circle]
+%\setbeameroption{hide notes} % Only slides
+\setbeameroption{show notes on second screen=bottom} % notes and slides
+\AtBeginSection[]{
+  \begin{frame}
+  \vfill
+  \centering
+  \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+    \usebeamerfont{title}\insertsectionhead\par%
+  \end{beamercolorbox}
+  \vfill
+  \end{frame}
+}
+\renewcommand{\arraystretch}{1.3}
+
+
+\author{Maximilian Moeller}
+\title{Evaluation of separation routines for some classes of inequalities of the Clique Partitioning polytope}
+\subtitle{Colloquium “Großer Beleg”}
+\date{21.11.2023}
+
+\begin{document}
+	
+\frame{\titlepage}
+
+\begin{frame}
+\frametitle{Agenda}
+\begin{enumerate}
+	\item Introduction to Clique Partitioning
+	\item Separating Inequalities
+	\item Data
+	\item Empirical Results
+	\item Conclusion
+\end{enumerate}
+\end{frame}
+
+\section{Introduction}
+\begin{frame}
+\frametitle{Clique Partitioning}
+\begin{columns}
+\begin{column}{0.5\textwidth}
+\begin{itemize}
+	\item clustering based on pairwise similarities
+	\item framework for aggregation of binary relations
+	\item useful in biology, medicine
+\end{itemize}
+	\note[item]{biology: taxonomy of animals (\eg whales and dolphins)}
+	\note[item]{medicine: clustering of organoids in light microscopy images}
+	\note[item]{probably also operations research}
+\end{column}
+\begin{column}{0.5\textwidth}  %%<--- here
+	\centering
+	\begin{tikzpicture}
+        \def \n{8};
+        \def \radius{1.5cm};
+        \def \r{0.3cm};
+        \foreach \i in {0,...,\n}{
+			\node[vertex] (\i) at ({\i/(\n+1)*360+90}:\radius) {};
+			\node at ({\i/(\n+1)*360+90}:\radius+\r) {$v_{\i}$};
+        }
+        \foreach \i in {0,...,\n}{
+            \foreach \j in {\i,...,\n}{
+                \draw[dotted, gray] (\i) -- (\j);
+        	}
+        }
+        \foreach \i/\j in {1/8, 1/3, 1/5, 8/3, 8/5, 3/5} {
+			\draw[line width=0.2mm] (\i) -- (\j);
+        }
+        \foreach \i/\j in {4/6, 4/7, 6/7} {
+			\draw[line width=0.2mm] (\i) -- (\j);
+        }
+	\end{tikzpicture}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Clique Partitioning}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+		\onslide<1->{
+		\begin{definition}
+			Given a graph $G=(V,E)$, a subset of edges $A \subseteq E$ is called a \textit{clique partitioning of $G$} if there exists a partition $\Gamma = \left\{ W_1, W_2, \ldots, W_k \right\}$ of $V$ such that
+			\[
+				A = \bigcup_{i=1}^k \left\{ (u,v) \in E \mid u,v \in W_i \right\}.
+			\]
+		\end{definition}}
+		\note[item]{\textcolor{red}{show} which partition is induced}
+		\note[item]{typically only complete graphs considered (indicates for every pair of nodes)}
+		\note[item]{then one-to-one corresponds to an equivalence relation}
+		\note[item]{induces complete subgraphs \textit{clique} partitioning}
+		\end{column}
+		\begin{column}{0.5\textwidth}  %%<--- here
+			\centering
+			\begin{tikzpicture}
+			\onslide<1->{
+		        \def \n{8};
+		        \def \radius{1.5cm};
+		        \def \r{0.3cm};
+		        \foreach \i in {0,...,\n}{
+					\node[vertex] (\i) at ({\i/(\n+1)*360+90}:\radius) {};
+					\node at ({\i/(\n+1)*360+90}:\radius+\r) {$v_{\i}$};
+		        }
+		        \foreach \i in {0,...,\n}{
+		            \foreach \j in {\i,...,\n}{
+		                \draw[dotted, gray] (\i) -- (\j);
+		        	}
+			}}
+			\only<2>{
+		        \foreach \i/\j in {1/8, 1/3, 1/5, 8/3, 8/5, 3/5} {
+					\draw[line width=0.2mm] (\i) -- (\j);
+		        }
+		        \foreach \i/\j in {4/6, 4/7, 6/7} {
+					\draw[line width=0.2mm] (\i) -- (\j);
+			}}
+			\end{tikzpicture}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\begin{frame}
+	\frametitle{The Clique Partitioning Problem}	
+	Input: complete graph $K_{n} = (V_{n}, E_{n})$ and edge costs $w \in \R^{E_{n}}$
+
+	Compute: a clique partitioning of minimum weight
+
+	\begin{align*}
+	\min && &\sum_{e \in E_{n}} w_{e} x_{e} \\[1.5ex]
+	\text{s.t.} && &\forall e \in E_{n} \colon x_{e} \in \left\{ 0,1 \right\}  \\
+				&& &x \text{ characterizes a clique partitioning} \\
+	\end{align*}
+	\note[item]{characterize clique partitionings by binary vectors}
+	\note[item]{1 means it is in the clique partitioning and 0 means it is not in it}
+	\note[item]{exactly opposite to \textcolor{red}{multicut} (equivalent problem)}
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{The Clique Partitioning Problem}	
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\begin{itemize}
+				\item<1-> \textsc{NP}-complete
+				\item<2-> Trivial cases:
+					\begin{itemize}
+						\item<3-> $w \geq \bm{0}$	
+						\item<4-> $w \leq \bm{0}$
+						\item<5-> $w$ induces cliques
+					\end{itemize}
+			\end{itemize}
+			\note[item]{blue drawn are edges with negative weights, all others non-negative}
+			\note[item]{interesting instances need to have ‘conflicts’}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\onslide<3->{
+			\begin{tikzpicture}
+		        \def \n{8};
+		        \def \radius{1.5cm};
+		        \def \r{0.3cm};
+		        \foreach \i in {0,...,\n}{
+					\node[vertex] (\i) at ({\i/(\n+1)*360+90}:\radius) {};
+					\node at ({\i/(\n+1)*360+90}:\radius+\r) {$v_{\i}$};
+		        }
+		        \foreach \i in {0,...,\n}{
+		            \foreach \j in {\i,...,\n}{
+						\only<3>{\draw[gray, dotted] (\i) -- (\j);}
+						\only<5>{\draw[gray] (\i) -- (\j);}
+		        	}
+			}
+			\only<4>{
+		        \foreach \i in {0,...,\n}{
+		            \foreach \j in {\i,...,\n}{
+		                \draw (\i) -- (\j);
+		    	}
+			}}
+			\only<5>{
+		        \foreach \i/\j in {1/8, 1/3, 1/5, 8/3, 8/5, 3/5} {
+					\draw[line width=0.4mm, color=cdblue] (\i) -- (\j);
+		        }
+		        \foreach \i/\j in {4/6, 4/7, 6/7} {
+					\draw[line width=0.4mm, color=cdblue] (\i) -- (\j);
+			}}}
+			\end{tikzpicture}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{An ILP-formulation of Clique Partitioning}	
+	\note[item]{we want to make use of (I)LP techniques: linear inequalities}
+	characteristic vectors $x$ \onslide<2->{need to satisfy \textit{triangle inequalities} ($i,j,k \in V_{n}$, pairwise distinct)}
+	\note[item]{explain support graph: left hand side can be drawn as graph, dotted negative, solid positive}
+	\note[item]{triangle inequalities ensure transitivity}
+	\note[item]{for the same $i,j,k$ there are actually three triangles (\textcolor{red}{show})}
+\begin{align*}
+	\onslide<2->{x_{ij} + x_{jk} - x_{ik} &\leq 1\\}
+	\onslide<3->{x_{ij} - x_{jk} + x_{ik} &\leq 1\\}
+	\onslide<3->{- x_{ij} + x_{jk} + x_{ik} &\leq 1\\}
+\end{align*}
+\vspace*{-2\baselineskip}
+\onslide<2->{
+\begin{figure}
+	\centering
+	\begin{subfigure}[b]{0.3\textwidth}
+		\centering
+			\begin{tikzpicture}
+			    \def \n{2};
+			    \def \radius{1.5cm};
+			    \def \r{0.3cm};
+			    \foreach \i/\j in {0/i,1/j,2/k}{
+					\node[vertex] (\i) at ({\i/(\n+1)*360+90}:\radius) {};
+					\node at ({\i/(\n+1)*360+90}:\radius+\r) {$v_{\j}$};
+			    }
+			    \draw (1) -- (2);
+			    \draw[dashed] (2) -- (0);
+			    \draw (1) -- (0);
+			\end{tikzpicture}
+	\end{subfigure}
+	\hfill
+	\only<3->{
+	\begin{subfigure}[b]{0.3\textwidth}
+		\centering
+			\begin{tikzpicture}
+			    \def \n{2};
+			    \def \radius{1.5cm};
+			    \def \r{0.3cm};
+			    \foreach \i/\j in {0/i,1/j,2/k}{
+					\node[vertex] (\i) at ({\i/(\n+1)*360+90}:\radius) {};
+					\node at ({\i/(\n+1)*360+90}:\radius+\r) {$v_{\j}$};
+			    }
+			    \draw[dashed] (1) -- (2);
+			    \draw (2) -- (0);
+			    \draw (1) -- (0);
+			\end{tikzpicture}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.3\textwidth}
+		\centering
+			\begin{tikzpicture}
+			    \def \n{2};
+			    \def \radius{1.5cm};
+			    \def \r{0.3cm};
+			    \foreach \i/\j in {0/i,1/j,2/k}{
+					\node[vertex] (\i) at ({\i/(\n+1)*360+90}:\radius) {};
+					\node at ({\i/(\n+1)*360+90}:\radius+\r) {$v_{\j}$};
+			    }
+			    \draw (1) -- (2);
+			    \draw (2) -- (0);
+			    \draw[dashed] (1) -- (0);
+			\end{tikzpicture}
+	\end{subfigure}}
+\end{figure}}
+\end{frame}
+
+\begin{frame}
+\frametitle{The Task}
+\note[item]{original task: branch-and-cut algorithm, \ie solving the ILP}
+\note[item]{consists of multiple parts: \textbf{cutting planes for bounds}, finding good solutions and branch management}
+\onslide<2->{
+focus on cutting plane procedure:
+\begin{itemize}
+	\item<2-> solve LP relaxation of the problem
+	\item<3-> tighten the solution iteratively
+	\note[item]{explain overall iteration procedure}
+	\item<4-> hopefully arrive at integral solution
+	\item<5-> ???
+	\item<5-> profit
+\end{itemize}}
+\note[item]{even if not integral, a few percent off might be good for practical use}
+\note[item]{however, no guarantee to arrive at integral or within a constant factor}
+\end{frame}
+
+\section{Separating Inequalities}
+
+
+\begin{frame}
+	\frametitle{Ingredients}	
+	\begin{itemize}
+		\item<1-> classes of facet-defining linear inequalities
+		\item<2-> algorithms for separating them
+		\item<3-> data to test on (next section)
+	\end{itemize}
+	\note[item]{explain: what is separation (check (and produce))}
+	\note[item]{explain: facet-defining}
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{Triangle Inequalities (\texttt{Δ})}	
+	Using complete enumeration $\mathcal{O}(n^{3})$
+	\note[item]{Separation algorithms: separators}
+	\note[item]{separators get abbreviations}
+
+	Four variations
+	\vspace*{2\baselineskip}
+\onslide<2>{
+\begin{table}
+	\begin{tabular}{@{}lcc@{}}
+		\toprule
+		abbreviation & \texttt{maxcut} & \texttt{var\_once} \\
+		\midrule
+		\texttt{Δ} & 400 & – \\ 
+		$\texttt{Δ}_{\infty}$ & $\infty$ & – \\
+		$\texttt{Δ}^{\leq 1}$ & 400 & \checkmark \\
+		$\texttt{Δ}_{\infty}^{\leq 1}$ & $\infty$ & \checkmark \\
+		\bottomrule
+	\end{tabular}
+	
+	\note[item]{\texttt{maxcut} is for limiting lp size}
+	\note[item]{\texttt{var\_once} is for solving the graph evenly}
+\end{table}}
+\end{frame}
+
+\begin{frame}
+	\frametitle{2-Partition Inequalities (\texttt{st})}	
+	\note[item]{Generalization of triangle inequalities}
+	Let $S, T \subseteq V_{n} $ disjoint.
+
+	2-\textit{partition inequality} \quad ($\left[ S,T \right]$-inequality)
+	\[
+		\sum_{s \in S}^{} \sum_{t \in T}^{} x_{st} - \sum_{\substack{s, s' \in S \\ s \neq s'}}^{} x_{ss'} - \sum_{\substack{t, t' \in T \\ t \neq t'}}^{} x_{tt'} \leq \func{min}( \lvert S \rvert, \lvert T \rvert )
+	\]
+	\vspace*{-2\baselineskip}
+	\onslide<2->{
+	\begin{columns}
+				\begin{column}{0.5\textwidth}
+					facet defining for $\lvert S \rvert \neq \lvert  T \rvert$
+				\end{column}
+				\begin{column}{0.5\textwidth}
+			\begin{tikzpicture}
+        \def \n{4};
+        \def \radius{1.5cm};
+        \def \r{0.3cm};
+        \foreach \i in {0,...,\n}{
+			\node[vertex] (\i) at ({\i/(\n+1)*360+90}:\radius) {};
+			\node at ({\i/(\n+1)*360+90}:\radius+\r) {$v_{\i}$};
+        }
+        \foreach \i/\j in {0/1, 1/2, 0/2, 3/4} {
+			\draw[dashed, line width=0.35mm] (\i) -- (\j);
+        }
+        \foreach \i/\j in {0/3, 0/4, 1/3, 1/4, 2/3, 2/4} {
+			\draw (\i) -- (\j);
+        }
+	\end{tikzpicture}}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{Separation of 2-Partition Inequalities (\texttt{st})}	
+	\begin{itemize}
+		\item<1-> already \textsc{NP}-hard for any fixed $\lvert S \rvert$
+		\item<2-> using two heuristics: $\texttt{st}^{1}$ and $\texttt{st}^{2}$
+		\item<3-> only search for constraints with $\lvert S \rvert = 1$
+	\end{itemize}
+	\note[item]{no use in using approximation if it is np-hard again}
+	\note[item]{not explaining details, involve random choosing of an order of some nodes. Thus re-run three times.}
+\end{frame}
+
+\section{Data}
+\begin{frame}
+	\frametitle{Natural instances}	
+	\begin{itemize}
+		\item<1-> \texttt{cetacea} (30)
+		\item<1-> \texttt{cetacea} (36)
+		\item<2-> \texttt{football} (115)
+		\item<2-> \texttt{adjnoun} (112)
+		\item<2-> \texttt{polbooks} (105)
+		\item<2-> \texttt{lesmis} (77)
+		\item<2-> \texttt{dolphins} (62)
+		\item<2-> \texttt{karate} (34)
+		\item<3-> \texttt{organoid\_[size]\_[difficulty]} (160, 100, 80, 40)
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Random instances}	
+	\begin{itemize}
+		\item<1-> Binary \texttt{r\_binary\_[size]} \\
+			$\texttt{size} \in \left\{ 25, 50 \right\}$
+		\item<2-> Uniform \texttt{r\_uniform\_[size]\_[lb]\_[ub]} \\
+			$\texttt{size} \in \left\{ 25, 50 \right\}$ \\
+			$(\texttt{lb}, \texttt{ub}) \in \left\{ (-10, 10), (-100, 100), (-10, 100) \right\}$
+		\item<3-> Normal \texttt{r\_normal\_[size]\_[mu]\_[sigma]} \\
+			$\texttt{size} \in \left\{ 25, 50 \right\}$ \\
+			$(\text{\texttt{mu}}, \text{\texttt{sigma}}) \in \left\{ 0, 0.5, 2 \right\} \times \left\{ 0.5, 1, 2 \right\}$
+
+	\end{itemize}
+	\end{frame}
+
+\section{Empirical Results}
+
+\section{Conclusion}
+
+
+\end{document}

@@ -17,18 +17,12 @@
 %\usepackage{url}
 % Einbindung von Bildern
 \usepackage{graphicx}
-% Bilder auf der Titelseite
-\usepackage{titlepic}
 % verbesserte floating-Objekte (z.B. figures/tables)
 \usepackage{float}
-% verbesserter Schriftsatz (nicht sichtbare Abweichungen)
-\usepackage[]{microtype}
 % kann erkennen, ob ein space gebraucht wird oder nicht (praktisch für newcommands)
 \usepackage{xspace}
 % verbesserte Tabellen
 \usepackage{booktabs}
-% Kontrolle über enumerate, itemize und description
-\usepackage{enumitem}
 % Platz zwischen Paragraphen
 \usepackage{parskip}
 % Keine Zeilennummern auf leeren Seiten
@@ -36,12 +30,8 @@
 \usepackage{subcaption}
 % Text in mehreren Spalten
 \usepackage{multicol}
-% Mehr Farben
-\usepackage[dvipsnames]{xcolor}
 % Lorem ipsum mit \blindtext
 \usepackage[]{blindtext}
-% Todos
-\usepackage[colorinlistoftodos]{todonotes}
 % Ersetzt etwas durch nichts (debugging)
 \newcommand\hide[1]{}
 % Zitate
@@ -95,17 +85,6 @@
 \usepackage{siunitx}  
 %\sisetup{locale = DE}
 
-% ┌──────────────┐
-% │ Environments │
-% └──────────────┘
-\theoremstyle{definition}
-\newtheorem{definition}{Definition}[section]
-\newtheorem{theorem}{Theorem}[section]
-\newtheorem{corollary}{Corollary}[theorem]
-
-\theoremstyle{remark}
-\newtheorem*{note}{Note}
-
 % ┌──────┐
 % │ tikz │
 % └──────┘
@@ -124,9 +103,3 @@
 % └────────────┘
 \usepackage{algorithm}
 \usepackage[noend]{algpseudocode}
-
-%  ┌───────────┐
-%  │ sonstiges │
-%  └───────────┘
-\usepackage{hyperref}
-\usepackage[capitalise]{cleveref}
