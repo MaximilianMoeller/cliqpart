@@ -45,8 +45,8 @@
 \begin{column}{0.5\textwidth}
 \begin{itemize}
 	\item clustering based on pairwise similarities
-	\item framework for aggregation of binary relations
-	\item useful in biology, medicine
+\item framework for aggregation of binary relations \cite{grotschelFacetsCliquePartitioning1990} \cite{wakabayashiAggregationBinaryRelations1986}
+\item useful in biology, medicine \cite{presbergerSegmentationClusteringOrganoids2023}
 \end{itemize}
 	\note[item]{biology: taxonomy of animals (\eg whales and dolphins)}
 	\note[item]{medicine: clustering of organoids in light microscopy images}
@@ -144,7 +144,7 @@
 	\begin{columns}
 		\begin{column}{0.5\textwidth}
 			\begin{itemize}
-				\item \textsc{NP}-complete
+				\item \textsc{NP}-complete \cite{wakabayashiAggregationBinaryRelations1986}
 				\item<2-> Trivial cases:
 					\onslide<3->{
 					\begin{itemize}
@@ -194,7 +194,7 @@
 \begin{frame}
 	\frametitle{An ILP-formulation of Clique Partitioning}	
 	\note[item]{we want to make use of (I)LP techniques: linear inequalities}
-	characteristic vectors $x$ \onslide<2->{need to satisfy \textit{triangle inequalities} ($i,j,k \in V_{n}$, pairwise distinct)}
+	characteristic vectors $x$ \onslide<2->{need to satisfy \textit{triangle inequalities} ($i,j,k \in V_{n}$, pairwise distinct) \cite{grotschelFacetsCliquePartitioning1990}}
 	\note[item]{explain support graph: left hand side can be drawn as graph, dotted negative, solid positive}
 	\note[item]{triangle inequalities ensure transitivity}
 	\note[item]{for the same $i,j,k$ there are actually three triangles (\textcolor{red}{show})}
@@ -322,7 +322,7 @@ focus on cutting plane procedure:
 	\note[item]{Generalization of triangle inequalities}
 	Let $S, T \subseteq V_{n} $ disjoint.
 
-	2-\textit{partition inequality} \quad ($\left[ S,T \right]$-inequality)
+	2-\textit{partition inequality} \quad ($\left[ S,T \right]$-inequality) \cite{grotschelFacetsCliquePartitioning1990}
 	\[
 		\sum_{s \in S}^{} \sum_{t \in T}^{} x_{st} - \sum_{\substack{s, s' \in S \\ s \neq s'}}^{} x_{ss'} - \sum_{\substack{t, t' \in T \\ t \neq t'}}^{} x_{tt'} \leq \func{min}( \lvert S \rvert, \lvert T \rvert )
 	\]
@@ -356,8 +356,8 @@ focus on cutting plane procedure:
 \begin{frame}
 	\frametitle{Separation of 2-Partition Inequalities (\texttt{st})}	
 	\begin{itemize}
-		\item<1-> already \textsc{NP}-hard for any fixed $\lvert S \rvert$
-		\item<2-> using two heuristics: $\texttt{st}^{1}$ and $\texttt{st}^{2}$
+		\item<1-> already \textsc{NP}-hard for any fixed $\lvert S \rvert$ \cite{oostenCliquePartitioningProblem2001a}
+		\item<2-> using two heuristics: $\texttt{st}^{1}$ and $\texttt{st}^{2}$ from \cite{grotschelCuttingPlaneAlgorithm1989}
 		\item<3-> only search for constraints with $\lvert S \rvert = 1$
 	\end{itemize}
 	\note[item]{no use in using approximation if it is np-hard again}
@@ -369,7 +369,7 @@ focus on cutting plane procedure:
 	\frametitle{Two-Chorded Odd Cycle Ineuqalities}	
 	Let $5 \leq k \leq n$ and $v: \Z_{k} \to \Z_{n}$ injective
 
-	\textit{two-chorded odd cycle inequality}
+	\textit{two-chorded odd cycle inequality} \cite{grotschelFacetsCliquePartitioning1990}
 	\[
 		\sum_{i \in \Z_{k}}^{} x_{v_{i}v_{i+1}} - x_{v_{i}v_{i+2}} \leq \left\lfloor \frac{1}{2} k \right\rfloor
 	\]
@@ -404,7 +404,7 @@ focus on cutting plane procedure:
 
 
 \begin{frame}
-	\frametitle{Separating two-chorded odd cycle inequalities (\texttt{two})}
+	\frametitle{Separating Two-Chorded Odd Cycle Inequalities (\texttt{two})}
 	\begin{columns}
 		\begin{column}{0.5\textwidth}
 	\begin{tikzpicture}
@@ -424,6 +424,7 @@ focus on cutting plane procedure:
 	\end{tikzpicture}
 		\end{column}
 		\begin{column}{0.6\textwidth}
+			\only<1>{\cite{mullerPartialOrderPolytope1996}}
 			\only<2>{
 \[
 \mathrlap{\overbrace{\phantom{v_{0} v_{1} v_{2} v_{3} v_{4} v_{5} v_{6} v_{0}}}^{\text{cycle}}}
@@ -596,6 +597,7 @@ After rearranging
 
 \end{column}
 \end{columns}
+\note[item]{each violated odd-cycle inequality corresponds to a u,uhat walk (same gadget)}
 \end{frame}
 
 \begin{frame}
@@ -621,7 +623,7 @@ Shortest path-algorithms
 	\frametitle{Half-Chorded Odd Cycle Ineuqalities}	
 	Let $5 \leq k \leq n$, let $d = \frac{k-1}{2}$ and $v: \Z_{k} \to \Z_{n}$ injective
 
-	\textit{half-chorded odd cycle inequality}
+	\textit{half-chorded odd cycle inequality} \cite{andresPolyhedralStudyLifted2022}
 	\[
 		\sum_{i \in \Z_{k}}^{} (x_{v_{i} v_{i+1}} - x_{v_{i} v_{i+d} }) \leq k - 3
 	\]
@@ -654,13 +656,55 @@ Shortest path-algorithms
 
 
 \begin{frame}
-	\frametitle{Half-Chorded Odd Cycle Ineuqalities}	
+	\frametitle{Separating Half-Chorded Odd Cycle Ineuqalities (\texttt{half})}	
 	\begin{columns}
-		\begin{column}{0.5\textwidth}
+		\begin{column}{0.4\textwidth}
+			\centering
+	\begin{tikzpicture}
+        \def \n{6};
+        \def \radius{1.5cm};
+        \def \r{0.3cm};
+        \foreach \i in {0,...,\n}{
+			\node[vertex] (\i) at ({\i/(\n+1)*360+90}:\radius) {};
+			\only<1>{\node at ({\i/(\n+1)*360+90}:\radius+\r) {$v_{\i}$};}
+			\only<2->{
+			\pgfmathtruncatemacro{\newlabel}{Mod(5*\i,7)}
+			\node at ({\i/(\n+1)*360+90}:\radius+\r) {$v_{\newlabel}$};}
+        }
+        \foreach \i/\j in {0/1, 1/2, 2/3, 3/4, 4/5, 5/6, 6/0} {
+			\draw[line width=0.2mm] (\i) -- (\j);
+        }
+        \foreach \i/\j in {0/3, 1/4, 2/5, 3/6, 4/0, 5/1, 6/2} {
+			\draw[line width=0.2mm, dashed] (\i) -- (\j);
+        }
+	\end{tikzpicture}
 		
-	\end{column}
+		\end{column}
+		\begin{column}{0.6\textwidth}
+			\only<1-2>{
+			\[
+				\sum_{i \in \Z_{k}}^{} (x_{v_{i} v_{i+1}} - x_{v_{i} v_{i+d} }) \leq k - 3
+			\]}
+			\only<2-3>{
+			After relabeling
+			\[
+				\sum_{i \in \Z_{k}}^{} (x_{v'_{i}v'_{i+2}} - x_{v'_{i}v'_{i+1}}) \leq k-3
+			\]}
+			\only<3-4>{
+			After rearranging
+			\[
+				\sum_{i \in \Z_{k}}^{} \Bigl( \underbrace{x_{v'_{i}v'_{i+1}}}_{\text{inner-gadget}} + \underbrace{1 -x_{v'_{i}v'_{i+2}}}_{\text{inter-gadged}} \Bigr) \geq 3
+			\]
+			}
+			\only<4>{
+			Dijkstra’s Algortihm: $\mathcal{O}(\lvert E_{H} \rvert + \lvert V_{H} \rvert \cdot\func{log} \lvert V_{H} \rvert) = \mathcal{O}(n^{3})$, $\mathcal{O}(n^{2})$ many times
+			}
+				
+		\end{column}
 	\end{columns}
-	\note[item]{}
+	\note[item]{half-chords also form a cycle, solid edges are two-chords to that cycle -> relabeling}
+	\note[item]{technique with auxiliary graph is exactly the same, except all weights are non-negative}
+	\note[item]{dijkstra, can terminate early if current weight is already $\geq 3$}
 \end{frame}
 
 \begin{frame}
@@ -687,15 +731,15 @@ Shortest path-algorithms
 \begin{frame}
 	\frametitle{Natural instances}	
 	\begin{itemize}
-		\item<1-> \texttt{cetacea} (30)
-		\item<1-> \texttt{cetacea} (36)
-		\item<2-> \texttt{football} (115)
+		\item<1-> \texttt{cetacea} (30) \cite{grotschelCuttingPlaneAlgorithm1989}
+		\item<1-> \texttt{cats} (36)
+		\item<2-> \texttt{football} (115) \cite{kappesComparativeStudyModern2015}
 		\item<2-> \texttt{adjnoun} (112)
 		\item<2-> \texttt{polbooks} (105)
 		\item<2-> \texttt{lesmis} (77)
 		\item<2-> \texttt{dolphins} (62)
 		\item<2-> \texttt{karate} (34)
-		\item<3-> \texttt{organoid\_[size]\_[difficulty]} (160, 100, 80, 40)
+		\item<3-> \texttt{organoid\_[size]\_[difficulty]} (160, 100, 80, 40) \cite{presbergerSegmentationClusteringOrganoids2023}
 	\end{itemize}
 \end{frame}
 
@@ -793,5 +837,20 @@ Shortest path-algorithms
 
 \section{Conclusion}
 
+\begin{frame}
+	\frametitle{Conclusion}
+	\begin{itemize}
+		\item \texttt{Δ} and \texttt{st} often sufficient for integral solutions
+		\item \texttt{two} and \texttt{half} run longer and do only improve bounds marginally
+	\end{itemize}
+	\note[item]{Everything with a note: on the instances i tested}
+	\note[item]{Personal: great fun, learned much}
+	\note[item]{would not have started it if i knew how little i knew ((i)lp, optimization, c++), 10/10}
+\end{frame}
+
+\begin{frame}[allowframebreaks]
+	\frametitle{Reference}
+\printbibliography
+\end{frame}
 
 \end{document}
