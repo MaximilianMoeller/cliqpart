@@ -3,6 +3,8 @@
 
 \input{preamble.tex}
 \usepackage{tudscrcolor}
+\usepackage{booktabs}
+\usepackage{csvsimple}
 
 % Beamer styling
 \usetheme{Dresden}
@@ -33,13 +35,7 @@
 
 \begin{frame}
 \frametitle{Agenda}
-\begin{enumerate}
-	\item Introduction to Clique Partitioning
-	\item Separating Inequalities
-	\item Data
-	\item Empirical Results
-	\item Conclusion
-\end{enumerate}
+\tableofcontents
 \end{frame}
 
 \section{Introduction}
@@ -148,13 +144,14 @@
 	\begin{columns}
 		\begin{column}{0.5\textwidth}
 			\begin{itemize}
-				\item<1-> \textsc{NP}-complete
+				\item \textsc{NP}-complete
 				\item<2-> Trivial cases:
+					\onslide<3->{
 					\begin{itemize}
 						\item<3-> $w \geq \bm{0}$	
 						\item<4-> $w \leq \bm{0}$
 						\item<5-> $w$ induces cliques
-					\end{itemize}
+					\end{itemize}}
 			\end{itemize}
 			\note[item]{blue drawn are edges with negative weights, all others non-negative}
 			\note[item]{interesting instances need to have ‘conflicts’}
@@ -218,7 +215,7 @@
 			    \def \r{0.3cm};
 			    \foreach \i/\j in {0/i,1/j,2/k}{
 					\node[vertex] (\i) at ({\i/(\n+1)*360+90}:\radius) {};
-					\node at ({\i/(\n+1)*360+90}:\radius+\r) {$v_{\j}$};
+					\node at ({\i/(\n+1)*360+90}:\radius+\r) {$v_{\i}$};
 			    }
 			    \draw (1) -- (2);
 			    \draw[dashed] (2) -- (0);
@@ -235,7 +232,7 @@
 			    \def \r{0.3cm};
 			    \foreach \i/\j in {0/i,1/j,2/k}{
 					\node[vertex] (\i) at ({\i/(\n+1)*360+90}:\radius) {};
-					\node at ({\i/(\n+1)*360+90}:\radius+\r) {$v_{\j}$};
+					\node at ({\i/(\n+1)*360+90}:\radius+\r) {$v_{\i}$};
 			    }
 			    \draw[dashed] (1) -- (2);
 			    \draw (2) -- (0);
@@ -251,7 +248,7 @@
 			    \def \r{0.3cm};
 			    \foreach \i/\j in {0/i,1/j,2/k}{
 					\node[vertex] (\i) at ({\i/(\n+1)*360+90}:\radius) {};
-					\node at ({\i/(\n+1)*360+90}:\radius+\r) {$v_{\j}$};
+					\node at ({\i/(\n+1)*360+90}:\radius+\r) {$v_{\i}$};
 			    }
 			    \draw (1) -- (2);
 			    \draw (2) -- (0);
@@ -321,7 +318,7 @@ focus on cutting plane procedure:
 \end{frame}
 
 \begin{frame}
-	\frametitle{2-Partition Inequalities (\texttt{st})}	
+	\frametitle{2-Partition Inequalities}	
 	\note[item]{Generalization of triangle inequalities}
 	Let $S, T \subseteq V_{n} $ disjoint.
 
@@ -367,6 +364,325 @@ focus on cutting plane procedure:
 	\note[item]{not explaining details, involve random choosing of an order of some nodes. Thus re-run three times.}
 \end{frame}
 
+
+\begin{frame}
+	\frametitle{Two-Chorded Odd Cycle Ineuqalities}	
+	Let $5 \leq k \leq n$ and $v: \Z_{k} \to \Z_{n}$ injective
+
+	\textit{two-chorded odd cycle inequality}
+	\[
+		\sum_{i \in \Z_{k}}^{} x_{v_{i}v_{i+1}} - x_{v_{i}v_{i+2}} \leq \left\lfloor \frac{1}{2} k \right\rfloor
+	\]
+
+	\vspace*{-1\baselineskip}
+	\onslide<2->{
+	\begin{columns}
+				\begin{column}{0.5\textwidth}
+					facet defining for $k$ odd
+				\end{column}
+				\begin{column}{0.5\textwidth}
+	\begin{tikzpicture}
+        \def \n{6};
+        \def \radius{1.5cm};
+        \def \r{0.3cm};
+        \foreach \i in {0,...,\n}{
+			\node[vertex] (\i) at ({\i/(\n+1)*360+90}:\radius) {};
+			\node at ({\i/(\n+1)*360+90}:\radius+\r) {$v_{\i}$};
+        }
+        \foreach \i/\j in {0/1, 1/2, 2/3, 3/4, 4/5, 5/6, 6/0} {
+			\draw[line width=0.2mm] (\i) -- (\j);
+        }
+        \foreach \i/\j in {0/2, 1/3, 2/4, 3/5, 4/6, 5/0, 6/1} {
+			\draw[line width=0.2mm, dashed] (\i) -- (\j);
+        }
+	\end{tikzpicture}
+	\end{column}
+\end{columns}}
+\note[item]{separable in polytime shown by müller 1996}
+\note[item]{technique hard to motivate}
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{Separating two-chorded odd cycle inequalities (\texttt{two})}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+	\begin{tikzpicture}
+        \def \n{6};
+        \def \radius{1.5cm};
+        \def \r{0.3cm};
+        \foreach \i in {0,...,\n}{
+			\node[vertex] (\i) at ({\i/(\n+1)*360+90}:\radius) {};
+			\node at ({\i/(\n+1)*360+90}:\radius+\r) {$v_{\i}$};
+        }
+        \foreach \i/\j in {0/1, 1/2, 2/3, 3/4, 4/5, 5/6, 6/0} {
+			\draw[line width=0.2mm] (\i) -- (\j);
+        }
+        \foreach \i/\j in {0/2, 1/3, 2/4, 3/5, 4/6, 5/0, 6/1} {
+			\draw[line width=0.2mm, dashed] (\i) -- (\j);
+        }
+	\end{tikzpicture}
+		\end{column}
+		\begin{column}{0.6\textwidth}
+			\only<2>{
+\[
+\mathrlap{\overbrace{\phantom{v_{0} v_{1} v_{2} v_{3} v_{4} v_{5} v_{6} v_{0}}}^{\text{cycle}}}
+v_{0} v_{1} v_{2} v_{3} v_{4} v_{5} v_{6}
+\mathrlap{\underbrace{\phantom{v_{0} v_{2} v_{4} v_{6} v_{1} v_{3} v_{5} v_{0}}}_{\text{two-chords}}}
+v_{0} v_{2} v_{4} v_{6} v_{1} v_{3} v_{5} v_{0}
+\]}
+\only<3>{
+\[
+	\sum_{i \in \Z_{k}}^{} x_{v_{i}v_{i+1}} - x_{v_{i}v_{i+2}} \leq \left\lfloor \frac{1}{2} k \right\rfloor
+\]
+	For odd $k$
+\[
+	\sum_{i \in \Z_k} x_{v_i v_{i+1}} - x_{v_i v_{i+2}} \leq \frac{1}{2} (k-1)
+\]
+After rearranging
+\[
+	\sum_{i \in \Z_k} \left( \frac{1}{2} -x_{v_i v_{i+1}} + x_{v_i v_{i+2}} \right) \geq \frac{1}{2}
+\]
+}
+\end{column}
+	\end{columns}
+	\note[item]{following an odd cycle and summing edges by +- 1 gives left hand side}
+	\note[item]{we do not need to know the $k$ to know that we get a lhs}
+	\note[item]{maybe we can also rewrite the rhs independent of $k$}
+	\note[item]{new problem distinguish even from odd cycles -> hints at auxiliary graph}
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{Auxiliary Graph $H = (V_{H}, E_{H})$}
+	\only<1-2>{
+	\begin{columns}
+	\begin{column}{0.5\textwidth}
+		For every pair $(i,j) \in V_{n}^{2}$ with $i \neq j$:
+		\onslide<2>{\begin{align*}
+			V_{H} &\coloneqq V_{H} \cup \big\{ u_{1}^{i,j}, u_{2}^{i,j}, \hat{u}_{1}^{i,j}, \hat{u}_{2}^{i,j} \big\} \\
+			E_{H} & \coloneqq E_{H} \cup \left\{ (u_{1}^{i,j}, u_{2}^{i,j}), (\hat{u}_{1}^{i,j}, \hat{u}_{2}^{i,j}) \right\}
+	\end{align*}}
+	\end{column}
+	\begin{column}{0.5\textwidth}
+		\centering
+		\onslide<2>{
+	\begin{tikzpicture}
+		\foreach \i/\j [count=\gc from 0] in {0/1}
+			\foreach \io in {1,2}
+				\foreach \uv [count=\uvc from 0] in {u,v}{
+					\pgfmathsetmacro{\desc}{ifthenelse(\uvc == 0, "$u_{\io}^{\i, \j}$", "$\hat{u}_{\io}^{\i, \j}$")}
+					\node[vertex]
+					(\uv\io\i\j) 
+					at ({ifthenelse(\gc < 3, 0, 1)*2.75 + \uvc*1.5}, {Mod(\gc,3)*3.5 + ifthenelse(\io == 2, 0, 1.5)})
+					{\desc};
+			}
+		\foreach \i/\j in {0/1}{
+			\draw[-latex] (u1\i\j) edge[line width=0.75pt] (u2\i\j);
+			\draw[-latex] (v1\i\j) edge[line width=0.75pt] (v2\i\j);
+		}
+	\end{tikzpicture}}
+			\end{column}
+		\end{columns}
+	}
+	\only<3-4>{
+	\begin{columns}
+	\begin{column}{0.5\textwidth}
+		For every triple $(i,j,k) \in V_{n}^{3}$ with $i,j,k$ pairwise distinct:
+		\onslide<4>{\begin{align*}
+			E_{H} & \coloneqq E_{H} \cup \left\{ (u_{2}^{i,j}, \hat{u}_{1}^{j,k}), (\hat{u}_{2}^{i,j}, u_{1}^{j,k}) \right\}
+	\end{align*}}
+					\end{column}
+	\begin{column}{0.5\textwidth}
+	\centering
+	\onslide<4>{
+	\begin{tikzpicture}
+		\foreach \i/\j [count=\gc from 0] in {0/1, 1/2}
+			\foreach \io in {1,2}
+				\foreach \uv [count=\uvc from 0] in {u,v}{
+					\pgfmathsetmacro{\desc}{ifthenelse(\uvc == 0, "$u_{\io}^{\i, \j}$", "$\hat{u}_{\io}^{\i, \j}$")}
+					\node[vertex]
+					(\uv\io\i\j) 
+					at ({ifthenelse(\gc < 3, 0, 1)*2.75 + \uvc*1.5}, {-Mod(\gc,3)*3.5 + ifthenelse(\io == 2, 0, 1.5)})
+					{\desc};
+			}
+		\foreach \i/\j in {0/1, 1/2}{
+			\draw[-latex] (u1\i\j) edge[line width=0.75pt] (u2\i\j);
+			\draw[-latex] (v1\i\j) edge[line width=0.75pt] (v2\i\j);
+		}
+		\foreach \i/\j/\k [count=\cc from 1] in {0/1/2}{
+			\pgfmathsetmacro{\outdiruv}{ifthenelse(Mod(\cc,3) == 0, "south west", "south"}
+			\pgfmathsetmacro{\outdirvu}{ifthenelse(Mod(\cc,3) == 0, "north west", "south"}
+			\pgfmathsetmacro{\indiruv}{ifthenelse(Mod(\cc,3) == 0, "north east", "north"}
+			\pgfmathsetmacro{\indirvu}{ifthenelse(Mod(\cc,3) == 0, "south east", "north"}
+			\pgfmathsetmacro{\looseness}{ifthenelse(Mod(\cc,3) == 0, 0.2, 1}
+			\draw[-latex] (u2\i\j) edge[line width=0.75pt, dashed, out=\outdiruv, in=\indiruv, looseness=\looseness] (v1\j\k);
+			\draw[-latex] (v2\i\j) edge[line width=0.75pt, dashed, out=\outdirvu, in=\indirvu, looseness=\looseness] (u1\j\k);
+		}
+	\end{tikzpicture}}
+	\end{column}
+	\end{columns}
+	}
+	\note[item]{bipartide graph can distinguish between odd and even walks}
+	\note[item]{}
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{Weights for the auxiliary graph}
+		\begin{equation*}
+			\sum_{i \in \Z_k} \biggl( \underbrace{ \frac{1}{2} -x_{v_i v_{i+1}} }_{\text{inner-gadget weights}} + \underbrace{x_{v_i v_{i+2}}}_{\text{inter-gadget weights}} \biggr) \geq \frac{1}{2}
+		\end{equation*}
+	\note[item]{no negative cycles as long as triangle inequalities are satisfied! (müller)}
+\end{frame}
+
+
+\begin{frame}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+	\begin{tikzpicture}
+        \def \n{6};
+        \def \radius{1.5cm};
+        \def \r{0.3cm};
+        \foreach \i in {0,...,\n}{
+			\node[vertex] (\i) at ({\i/(\n+1)*360+90}:\radius) {};
+			\node at ({\i/(\n+1)*360+90}:\radius+\r) {$v_{\i}$};
+        }
+        \foreach \i/\j in {0/1, 1/2, 2/3, 3/4, 4/5, 5/6, 6/0} {
+			\draw[line width=0.2mm] (\i) -- (\j);
+        }
+        \foreach \i/\j in {0/2, 1/3, 2/4, 3/5, 4/6, 5/0, 6/1} {
+			\draw[line width=0.2mm, dashed] (\i) -- (\j);
+        }
+	\end{tikzpicture}
+		\end{column}
+		\begin{column}{0.6\textwidth}
+		\centering
+		\resizebox{0.95\textwidth}{!}{
+			\begin{tikzpicture}
+        \def \n{6};
+		\foreach \i in {0, ..., \n}
+			\foreach \j in {0, ..., \n}{
+
+			\ifthenelse{\i = \j}{}{
+
+			\foreach \io in {1,2}
+				\foreach \uv [count=\uvc from 0] in {u,v}{
+					\pgfmathsetmacro{\desc}{ifthenelse(\uvc == 0, "$u_{\io}^{\i, \j}$", "$\hat{u}_{\io}^{\i, \j}$")}
+					\node[vertex]
+					(\uv\io\i\j) 
+					at ({\i*3 + \uvc*1.25}, -{\j*3 + ifthenelse(\io == 2, 0, 1.25)}) %{};
+					{\desc};
+				}
+			\draw[-latex] (u1\i\j) -- (u2\i\j);
+			\draw[-latex] (v1\i\j) -- (v2\i\j);
+			}
+
+			}
+		\foreach \i/\j/\k [count=\counter from 0] in {0/1/2, 1/2/3, 2/3/4, 3/4/5, 4/5/6, 5/6/0, 6/0/1}{
+			\pgfmathsetmacro{\startnode}{ifthenelse(Mod(\counter,2) == 0, "u", "v")}
+			\pgfmathsetmacro{\endnode}{ifthenelse(Mod(\counter,2) == 0, "v", "u")}
+			\pgfmathsetmacro{\indir}{ifthenelse(\j == 6, "west", "north")}
+			\pgfmathsetmacro{\outdir}{ifthenelse(\j == 6, "east", "south")}
+			\pgfmathsetmacro{\looseness}{ifthenelse(\j == 0, 0.25, ifthenelse(\j == 6, 0.25, 0.5))}
+			\draw[-latex] (\startnode2\i\j) edge[line width=0.75pt, color=cdblue, out=\outdir, in=\indir, looseness=\looseness] (\endnode1\j\k);
+		}
+		\foreach \i/\j [count=\counter from 0] in {0/1, 1/2, 2/3, 3/4, 4/5, 5/6, 6/0}{
+			\pgfmathsetmacro{\uv}{ifthenelse(Mod(\counter,2) == 0, "u", "v")}
+			\draw[-latex] (\uv1\i\j) edge[line width=0.75pt, color=cdblue] (\uv2\i\j);
+
+		}
+\end{tikzpicture}}
+
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Dimensions of $H$}
+\begin{align*}
+	\lvert V_{H} \rvert &= 4 n(n-1) = 4n^{2} - 4n \\
+	\lvert E_{H} \rvert &= \underbrace{2 n(n-1)}_{\text{inner-gadget edges}} + \underbrace{2 n(n-1)(n-2)}_{\text{inter-gadget edges}} = 2n^{3} - 4n^{2} + 2n \\
+\end{align*}
+\onslide<2->{
+Shortest path-algorithms
+\begin{itemize}
+	\item<2-> Floyd-Warshall $\mathcal{O}(\lvert V \rvert^3) = \mathcal{O}(n^{6})$\onslide<4->{, $\mathcal{O}(\lvert V \rvert^{2}) = \mathcal{O}(n^{4})$ space!}
+	\item<3-> Belman-Ford: $\mathcal{O}(\lvert V_{H} \rvert \cdot \lvert E_{H} \rvert) = \mathcal{O}(n^{5})$, $\mathcal{O}(n^{2})$ many times\onslide<4->{, $\mathcal{O}(\lvert V \rvert) = \mathcal{O}(n^{2})$ space}
+\end{itemize}
+}
+	\note[item]{size has effect on choice of shortest path}
+	\note[item]{floyd-warshall takes 80GB of memory on largest instances}
+	\note[item]{we can terminate belman-ford early -> after 15 minutes}
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{Half-Chorded Odd Cycle Ineuqalities}	
+	Let $5 \leq k \leq n$, let $d = \frac{k-1}{2}$ and $v: \Z_{k} \to \Z_{n}$ injective
+
+	\textit{half-chorded odd cycle inequality}
+	\[
+		\sum_{i \in \Z_{k}}^{} (x_{v_{i} v_{i+1}} - x_{v_{i} v_{i+d} }) \leq k - 3
+	\]
+
+	\vspace*{-1\baselineskip}
+	\onslide<2->{
+	\begin{columns}
+				\begin{column}{0.5\textwidth}
+					facet defining for $k$ odd
+				\end{column}
+				\begin{column}{0.5\textwidth}
+	\begin{tikzpicture}
+        \def \n{6};
+        \def \radius{1.5cm};
+        \def \r{0.3cm};
+        \foreach \i in {0,...,\n}{
+			\node[vertex] (\i) at ({\i/(\n+1)*360+90}:\radius) {};
+			\node at ({\i/(\n+1)*360+90}:\radius+\r) {$v_{\i}$};
+        }
+        \foreach \i/\j in {0/1, 1/2, 2/3, 3/4, 4/5, 5/6, 6/0} {
+			\draw[line width=0.2mm] (\i) -- (\j);
+        }
+        \foreach \i/\j in {0/3, 1/4, 2/5, 3/6, 4/0, 5/1, 6/2} {
+			\draw[line width=0.2mm, dashed] (\i) -- (\j);
+        }
+	\end{tikzpicture}
+	\end{column}
+\end{columns}}
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{Half-Chorded Odd Cycle Ineuqalities}	
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+		
+	\end{column}
+	\end{columns}
+	\note[item]{}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Run Configurations}
+\begin{table}
+\centering
+\begin{tabular}{lccccccc}
+\toprule
+  & \texttt{Δ-st-1} & \texttt{Δ-st-2} & \texttt{Δ-st-12}	& \texttt{Δ-½}	& \texttt{Δ-2} 	& \texttt{Δ-c}	& \texttt{all}  	\\
+\midrule
+1 & \texttt{Δ}      & \texttt{Δ}      & \texttt{Δ}      	& \texttt{Δ}	& \texttt{Δ}	& \texttt{Δ}	& \texttt{Δ} 		\\
+2 & $\texttt{st}^1$ & $\texttt{st}^2$ & $\texttt{st}^1$ 	& \texttt{half}	& \texttt{two} 	& \texttt{half}	& $\texttt{st}^1$  	\\
+3 & —               & —               & $\texttt{st}^2$ 	& —    			& —   		   	& \texttt{two}  & $\texttt{st}^2$  	\\
+4 & —               & —               & —               	& —    			& —   		   	& —      		& \texttt{half}     \\
+5 & —               & —               & —               	& —    			& — 			& —      		& \texttt{two}      \\
+\bottomrule
+\end{tabular}
+\end{table}
+\note[item]{all use Δ first, because they implicitly rely on it}
+\note[item]{ordered them by (expected) run time}
+\end{frame}
+
 \section{Data}
 \begin{frame}
 	\frametitle{Natural instances}	
@@ -396,9 +712,84 @@ focus on cutting plane procedure:
 			$(\text{\texttt{mu}}, \text{\texttt{sigma}}) \in \left\{ 0, 0.5, 2 \right\} \times \left\{ 0.5, 1, 2 \right\}$
 
 	\end{itemize}
-	\end{frame}
+\end{frame}
 
 \section{Empirical Results}
+\begin{frame}
+	\frametitle{Relative Gap}
+	Relative gap of solution $z'$ to the optimal solution $z$
+	\[
+		\func{gap}(z, z') \coloneqq \frac{\lvert z - z' \rvert}{\lvert z \rvert}
+	\]
+	\note[item]{case $z=0$ can be ignored}
+	\note[item]{only possible to compute when optimal value is known}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Example: \texttt{adjnoun}}
+	\begin{figure}
+		\centering
+		\resizebox{\linewidth}{!}{
+		\includegraphics{analysisCSVs/adjnoun_analysis.png}
+		}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Example: \texttt{organoid\_160\_hard}}
+	\begin{figure}
+		\centering
+		\resizebox{\linewidth}{!}{
+		\includegraphics{analysisCSVs/organoid160hard_analysis.png}
+		}
+	\end{figure}
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{Run-Times on Natural Instances}
+\begin{figure}[H]
+	\centering
+	\resizebox{0.95\linewidth}{!}{
+	\input{analysisCSVs/non_random_time_bars.pgf}}
+\end{figure}
+\note[item]{Running time of run configurations on non-random instances.}
+\note[item]{For run configurations containing a \texttt{st}-separator the results were averaged per instance among the three runs.}
+\note[item]{All results are normalized with respect to the \texttt{Δ} run configuration (first column).}
+\note[item]{The ordinate is logarthmically scaled.
+	Box plots are drawn in the standard way, \ie boxes are from $Q_{1}$ to $Q_{3}$, the blue mark highlights the median, and whiskers extend by $1.5*\var{IQR}$.}
+\note[item]{\textcolor{red}{are cycles worth it?}}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Relative Gaps on Natural Instances}
+\begin{figure}[H]
+	\centering
+	\resizebox{0.95\linewidth}{!}{
+	\input{analysisCSVs/non_random_log_gap_bars.pgf}}
+\end{figure}
+\note[item]{st-separators artifact of measuring integrality with tolerance parameter}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Run-Times on Random Instances}
+\begin{figure}[H]
+	\centering
+	\resizebox{0.95\linewidth}{!}{
+	\input{analysisCSVs/random_time_bars.pgf}}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Relative Gaps on Random Instances}
+\begin{figure}[H]
+	\centering
+	\resizebox{0.95\linewidth}{!}{
+	\input{analysisCSVs/random_lin_gap_bars.pgf}}
+\end{figure}
+\note[item]{axis is now linear!}
+\note[item]{explain underlying structure in natural instances to show why they are easier}
+\end{frame}
 
 \section{Conclusion}
 
