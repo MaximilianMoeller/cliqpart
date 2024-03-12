@@ -1,7 +1,21 @@
 % !TEX TS-program = lualatex
-\documentclass[a4paper, cdfont=false, cdsection=false, cdgeometry=off]{tudscrartcl}
+\documentclass{tudscrartcl}
+%\documentclass[a4paper, cdfont=false, cdsection=false, cdgeometry=off]{tudscrartcl}
 
-\input{preamble.tex}
+% Mix and match whatever you need
+
+% This part of the preamble is indispensable for this template to work.
+\input{preamble/01-mandatory.tex}
+\input{preamble/02-language-english.tex}
+%\input{preamble/02-language-german.tex}
+\input{preamble/03-typography.tex}
+\input{preamble/04-improvements.tex}
+\input{preamble/20-math.tex}
+\input{preamble/21-theorems.tex}
+\input{preamble/25-complexity-classes.tex}
+\input{preamble/30-algorithms.tex}
+\input{preamble/99-references.tex}
+
 
 \usepackage{csvsimple}
 \usepackage{lscape} 
@@ -27,23 +41,30 @@
 
 \renewcommand{\arraystretch}{1.3}
 
-\setuptodonotes{color=cdgreen!30, tickmarkheight=0.2cm, noline}
+%\setuptodonotes{color=cdgreen!30, tickmarkheight=0.2cm, noline}
 
+\usepackage{tikz}
+\usetikzlibrary{arrows, automata, graphs, positioning}
 \tikzstyle{vertex}=[circle, draw, fill=white, inner sep=0pt, minimum width=1ex]
 
 \newcommand\CP[0]{\textmd{\textsc{Clique Partitioning}}\xspace}
 \newcommand\MC[0]{\textmd{\textsc{Multicut}}\xspace}
 \newcommand\ST[0]{$\left[S{:}T\right]$}
 
+\usepackage[backend=biber, style=alphabetic]{biblatex}
+\addbibresource{references.bib}
+
+\usepackage[scientific-notation=true]{siunitx}
+
 \begin{document}
 
 % Makes all the section headings etc. use a serif font
-\addtokomafont{disposition}{\rmfamily}
-\addtokomafont{title}{\rmfamily}
-\addtokomafont{subtitle}{\rmfamily}
-\addtokomafont{author}{\rmfamily}
-\addtokomafont{date}{\rmfamily}
-\addtokomafont{subject}{\rmfamily}
+%addtokomafont{disposition}{\rmfamily}
+%\addtokomafont{title}{\rmfamily}
+%\addtokomafont{subtitle}{\rmfamily}
+%\addtokomafont{author}{\rmfamily}
+%\addtokomafont{date}{\rmfamily}
+%\addtokomafont{subject}{\rmfamily}
 
 \faculty{Faculty of Computer Science}
 \institute{Institute for Artificial Intelligence}

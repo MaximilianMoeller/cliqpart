@@ -155,38 +155,36 @@ Therefore, assuming that all triangle inequalities are satisfied, $x^{*}$ violat
 
 
 % Took so long to create, but sadly not helpful in explaining the subject :'(
-\hide{
-\begin{figure}[p]
-	\centering
-	\begin{tikzpicture}
-		\foreach \i/\j [count=\gc from 0] in {0/1, 1/2, 2/0, 0/2, 2/1, 1/0}
-			\foreach \io in {1,2}
-				\foreach \uv [count=\uvc from 0] in {u,v}{
-					\pgfmathsetmacro{\desc}{ifthenelse(\uvc == 0, "$u_{\io}^{\i, \j}$", "$\hat{u}_{\io}^{\i, \j}$")}
-					\node[vertex]
-					(\uv\io\i\j) 
-					at ({Mod(\gc,3)*3.5 - ifthenelse(\io == 2, 0, 1.5)}, {ifthenelse(\gc < 3, 0, 1)*2.75 - \uvc*1.5})
-					{\desc};
-			}
-		\foreach \i/\j in {0/1, 0/2, 1/0, 1/2, 2/0, 2/1}{
-			\draw[-latex] (u1\i\j) edge[line width=0.75pt] (u2\i\j);
-			\draw[-latex] (v1\i\j) edge[line width=0.75pt] (v2\i\j);
-		}
-		\foreach \i/\j/\k [count=\cc from 1] in {0/1/2, 1/2/0, 2/0/1, 0/2/1, 2/1/0, 1/0/2}{
-			\pgfmathsetmacro{\outdiruv}{ifthenelse(Mod(\cc,3) == 0, "south west", "east"}
-			\pgfmathsetmacro{\outdirvu}{ifthenelse(Mod(\cc,3) == 0, "north west", "east"}
-			\pgfmathsetmacro{\indiruv}{ifthenelse(Mod(\cc,3) == 0, "north east", "west"}
-			\pgfmathsetmacro{\indirvu}{ifthenelse(Mod(\cc,3) == 0, "south east", "west"}
-			\pgfmathsetmacro{\looseness}{ifthenelse(Mod(\cc,3) == 0, 0.2, 1}
-			\draw[-latex] (u2\i\j) edge[line width=0.75pt, dashed, out=\outdiruv, in=\indiruv, looseness=\looseness] (v1\j\k);
-			\draw[-latex] (v2\i\j) edge[line width=0.75pt, dashed, out=\outdirvu, in=\indirvu, looseness=\looseness] (u1\j\k);
-		}
-	\end{tikzpicture}
-	\caption[Auxiliary graph $H$ for $K_3$]{The auxiliary graph for the complete graph $K_{3}$.
-	Inner-gadget edges are shown as solid lines and inter-gadget edges are shown as dashed lines.}
-	\label{fig:aux_graph_K3}
-\end{figure}
-}
+%\begin{figure}[p]
+%	\centering
+%	\begin{tikzpicture}
+%		\foreach \i/\j [count=\gc from 0] in {0/1, 1/2, 2/0, 0/2, 2/1, 1/0}
+%			\foreach \io in {1,2}
+%				\foreach \uv [count=\uvc from 0] in {u,v}{
+%					\pgfmathsetmacro{\desc}{ifthenelse(\uvc == 0, "$u_{\io}^{\i, \j}$", "$\hat{u}_{\io}^{\i, \j}$")}
+%					\node[vertex]
+%					(\uv\io\i\j) 
+%					at ({Mod(\gc,3)*3.5 - ifthenelse(\io == 2, 0, 1.5)}, {ifthenelse(\gc < 3, 0, 1)*2.75 - \uvc*1.5})
+%					{\desc};
+%			}
+%		\foreach \i/\j in {0/1, 0/2, 1/0, 1/2, 2/0, 2/1}{
+%			\draw[-latex] (u1\i\j) edge[line width=0.75pt] (u2\i\j);
+%			\draw[-latex] (v1\i\j) edge[line width=0.75pt] (v2\i\j);
+%		}
+%		\foreach \i/\j/\k [count=\cc from 1] in {0/1/2, 1/2/0, 2/0/1, 0/2/1, 2/1/0, 1/0/2}{
+%			\pgfmathsetmacro{\outdiruv}{ifthenelse(Mod(\cc,3) == 0, "south west", "east"}
+%			\pgfmathsetmacro{\outdirvu}{ifthenelse(Mod(\cc,3) == 0, "north west", "east"}
+%			\pgfmathsetmacro{\indiruv}{ifthenelse(Mod(\cc,3) == 0, "north east", "west"}
+%			\pgfmathsetmacro{\indirvu}{ifthenelse(Mod(\cc,3) == 0, "south east", "west"}
+%			\pgfmathsetmacro{\looseness}{ifthenelse(Mod(\cc,3) == 0, 0.2, 1}
+%			\draw[-latex] (u2\i\j) edge[line width=0.75pt, dashed, out=\outdiruv, in=\indiruv, looseness=\looseness] (v1\j\k);
+%			\draw[-latex] (v2\i\j) edge[line width=0.75pt, dashed, out=\outdirvu, in=\indirvu, looseness=\looseness] (u1\j\k);
+%		}
+%	\end{tikzpicture}
+%	\caption[Auxiliary graph $H$ for $K_3$]{The auxiliary graph for the complete graph $K_{3}$.
+%	Inner-gadget edges are shown as solid lines and inter-gadget edges are shown as dashed lines.}
+%	\label{fig:aux_graph_K3}
+%\end{figure}
 
 \begin{figure}[ht]
 	\centering
