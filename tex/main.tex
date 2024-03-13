@@ -1,6 +1,6 @@
 % !TEX TS-program = lualatex
-\documentclass{tudscrartcl}
-%\documentclass[a4paper, cdfont=false, cdsection=false, cdgeometry=off]{tudscrartcl}
+%\documentclass{tudscrartcl}
+\documentclass[a4paper, cdfont=false, cdsection=false, cdgeometry=off, titlepage]{tudscrartcl}
 
 % Mix and match whatever you need
 
@@ -9,6 +9,7 @@
 \input{preamble/02-language-english.tex}
 %\input{preamble/02-language-german.tex}
 \input{preamble/03-typography.tex}
+\setmainfont[SmallCapsFont={Latin Modern Roman Caps}]{Latin Modern Roman}
 \input{preamble/04-improvements.tex}
 \input{preamble/20-math.tex}
 \input{preamble/21-theorems.tex}
@@ -16,23 +17,28 @@
 \input{preamble/30-algorithms.tex}
 \input{preamble/99-references.tex}
 
-
-\usepackage{csvsimple}
+\usepackage{csvsimple-l3}
 \usepackage{lscape} 
 \usepackage{booktabs}
 \usepackage{centernot}
+\usepackage{xcolor}
 % used if sidewaystable is desired instead of \landscape-method
 %\usepackage{rotating}
 
+\usepackage[backend=biber, style=alphabetic]{biblatex}
+\addbibresource{references.bib}
+
+\usepackage{siunitx}
+
+\usepackage{tikz}
+\usetikzlibrary{arrows, automata, graphs, positioning}
+\tikzstyle{vertex}=[circle, draw, fill=white, inner sep=0pt, minimum width=1ex]
 
 \hypersetup{
-    pdfauthor={Maximilian Moeller},
 	pdftitle={Separation Routines for Clique Partitioning},
     pdfsubject={Großer Beleg},
     pdfkeywords={Clique Partitioning} {Combinatorial Optimization},
 	% Colors from TUD corparate design
-    unicode=true,
-    colorlinks=true,
     linkcolor=cdblue,
     citecolor=cdblue,
     filecolor=cdblue,
@@ -41,30 +47,10 @@
 
 \renewcommand{\arraystretch}{1.3}
 
-%\setuptodonotes{color=cdgreen!30, tickmarkheight=0.2cm, noline}
-
-\usepackage{tikz}
-\usetikzlibrary{arrows, automata, graphs, positioning}
-\tikzstyle{vertex}=[circle, draw, fill=white, inner sep=0pt, minimum width=1ex]
 
 \newcommand\CP[0]{\textmd{\textsc{Clique Partitioning}}\xspace}
 \newcommand\MC[0]{\textmd{\textsc{Multicut}}\xspace}
 \newcommand\ST[0]{$\left[S{:}T\right]$}
-
-\usepackage[backend=biber, style=alphabetic]{biblatex}
-\addbibresource{references.bib}
-
-\usepackage[scientific-notation=true]{siunitx}
-
-\begin{document}
-
-% Makes all the section headings etc. use a serif font
-%addtokomafont{disposition}{\rmfamily}
-%\addtokomafont{title}{\rmfamily}
-%\addtokomafont{subtitle}{\rmfamily}
-%\addtokomafont{author}{\rmfamily}
-%\addtokomafont{date}{\rmfamily}
-%\addtokomafont{subject}{\rmfamily}
 
 \faculty{Faculty of Computer Science}
 \institute{Institute for Artificial Intelligence}
@@ -74,8 +60,19 @@
 \title{Evaluation of separation routines for some classes of inequalities of the \CP polytope}
 \supervisor{Jannik Irmai}
 \professor{Prof. Dr. Björn Andres}
-\usepackage[en-GB,showdow]{datetime2}
-\date{\DTMdisplaydate{2023}{11}{19}{-1}}
+\usepackage[en-GB]{datetime2}
+\DTMlangsetup[en-GB]{abbr,ord=raise,monthyearsep={,\space}}
+\date{2023-11-19}
+
+\begin{document}
+
+% Makes all the section headings etc. use a serif font
+\addtokomafont{disposition}{\rmfamily}
+\addtokomafont{title}{\rmfamily}
+\addtokomafont{subtitle}{\rmfamily}
+\addtokomafont{author}{\rmfamily}
+\addtokomafont{date}{\rmfamily}
+\addtokomafont{subject}{\rmfamily}
 
 \maketitle[cdfont=off]
 
@@ -83,9 +80,9 @@
 \tableofcontents
 \listoffigures
 \listoftables
-%\listoftodos
 
 \newpage
+
 \include{sections/Introduction.tex}
 \include{sections/Separation.tex}
 \include{sections/Data.tex}

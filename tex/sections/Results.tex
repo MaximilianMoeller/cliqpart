@@ -64,7 +64,7 @@ This is highlighted by the fact that it also always among the run configurations
 % maybe a bar chart?
 
 \subsection{Conclusion for Natural Instances}
-\cref{fig:non_random_time_bars} shows a comparison of running times of all run configurations on the non-random instances.
+\Cref{fig:non_random_time_bars} shows a comparison of running times of all run configurations on the non-random instances.
 We arbitrarily chose the \texttt{Δ}-run configuration and normalized all other running times with respect to it.
 This allows us to compare running times across instances and run configurations.
 
@@ -83,7 +83,7 @@ This allows us to compare running times across instances and run configurations.
 \end{figure}
 
 We found that separating chorded cycle inequalities was hardly ever worth the additional time consumption of the algorithm.
-\cref{fig:non_random_log_gap_bars} shows that the improvements in the objective bound when using \texttt{half} or \texttt{two} were marginal.
+\Cref{fig:non_random_log_gap_bars} shows that the improvements in the objective bound when using \texttt{half} or \texttt{two} were marginal.
 
 \begin{figure}[H]
 	\centering
@@ -105,7 +105,7 @@ Since we measure integrality of a solution with a tolerance of \num{e-6}, it is 
 It is easy to see that randomly created instances are in general much harder than the natural ones.
 We could not obtain optimal solutions for some of them and hence cannot compute relative gaps.
 For instances where we could obtain optimal solutions, the large relative gaps that remain when only separating triangle inequalities are quite remarkable.
-\cref{fig:random_time_and_gap_bars} summarizes the results for random instances.
+\Cref{fig:random_time_and_gap_bars} summarizes the results for random instances.
 Again, $\texttt{Δ}_{\infty}$ is the fastest run configuration on almost all instances, while $\texttt{Δ}_{\infty}^{\leq 1}$ performs a bit worse.
 We suspect that $\texttt{Δ}_{\infty}^{\leq 1}$ could not achieve the same balance as before, because in the random instances more ‘conflicts’ lead to a higher number of constraints with a high violation degree.
 Adding only one constraint per variable and iteration might not be enough to quickly converge towards a solution.

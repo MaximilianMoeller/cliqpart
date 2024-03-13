@@ -9,7 +9,7 @@ cuts;;;;;;;;;;;;;;;;;;;
 # removed;{165};{165};{111};{111};{165};{165};{165};{165};{165};{165};{165};{165};{165};{165};{165};{165};{165};{165};{165}
 objective;;;;;;;;;;;;;;;;;;;
 bound;\textbf{2.508};\textbf{2.508};\textbf{2.508};\textbf{2.508};\textbf{2.508};\textbf{2.508};\textbf{2.508};\textbf{2.508};\textbf{2.508};\textbf{2.508};\textbf{2.508};\textbf{2.508};\textbf{2.508};\textbf{2.508};\textbf{2.508};\textbf{2.508};\textbf{2.508};\textbf{2.508};\textbf{2.508}
-gap;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$;$\bm{0.0%}^{*}$
+gap;$\mathbf{0.0%}^{*}$;$\mathbf{0.0%}^{*}$;$\mathbf{0.0%}^{*}$;$\mathbf{0.0%}^{*}$;$\mathbf{0.0%}^{*}$;$\mathbf{0.0%}^{*}$;$\mathbf{0.0%}^{*}$;$\mathbf{0.0%}^{*}$;$\mathbf{0.0%}^{*}$;$\mathbf{0.0%}^{*}$;$\mathbf{0.0%}^{*}$;$\mathbf{0.0%}^{*}$;$\mathbf{0.0%}^{*}$;$\mathbf{0.0%}^{*}$;$\mathbf{0.0%}^{*}$;$\mathbf{0.0%}^{*}$;$\mathbf{0.0%}^{*}$;$\mathbf{0.0%}^{*}$;$\mathbf{0.0%}^{*}$
 time;;;;;;;;;;;;;;;;;;;
 total \si[per-mode=symbol]{\per\second};\textbf{0.003};\textbf{0.003};0.005;0.005;\textbf{0.003};\textbf{0.003};\textbf{0.003};\textbf{0.003};\textbf{0.003};\textbf{0.003};\textbf{0.003};\textbf{0.003};\textbf{0.003};\textbf{0.003};\textbf{0.003};\textbf{0.003};\textbf{0.003};\textbf{0.003};\textbf{0.003}
 normalized;\textbf{1.00};\textbf{1.00};1.67;1.67;\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00};\textbf{1.00}
