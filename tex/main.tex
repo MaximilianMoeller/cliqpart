@@ -1,24 +1,44 @@
 % !TEX TS-program = lualatex
-\documentclass[a4paper, cdfont=false, cdsection=false, cdgeometry=off]{tudscrartcl}
+%\documentclass{tudscrartcl}
+\documentclass[a4paper, cdfont=false, cdsection=false, cdgeometry=off, titlepage]{tudscrartcl}
 
-\input{preamble.tex}
+% Mix and match whatever you need
 
-\usepackage{csvsimple}
+% This part of the preamble is indispensable for this template to work.
+\input{preamble/01-mandatory.tex}
+\input{preamble/02-language-english.tex}
+%\input{preamble/02-language-german.tex}
+\input{preamble/03-typography.tex}
+\setmainfont[SmallCapsFont={Latin Modern Roman Caps}]{Latin Modern Roman}
+\input{preamble/04-improvements.tex}
+\input{preamble/20-math.tex}
+\input{preamble/21-theorems.tex}
+\input{preamble/25-complexity-classes.tex}
+\input{preamble/30-algorithms.tex}
+\input{preamble/99-references.tex}
+
+\usepackage{csvsimple-l3}
 \usepackage{lscape} 
 \usepackage{booktabs}
 \usepackage{centernot}
+\usepackage{xcolor}
 % used if sidewaystable is desired instead of \landscape-method
 %\usepackage{rotating}
 
+\usepackage[backend=biber, style=alphabetic]{biblatex}
+\addbibresource{references.bib}
+
+\usepackage{siunitx}
+
+\usepackage{tikz}
+\usetikzlibrary{arrows, automata, graphs, positioning}
+\tikzstyle{vertex}=[circle, draw, fill=white, inner sep=0pt, minimum width=1ex]
 
 \hypersetup{
-    pdfauthor={Maximilian Moeller},
 	pdftitle={Separation Routines for Clique Partitioning},
     pdfsubject={Großer Beleg},
     pdfkeywords={Clique Partitioning} {Combinatorial Optimization},
 	% Colors from TUD corparate design
-    unicode=true,
-    colorlinks=true,
     linkcolor=cdblue,
     citecolor=cdblue,
     filecolor=cdblue,
@@ -27,13 +47,22 @@
 
 \renewcommand{\arraystretch}{1.3}
 
-\setuptodonotes{color=cdgreen!30, tickmarkheight=0.2cm, noline}
-
-\tikzstyle{vertex}=[circle, draw, fill=white, inner sep=0pt, minimum width=1ex]
 
 \newcommand\CP[0]{\textmd{\textsc{Clique Partitioning}}\xspace}
 \newcommand\MC[0]{\textmd{\textsc{Multicut}}\xspace}
 \newcommand\ST[0]{$\left[S{:}T\right]$}
+
+\faculty{Faculty of Computer Science}
+\institute{Institute for Artificial Intelligence}
+\chair{Chair for Machine Learning for Computer Vision}
+\thesis{Student Research Project “Großer Beleg”}
+\author{Maximilian Moeller} 
+\title{Evaluation of separation routines for some classes of inequalities of the \CP polytope}
+\supervisor{Jannik Irmai}
+\professor{Prof. Dr. Björn Andres}
+\usepackage[en-GB]{datetime2}
+\DTMlangsetup[en-GB]{abbr,ord=raise,monthyearsep={,\space}}
+\date{2023-11-19}
 
 \begin{document}
 
@@ -45,25 +74,15 @@
 \addtokomafont{date}{\rmfamily}
 \addtokomafont{subject}{\rmfamily}
 
-\faculty{Faculty of Computer Science}
-\institute{Institute for Artificial Intelligence}
-\chair{Chair for Machine Learning for Computer Vision}
-\thesis{Student Research Project “Großer Beleg”}
-\author{Maximilian Moeller} 
-\title{Evaluation of separation routines for some classes of inequalities of the \CP polytope}
-\supervisor{Jannik Irmai}
-\professor{Prof. Dr. Björn Andres}
-\date{\today}
-
 \maketitle[cdfont=off]
 
 \newpage
 \tableofcontents
 \listoffigures
 \listoftables
-%\listoftodos
 
 \newpage
+
 \include{sections/Introduction.tex}
 \include{sections/Separation.tex}
 \include{sections/Data.tex}

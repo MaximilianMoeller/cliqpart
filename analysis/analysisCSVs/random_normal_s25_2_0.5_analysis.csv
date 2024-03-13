@@ -1,14 +1,14 @@
 ;\texttt{Δ};$\texttt{Δ}_{\infty}$;$\texttt{Δ}^{\leq 1}$;$\texttt{Δ}_{\infty}^{\leq 1}$;1;2;3;1;2;3;1;2;3;\texttt{Δ-½};\texttt{Δ-2};\texttt{Δ-c};1;2;3
-# it.;\textbf{{3}};\textbf{{3}};{4};{4};\textbf{{3}};\textbf{{3}};\textbf{{3}};\textbf{{3}};\textbf{{3}};\textbf{{3}};\textbf{{3}};\textbf{{3}};\textbf{{3}};\textbf{{3}};\textbf{{3}};\textbf{{3}};\textbf{{3}};\textbf{{3}};\textbf{{3}}
+# it.;\textbf{{1}};\textbf{{1}};\textbf{{1}};\textbf{{1}};\textbf{{1}};\textbf{{1}};\textbf{{1}};\textbf{{1}};\textbf{{1}};\textbf{{1}};\textbf{{1}};\textbf{{1}};\textbf{{1}};\textbf{{1}};\textbf{{1}};\textbf{{1}};\textbf{{1}};\textbf{{1}};\textbf{{1}}
 # $\centernot{\texttt{Δ}}$-calls;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0
 cuts;;;;;;;;;;;;;;;;;;;
-# total;{286};{286};\textbf{{28}};\textbf{{28}};{286};{286};{286};{286};{286};{286};{286};{286};{286};{286};{286};{286};{286};{286};{286}
-# max;{274};{274};{18};{18};{274};{274};{274};{274};{274};{274};{274};{274};{274};{274};{274};{274};{274};{274};{274}
-# min;{12};{12};{4};{4};{12};{12};{12};{12};{12};{12};{12};{12};{12};{12};{12};{12};{12};{12};{12}
+# total;\textbf{{0}};\textbf{{0}};\textbf{{0}};\textbf{{0}};\textbf{{0}};\textbf{{0}};\textbf{{0}};\textbf{{0}};\textbf{{0}};\textbf{{0}};\textbf{{0}};\textbf{{0}};\textbf{{0}};\textbf{{0}};\textbf{{0}};\textbf{{0}};\textbf{{0}};\textbf{{0}};\textbf{{0}}
+# max;{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0}
+# min;{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0}
 # $\centernot{\texttt{Δ}}$-cuts;{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0}
-# removed;{10};{10};{0};{0};{10};{10};{10};{10};{10};{10};{10};{10};{10};{10};{10};{10};{10};{10};{10}
+# removed;{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0};{0}
 objective;;;;;;;;;;;;;;;;;;;
-bound;\textbf{-967};\textbf{-967};\textbf{-967};\textbf{-967};\textbf{-967};\textbf{-967};\textbf{-967};\textbf{-967};\textbf{-967};\textbf{-967};\textbf{-967};\textbf{-967};\textbf{-967};\textbf{-967};\textbf{-967};\textbf{-967};\textbf{-967};\textbf{-967};\textbf{-967}
+bound;\textbf{0};\textbf{0};\textbf{0};\textbf{0};\textbf{0};\textbf{0};\textbf{0};\textbf{0};\textbf{0};\textbf{0};\textbf{0};\textbf{0};\textbf{0};\textbf{0};\textbf{0};\textbf{0};\textbf{0};\textbf{0};\textbf{0}
 gap;$\mathbf{0.0%}^{*}$;$\mathbf{0.0%}^{*}$;$\mathbf{0.0%}^{*}$;$\mathbf{0.0%}^{*}$;$\mathbf{0.0%}^{*}$;$\mathbf{0.0%}^{*}$;$\mathbf{0.0%}^{*}$;$\mathbf{0.0%}^{*}$;$\mathbf{0.0%}^{*}$;$\mathbf{0.0%}^{*}$;$\mathbf{0.0%}^{*}$;$\mathbf{0.0%}^{*}$;$\mathbf{0.0%}^{*}$;$\mathbf{0.0%}^{*}$;$\mathbf{0.0%}^{*}$;$\mathbf{0.0%}^{*}$;$\mathbf{0.0%}^{*}$;$\mathbf{0.0%}^{*}$;$\mathbf{0.0%}^{*}$
 time;;;;;;;;;;;;;;;;;;;
 total \si[per-mode=symbol]{\per\second};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001};\textbf{0.001}

@@ -165,9 +165,9 @@ def single_instance_analysis(instance_name, rc_list, update_csv):
         for i in range(len(gaps)):
             (integral, mark) = (integrals[i], mark_indices[i])
             if integral:
-                gaps[i] = f"$\\bm{{{gaps[i]:.1%}}}^{{*}}$"
+                gaps[i] = f"$\\mathbf{{{gaps[i]:.1%}}}^{{*}}$"
             elif mark:
-                gaps[i] = f"$\\bm{{{gaps[i]:.1%}}}$"
+                gaps[i] = f"$\\mathbf{{{gaps[i]:.1%}}}$"
             else:
                 gaps[i] = f"{gaps[i]:.1%}"
 

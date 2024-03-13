@@ -14,11 +14,11 @@ The structure of the document is as follows:
 		\toprule
 		Section & Topic \\
 		\midrule
-		\cref{sec:separation}& Separation routines for some classes of inequalities \\
-		\cref{sec:data}& Instances used for computational experiments \\
-		\cref{sec:experiments}& Setup, overall procedure and configuration of the algorithm \\
-		\cref{sec:empirical_results}& Empirical results from our experiments \\
-		\cref{sec:discussion}& Conclusion \\
+		\Cref{sec:separation}& Separation routines for some classes of inequalities \\
+		\Cref{sec:data}& Instances used for computational experiments \\
+		\Cref{sec:experiments}& Setup, overall procedure and configuration of the algorithm \\
+		\Cref{sec:empirical_results}& Empirical results from our experiments \\
+		\Cref{sec:discussion}& Conclusion \\
 		\bottomrule
 	\end{tabular}
 	\vspace{10pt}
@@ -37,7 +37,7 @@ The objective is to cluster a given set of objects with respect to their pairwis
 \end{definition}
 A clique partitioning $A$ consists precisely of the edges that connect vertices within the same block $W_i$ of the partition $\Gamma$.
 Thus, every clique partitioning $A$ induces an equivalence relation $\sim_A$ on $V$.
-\cref{fig:example_clique_partitioning} shows an example of a clique partitioning.
+\Cref{fig:example_clique_partitioning} shows an example of a clique partitioning.
 
 \begin{figure}[H]
 	\centering
@@ -144,9 +144,9 @@ The main difference is that for some clique partitioning $A$ of $K_{n}$, the cor
 For any edge $e \in E_{n}$ the value $x_{e} = 1$ for the multicut variable means that $e$ is part of the multicut, \ie not part of the correpsonding clique partitioning, and vice versa.
 We therefore get the following relation between the \CP polytope $\mathscr{P}_{n}$ and the \MC polytope $\mathscr{M}_{n}$:
 \[
-	\mathscr{M}_{n} = \left\{ \mathbbm{1}^{E_{n}} - x \mid x \in \mathscr{P}_{n} \right\}
+	\mathscr{M}_{n} = \left\{ \mathbb{1}^{E_{n}} - x \mid x \in \mathscr{P}_{n} \right\}
 \]
-where $\mathbbm{1}^{E_{n}}$ denotes the vector of dimension $\lvert E_{n} \rvert$ with all entries equal to $1$.
+where $\mathbb{1}^{E_{n}}$ denotes the vector of dimension $\lvert E_{n} \rvert$ with all entries equal to $1$.
 
 Furthermore, the \MC problem is seldom restricted to the case of complete graphs.
 However, any results obtained for the \MC problem of the complete graph can be easily transferred to the \CP problem and vice versa.

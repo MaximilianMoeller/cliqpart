@@ -3,7 +3,7 @@
 
 \section{Empirical Data}\label{sec:empirical_data}
 
-\newcommand{\mycsvtable}[1]{
+\NewDocumentCommand{\mycsvtable}{ m }{
 	\resizebox{\linewidth}{!}{
 		\csvreader[
 			separator=semicolon,
@@ -32,7 +32,7 @@
 \label{tab:cetacea}
 \end{table}
 
-\cref{tab:cetacea} shows the empirical results for the \texttt{cetacea} data set.
+\Cref{tab:cetacea} shows the empirical results for the \texttt{cetacea} data set.
 The table is organized as follows:
 \begin{itemize}
 	\item 1: Each column contains statistics for one \textit{run configuration} (cf.\ \cref{subsec:run_configurations}),
