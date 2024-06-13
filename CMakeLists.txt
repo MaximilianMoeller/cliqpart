@@ -8,6 +8,20 @@ project(cliqpart
         DESCRIPTION "Implementation of a branch and cut algorithm for the clique partitioning problem."
         LANGUAGES CXX)
 
+# creates a `compile_commands.json`, which is used by further clang tooling.
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+# symlink the createy compile_commands.json
+if (PROJECT_IS_TOP_LEVEL AND UNIX)
+    execute_process(
+		# ${CMAKE_COMMAND} is just the `cmake`-binary
+		# -E makes `cmake` run a command-line tool
+		# `create_symlink` is such a command-line tool
+        COMMAND ${CMAKE_COMMAND} -E create_symlink
+            ${CMAKE_BINARY_DIR}/compile_commands.json
+            ${CMAKE_CURRENT_SOURCE_DIR}/compile_commands.json
+    )
+endif()
+
 option(CXX "enable C++ compilation" ON)
 enable_language(CXX)
 set(CMAKE_CXX_STANDARD 17)

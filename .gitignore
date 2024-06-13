@@ -2,6 +2,7 @@
 cliqpart
 cliqpart_r
 log*
+compile_commands.json
 
 # instances
 random_*
